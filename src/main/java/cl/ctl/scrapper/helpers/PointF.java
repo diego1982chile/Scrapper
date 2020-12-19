@@ -1,4 +1,4 @@
-package cl.dsoto.helpers;
+package cl.ctl.scrapper.helpers;
 
 /**
  * Created by des01c7 on 15-12-20.

@@ -1,4 +1,4 @@
-package cl.dsoto.helpers;
+package cl.ctl.scrapper.helpers;
 
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;

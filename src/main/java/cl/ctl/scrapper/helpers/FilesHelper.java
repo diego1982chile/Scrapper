@@ -1,15 +1,12 @@
-package cl.dsoto.helpers;
+package cl.ctl.scrapper.helpers;
 
-import cl.dsoto.model.FileControl;
+import cl.ctl.scrapper.model.FileControl;
 import org.apache.commons.lang.SystemUtils;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.File;
 import java.io.FileReader;
-import java.nio.file.Files;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Arrays;

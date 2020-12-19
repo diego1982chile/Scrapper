@@ -1,4 +1,4 @@
-package cl.dsoto.model;
+package cl.ctl.scrapper.model;
 
 /**
  * Created by des01c7 on 18-12-20.

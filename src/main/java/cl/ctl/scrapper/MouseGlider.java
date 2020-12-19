@@ -1,20 +1,10 @@
-package cl.dsoto;
+package cl.ctl.scrapper;
 
-import cl.dsoto.scrappers.ConstrumartScrapper;
-import cl.dsoto.scrappers.EasyScrapper;
+import cl.ctl.scrapper.scrappers.ConstrumartScrapper;
 import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.*;
 
-import org.openqa.selenium.firefox.*;
-
-import java.awt.*;
-import java.awt.Rectangle;
 import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.*;
-
-import static umontreal.ssj.functionfit.BSpline.createInterpBSpline;
 
 /**
  * Created by root on 07-12-20.

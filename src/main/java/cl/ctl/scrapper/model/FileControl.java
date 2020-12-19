@@ -1,4 +1,4 @@
-package cl.dsoto.model;
+package cl.ctl.scrapper.model;
 
 import java.util.ArrayList;
 import java.util.List;

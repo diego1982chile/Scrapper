@@ -1,4 +1,4 @@
-package cl.dsoto.helpers;
+package cl.ctl.scrapper.helpers;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;

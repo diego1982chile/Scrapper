@@ -1,7 +1,6 @@
-package cl.dsoto.scrappers;
+package cl.ctl.scrapper.scrappers;
 
-import cl.dsoto.helpers.CaptchaSolver;
-import cl.dsoto.helpers.FilesHelper;
+import cl.ctl.scrapper.helpers.FilesHelper;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.lang.SystemUtils;
 import org.openqa.selenium.By;
@@ -12,7 +11,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.awt.*;

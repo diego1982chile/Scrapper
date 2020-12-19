@@ -1,7 +1,7 @@
-package cl.dsoto.scrappers;
+package cl.ctl.scrapper.scrappers;
 
-import cl.dsoto.helpers.CaptchaSolver;
-import cl.dsoto.helpers.FilesHelper;
+import cl.ctl.scrapper.helpers.CaptchaSolver;
+import cl.ctl.scrapper.helpers.FilesHelper;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -13,11 +13,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.security.GeneralSecurityException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by des01c7 on 16-12-20.

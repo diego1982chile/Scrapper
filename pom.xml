@@ -81,7 +81,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>cl.dsoto.MouseGlider</mainClass>
+                            <mainClass>cl.ctl.scrapper.MouseGlider</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -107,7 +107,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>cl.dsoto.MouseGlider</mainClass>
+                            <mainClass>cl.ctl.scrapper.MouseGlider</mainClass>
                         </manifest>
                     </archive>
                     <appendAssemblyId>false</appendAssemblyId>

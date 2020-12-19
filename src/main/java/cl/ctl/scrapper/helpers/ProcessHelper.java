@@ -1,6 +1,6 @@
-package cl.dsoto.helpers;
+package cl.ctl.scrapper.helpers;
 
-import cl.dsoto.model.FileControl;
+import cl.ctl.scrapper.model.FileControl;
 
 import java.util.ArrayList;
 import java.util.List;
