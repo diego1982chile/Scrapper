@@ -10,8 +10,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.sikuli.basics.Settings;
+import org.sikuli.script.*;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -30,7 +33,14 @@ public class ConstrumartScrapper {
     LocalDate processDate  = LocalDate.now().minusDays(1);
     private static final String CADENA = "Construmart";
 
-    public ConstrumartScrapper() {
+    FilesHelper filesHelper;
+
+    Screen screen;
+    static final String SCREENSHOTS_PATH = "Construmart/Screenshots";
+
+    public ConstrumartScrapper() throws Exception {
+
+        filesHelper = new FilesHelper();
 
         WebDriverManager.chromedriver().setup();
 
@@ -84,9 +94,8 @@ public class ConstrumartScrapper {
     }
 
     public void scrap() throws Exception {
-        driver.get(URL);
 
-        FilesHelper filesHelper = new FilesHelper();
+        driver.get(URL);
 
         // *Login
         login();
@@ -107,12 +116,7 @@ public class ConstrumartScrapper {
         generateScrap(processDate.getDayOfMonth(), 1);
         filesHelper.renameLastDownloadedFile(CADENA, "DAY");
 
-        Thread.sleep(2000);
-
-        // Cerrar Tab
-        closeTab();
-
-        Thread.sleep(2000);
+        Thread.sleep( 10000);
 
         // Generar Scrap Mensual
         generateScrap(1, 2);
@@ -125,16 +129,7 @@ public class ConstrumartScrapper {
             filesHelper.renameLastDownloadedFile(CADENA, "WEEK");
         }
 
-        // PROCESAMIENTO ARCHIVOS DESCARGADOS
-        filesHelper.processFiles();
-
-        // Descomprimir archivos descargados
-
-        // Renombrar archivos dentro de las carpetas descomprimidas
-
-        // Mover archivos a carpeta padre
-
-        // Subir archivos a servidor
+        driver.quit();
     }
 
     private void login() {
@@ -175,28 +170,36 @@ public class ConstrumartScrapper {
     }
 
     private void generateScrap(int startDay, int count) throws InterruptedException {
+
+        screen = new Screen();
+
+        String name =  ConstrumartScrapper.class.getCanonicalName();
+
+        ImagePath.add(name + "/Construmart/Screenshots");
+
+        Settings.MinSimilarity = 0.6;
+
+        boolean flag = true;
+
+        int cont = 0;
+
         // GoTo Comercial
-        while(true) {
+        while(cont < 10) {
             try {
-                WebElement menuCommerce = driver.findElement(By.xpath("//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']")).findElements(By.cssSelector("span:nth-child(3)")).get(0);
-                WebDriverWait wait = new WebDriverWait(driver, 10);
-                wait.until(ExpectedConditions.elementToBeClickable(menuCommerce));
+                cont++;
+
+                screen.click("comercial");
 
                 Thread.sleep(2000);
 
-                menuCommerce.click();
+                screen.click("ventas");
 
-                Thread.sleep(2000);
+                Thread.sleep(5000);
 
-                WebElement submenuCommerce = driver.findElement(By.xpath("//div[@class='v-menubar-submenu v-widget mainMenuBar v-menubar-submenu-mainMenuBar v-has-width']")).findElements(By.cssSelector("span:nth-child(1)")).get(0);
-                wait = new WebDriverWait(driver, 10);
-                wait.until(ExpectedConditions.elementToBeClickable(submenuCommerce));
-
-                Thread.sleep(2000);
-
-                submenuCommerce.click();
+                screen.click("cerrar");
 
                 break;
+
             }
             catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -204,102 +207,96 @@ public class ConstrumartScrapper {
 
         }
 
-        Thread.sleep(3000);
+        Thread.sleep(10000);
 
-        Actions actions;
+        cont = 0;
 
-        String check1Id = "";
-        String check2Id = "";
-
-        switch(count) {
-            case 1:
-                check1Id = "gwt-uid-8";
-                check2Id = "gwt-uid-9";
-                break;
-            case 2:
-                check1Id = "gwt-uid-25";
-                check2Id = "gwt-uid-26";
-                break;
-            case 3:
-                check1Id = "gwt-uid-37";
-                check2Id = "gwt-uid-38";
-                break;
-        }
-
-        // *SelectParameters
-        while(true) {
+        // Select parameters
+        while(cont < 10) {
             try {
-                WebElement checkDisplayStock = driver.findElement(By.xpath("//input[@id='" + check1Id + "']"));
-                actions = new Actions(driver);
-                actions.moveToElement(checkDisplayStock).click().build().perform();
+                cont++;
 
-                Thread.sleep(1000);
+                screen.click("solo_productos_activos");
 
-                WebElement excludeProductsWithoutStock = driver.findElement(By.xpath("//input[@id='" + check2Id + "']"));
-                actions = new Actions(driver);
-                actions.moveToElement(excludeProductsWithoutStock).click().build().perform();
+                Thread.sleep(2000);
 
-                Thread.sleep(1000);
+                screen.click("excluir_productos_sin_ventas");
 
-                WebElement sinceCalendar = driver.findElement(By.xpath("//button[@class='v-datefield-button']"));
+                Thread.sleep(2000);
 
-                sinceCalendar.click();
+                screen.click("desde");
 
-                Thread.sleep(1000);
+                Thread.sleep(2000);
 
-                WebElement day = driver.findElement(By.xpath("//span[text()='" + startDay + "']"));
-                actions = new Actions(driver);
-                actions.moveToElement(day).click().build().perform();
+                screen.click(String.valueOf(startDay));
+
+                Thread.sleep(2000);
+
+                screen.click("generar_informe");
 
                 break;
+
+
             }
             catch (Exception e) {
+
                 System.out.println(e.getMessage());
             }
 
         }
 
-        Thread.sleep(1000);
+        Thread.sleep(10000);
 
-        // GenerateFile
+        cont = 0;
 
-        while(true) {
+        // Download file
+        while(cont < 10) {
             try {
-                WebElement generateReport = driver.findElement(By.xpath("//div[@class='v-button v-widget btn-filter-search v-button-btn-filter-search']"));
-                actions = new Actions(driver);
-                actions.moveToElement(generateReport).click().build().perform();
+                cont++;
 
-                Thread.sleep(20000);
+                screen.click("descargar_reporte");
 
-                WebElement downloadReportMenu = driver.findElement(By.xpath("//div[@class='v-button v-widget toolbar-button v-button-toolbar-button bbr-popupbutton']"));
-                actions = new Actions(driver);
-                actions.moveToElement(downloadReportMenu).click().build().perform();
+                Thread.sleep(10000);
 
-                Thread.sleep(2000);
+                screen.click("si");
 
-                WebElement downloadReportOption = driver.findElement(By.xpath("//div[@class='v-verticallayout v-layout v-vertical v-widget v-has-width v-margin-right v-margin-left']")).findElements(By.cssSelector("div:nth-child(2)")).get(0);
-                actions = new Actions(driver);
-                actions.moveToElement(downloadReportOption).click().build().perform();
+                Thread.sleep(10000);
 
-                Thread.sleep(2000);
+                screen.click("guardar");
 
-                WebElement downloadReportButton = driver.findElement(By.xpath("//div[@class='v-button v-widget primary v-button-primary btn-generic v-button-btn-generic v-has-width']"));
-                actions = new Actions(driver);
-                actions.moveToElement(downloadReportButton).click().build().perform();
+                Thread.sleep(10000);
 
-                Thread.sleep(30000);
+                screen.type(Key.HOME);
 
-                WebElement downloadReportLink = driver.findElement(By.xpath("//div[@class='v-horizontallayout v-layout v-horizontal v-widget']")).findElements(By.xpath("//div[@class='v-slot']")).get(0).findElements(By.xpath("//div[@class='v-link v-widget']")).get(0);
-                actions = new Actions(driver);
-                actions.moveToElement(downloadReportLink).click().build().perform();
+                Thread.sleep(5000);
+
+                screen.type(filesHelper.getDownloadPath());
+
+                Thread.sleep(5000);
+
+                screen.type(Key.ENTER);
+
+                Thread.sleep(5000);
+
+                screen.click("cerrar_descarga");
+
+                Thread.sleep(5000);
+
+                screen.click("cerrar_ventas");
 
                 break;
+
             }
             catch (Exception e) {
+
                 System.out.println(e.getMessage());
             }
 
         }
+
+
+
+
     }
 
 }

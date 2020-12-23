@@ -122,4 +122,8 @@ public class FilesHelper {
         ProcessHelper.getInstance().registerFileControl(new FileControl(processDay, dayOfWeekProcess, dayOfWeek, frequency, holding, fileNameShort, status));
     }
 
+    public String getDownloadPath() {
+        return DOWNLOAD_PATH + SEPARATOR;
+    }
+
 }

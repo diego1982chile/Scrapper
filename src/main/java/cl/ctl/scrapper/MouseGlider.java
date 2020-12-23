@@ -1,6 +1,7 @@
 package cl.ctl.scrapper;
 
 import cl.ctl.scrapper.scrappers.ConstrumartScrapper;
+import cl.ctl.scrapper.scrappers.SodimacScrapper;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -22,9 +23,13 @@ public class MouseGlider {
 
         //easyScrapper.scrap();
 
-        ConstrumartScrapper construmartScrapper = new ConstrumartScrapper();
+        //ConstrumartScrapper construmartScrapper = new ConstrumartScrapper();
 
-        construmartScrapper.scrap();
+        //construmartScrapper.scrap();
+
+        SodimacScrapper sodimacScrapper = new SodimacScrapper();
+
+        sodimacScrapper.scrap();
 
     }
 

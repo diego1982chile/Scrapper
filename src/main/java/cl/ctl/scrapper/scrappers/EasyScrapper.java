@@ -87,16 +87,7 @@ public class EasyScrapper {
             filesHelper.renameLastDownloadedFile(CADENA, "WEEK");
         }
 
-        // PROCESAMIENTO ARCHIVOS DESCARGADOS
-        filesHelper.processFiles();
-
-        // Descomprimir archivos descargados
-
-        // Renombrar archivos dentro de las carpetas descomprimidas
-
-        // Mover archivos a carpeta padre
-
-        // Subir archivos a servidor
+        driver.quit();
     }
 
     private void login() {
