@@ -13,6 +13,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
@@ -42,8 +43,6 @@ public class EasyScrapper {
 
         driver.get(URL);
 
-        FilesHelper filesHelper = new FilesHelper();
-
         // *SolveCaptcha
         CaptchaSolver captchaSolver = new CaptchaSolver(driver, URL);
         captchaSolver.solveCaptcha();
@@ -67,7 +66,8 @@ public class EasyScrapper {
 
         // Generar Scrap Diario
         generateScrap(processDate.getDayOfMonth(), 1);
-        filesHelper.renameLastDownloadedFile(CADENA, "DAY");
+        Thread.sleep(5000);
+        FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "DAY");
 
         Thread.sleep(2000);
 
@@ -78,13 +78,15 @@ public class EasyScrapper {
 
         // Generar Scrap Mensual
         generateScrap(1, 2);
-        filesHelper.renameLastDownloadedFile(CADENA, "MONTH");
+        Thread.sleep(5000);
+        FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "MONTH");
 
         // Si es proceso de Domingo
         // Generar Scrap Semanal
         if(processDate.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
             generateScrap(processDate.minusDays(7).getDayOfMonth(), 3);
-            filesHelper.renameLastDownloadedFile(CADENA, "WEEK");
+            Thread.sleep(5000);
+            FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "WEEK");
         }
 
         driver.quit();
@@ -111,7 +113,6 @@ public class EasyScrapper {
 
     private void closeTab() throws InterruptedException {
         driver.findElement(By.xpath("//span[@class='v-tabsheet-caption-close']")).click();
-
         Thread.sleep(5000);
     }
 

@@ -94,5 +94,6 @@
     <orderEntry type="library" name="Maven: org.slf4j:jcl-over-slf4j:1.7.28" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:log4j-over-slf4j:1.7.28" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-nop:1.7.28" level="project" />
+    <orderEntry type="library" name="Maven: net.lingala.zip4j:zip4j:2.6.1" level="project" />
   </component>
 </module>

@@ -33,14 +33,10 @@ public class ConstrumartScrapper {
     LocalDate processDate  = LocalDate.now().minusDays(1);
     private static final String CADENA = "Construmart";
 
-    FilesHelper filesHelper;
-
     Screen screen;
     static final String SCREENSHOTS_PATH = "Construmart/Screenshots";
 
     public ConstrumartScrapper() throws Exception {
-
-        filesHelper = new FilesHelper();
 
         WebDriverManager.chromedriver().setup();
 
@@ -114,19 +110,19 @@ public class ConstrumartScrapper {
 
         // Generar Scrap Diario
         generateScrap(processDate.getDayOfMonth(), 1);
-        filesHelper.renameLastDownloadedFile(CADENA, "DAY");
+        FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "DAY");
 
         Thread.sleep( 10000);
 
         // Generar Scrap Mensual
         generateScrap(1, 2);
-        filesHelper.renameLastDownloadedFile(CADENA, "MONTH");
+        FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "MONTH");
 
         // Si es proceso de Domingo
         // Generar Scrap Semanal
         if(processDate.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
             generateScrap(processDate.minusDays(7).getDayOfMonth(), 3);
-            filesHelper.renameLastDownloadedFile(CADENA, "WEEK");
+            FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "WEEK");
         }
 
         driver.quit();
@@ -270,7 +266,7 @@ public class ConstrumartScrapper {
 
                 Thread.sleep(5000);
 
-                screen.type(filesHelper.getDownloadPath());
+                screen.type(FilesHelper.getInstance().getDownloadPath());
 
                 Thread.sleep(5000);
 
@@ -293,9 +289,6 @@ public class ConstrumartScrapper {
             }
 
         }
-
-
-
 
     }
 

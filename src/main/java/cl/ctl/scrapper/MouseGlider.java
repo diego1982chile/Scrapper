@@ -1,6 +1,8 @@
 package cl.ctl.scrapper;
 
+import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.scrappers.ConstrumartScrapper;
+import cl.ctl.scrapper.scrappers.EasyScrapper;
 import cl.ctl.scrapper.scrappers.SodimacScrapper;
 import org.apache.commons.io.FileUtils;
 
@@ -12,55 +14,24 @@ import java.util.*;
  */
 public class MouseGlider {
 
-    static Random r = new Random();
-    static int low = 10;
-    static int high = 100;
-
     public static void main(String... args) throws Exception {
 
 
-        //EasyScrapper easyScrapper = new EasyScrapper(driver);
+        ConstrumartScrapper construmartScrapper = new ConstrumartScrapper();
 
-        //easyScrapper.scrap();
+        construmartScrapper.scrap();
 
-        //ConstrumartScrapper construmartScrapper = new ConstrumartScrapper();
+        EasyScrapper easyScrapper = new EasyScrapper();
 
-        //construmartScrapper.scrap();
+        easyScrapper.scrap();
 
         SodimacScrapper sodimacScrapper = new SodimacScrapper();
 
         sodimacScrapper.scrap();
 
-    }
+        FilesHelper.getInstance().processFiles();
 
 
-    // get a file from the resources folder
-    // works everywhere, IDEA, unit test and JAR file.
-    private File getFileFromResourceAsStream(String fileName) {
-
-        final String FILE_TO = "buster_captcha_solver_for_humans-1.1.0-an+fx.xpi";
-
-        // The class loader that loaded the class
-        InputStream inputStream = getClass().getResourceAsStream(fileName);
-
-        // the stream holding the file content
-        if (inputStream == null) {
-            throw new IllegalArgumentException("file not found! " + fileName);
-        } else {
-            //return inputStream;
-            // commons-io
-            try {
-                File file = new File(FILE_TO);
-
-                FileUtils.copyInputStreamToFile(inputStream, file);
-
-                return file;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return null;
     }
 
 

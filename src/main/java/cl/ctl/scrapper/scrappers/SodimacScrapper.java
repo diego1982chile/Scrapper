@@ -13,6 +13,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
@@ -42,8 +43,6 @@ public class SodimacScrapper {
 
         driver.get(URL);
 
-        FilesHelper filesHelper = new FilesHelper();
-
         // *Login
         login();
 
@@ -51,7 +50,7 @@ public class SodimacScrapper {
 
         // Generar Scrap Diario
         generateScrap(processDate.getDayOfMonth());
-        filesHelper.renameLastDownloadedFile(CADENA, "DAY");
+        FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "DAY");
 
         Thread.sleep(2000);
 
@@ -80,11 +79,34 @@ public class SodimacScrapper {
         // GoTo Comercial
         driver.switchTo().frame(0);
 
+        driver.switchTo().parentFrame();
+
+        Actions actions = new Actions(driver);
+        actions.moveToElement(driver.findElement(By.id("Bar2"))).perform();
+
         Thread.sleep(3000);
 
-        driver.findElement(By.id("Bar2"));
+        driver.findElement(By.id("menuItem223_6")).click();
 
         Thread.sleep(3000);
+
+        long numberOfFiles = FilesHelper.getInstance().countFiles();
+        boolean flag = true;
+
+        while(flag) {
+            try {
+                driver.findElement(By.className("tablaDatos")).findElements(By.tagName("tbody")).get(0).findElements(By.tagName("tr")).get(0).findElements(By.tagName("td")).get(0).findElements(By.tagName("a")).get(0).click();
+
+                Thread.sleep(5000);
+
+                if(FilesHelper.getInstance().countFiles() > numberOfFiles) {
+                   flag = false;
+                }
+            }
+            catch(Exception e) {
+                throw e;
+            }
+        }
     }
 
 }
