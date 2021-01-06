@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cl.dsoto</groupId>
-    <artifactId>ui-mouse-robot</artifactId>
+    <artifactId>Scrapper</artifactId>
     <version>1.0-SNAPSHOT</version>
 
 
@@ -18,30 +18,6 @@
 
     <dependencies>
 
-        <!--dependency>
-            <groupId>org.uma.jmetal</groupId>
-            <artifactId>jmetal-core</artifactId>
-            <version>5.7-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.uma.jmetal</groupId>
-            <artifactId>jmetal-algorithm</artifactId>
-            <version>5.7-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.uma.jmetal</groupId>
-            <artifactId>jmetal-problem</artifactId>
-            <version>5.7-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.uma.jmetal</groupId>
-            <artifactId>jmetal-exec</artifactId>
-            <version>5.7-SNAPSHOT</version>
-        </dependency-->
-
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
@@ -52,12 +28,6 @@
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
             <version>4.2.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>ca.umontreal.iro.simul</groupId>
-            <artifactId>ssj</artifactId>
-            <version>3.1.0</version>
         </dependency>
 
         <dependency>
@@ -86,6 +56,20 @@
             <version>2.6.1</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/javax.mail/mail -->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.jcraft/jsch -->
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.55</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -100,7 +84,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>cl.ctl.scrapper.MouseGlider</mainClass>
+                            <mainClass>cl.ctl.scrapper.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -128,7 +112,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>cl.ctl.scrapper.MouseGlider</mainClass>
+                            <mainClass>cl.ctl.scrapper.Main</mainClass>
                         </manifest>
                     </archive>
                     <appendAssemblyId>false</appendAssemblyId>

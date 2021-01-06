@@ -1,2 +1,100 @@
-dic 24, 2020 1:07:54 AM cl.ctl.scrapper.helpers.FilesHelper renameLastDownloadedFile
-INFORMACIÓN: Moviendo archivo cadena = Construmart frecuencia = DAY
+ene 05, 2021 10:27:18 PM cl.ctl.scrapper.scrappers.ConstrumartScrapper generateScrap
+GRAVE: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']"}
+  (Session info: chrome=87.0.4280.88)
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
+System info: host: 'DESKTOP-PPQDG3J', ip: '10.0.2.15', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '1.8.0_271'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 87.0.4280.88, chrome: {chromedriverVersion: 87.0.4280.88 (89e2380a3e36c..., userDataDir: C:\Users\HOME-U~1\AppData\L...}, goog:chromeOptions: {debuggerAddress: localhost:49894}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:virtualAuthenticators: true}
+Session ID: 76da5f6a5f20fb972d71c1eeb086cb9f
+*** Element info: {Using=xpath, value=//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']}
+ene 05, 2021 10:27:18 PM cl.ctl.scrapper.scrappers.ConstrumartScrapper generateScrap
+GRAVE: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']"}
+  (Session info: chrome=87.0.4280.88)
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
+System info: host: 'DESKTOP-PPQDG3J', ip: '10.0.2.15', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '1.8.0_271'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 87.0.4280.88, chrome: {chromedriverVersion: 87.0.4280.88 (89e2380a3e36c..., userDataDir: C:\Users\HOME-U~1\AppData\L...}, goog:chromeOptions: {debuggerAddress: localhost:49894}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:virtualAuthenticators: true}
+Session ID: 76da5f6a5f20fb972d71c1eeb086cb9f
+*** Element info: {Using=xpath, value=//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']}
+ene 05, 2021 10:27:18 PM cl.ctl.scrapper.scrappers.ConstrumartScrapper generateScrap
+GRAVE: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']"}
+  (Session info: chrome=87.0.4280.88)
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
+System info: host: 'DESKTOP-PPQDG3J', ip: '10.0.2.15', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '1.8.0_271'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 87.0.4280.88, chrome: {chromedriverVersion: 87.0.4280.88 (89e2380a3e36c..., userDataDir: C:\Users\HOME-U~1\AppData\L...}, goog:chromeOptions: {debuggerAddress: localhost:49894}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:virtualAuthenticators: true}
+Session ID: 76da5f6a5f20fb972d71c1eeb086cb9f
+*** Element info: {Using=xpath, value=//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']}
+ene 05, 2021 10:27:18 PM cl.ctl.scrapper.scrappers.ConstrumartScrapper generateScrap
+GRAVE: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']"}
+  (Session info: chrome=87.0.4280.88)
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
+System info: host: 'DESKTOP-PPQDG3J', ip: '10.0.2.15', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '1.8.0_271'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 87.0.4280.88, chrome: {chromedriverVersion: 87.0.4280.88 (89e2380a3e36c..., userDataDir: C:\Users\HOME-U~1\AppData\L...}, goog:chromeOptions: {debuggerAddress: localhost:49894}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:virtualAuthenticators: true}
+Session ID: 76da5f6a5f20fb972d71c1eeb086cb9f
+*** Element info: {Using=xpath, value=//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']}
+ene 05, 2021 10:27:18 PM cl.ctl.scrapper.scrappers.ConstrumartScrapper generateScrap
+GRAVE: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']"}
+  (Session info: chrome=87.0.4280.88)
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
+System info: host: 'DESKTOP-PPQDG3J', ip: '10.0.2.15', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '1.8.0_271'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 87.0.4280.88, chrome: {chromedriverVersion: 87.0.4280.88 (89e2380a3e36c..., userDataDir: C:\Users\HOME-U~1\AppData\L...}, goog:chromeOptions: {debuggerAddress: localhost:49894}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:virtualAuthenticators: true}
+Session ID: 76da5f6a5f20fb972d71c1eeb086cb9f
+*** Element info: {Using=xpath, value=//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']}
+ene 05, 2021 10:27:18 PM cl.ctl.scrapper.scrappers.ConstrumartScrapper generateScrap
+GRAVE: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']"}
+  (Session info: chrome=87.0.4280.88)
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
+System info: host: 'DESKTOP-PPQDG3J', ip: '10.0.2.15', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '1.8.0_271'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 87.0.4280.88, chrome: {chromedriverVersion: 87.0.4280.88 (89e2380a3e36c..., userDataDir: C:\Users\HOME-U~1\AppData\L...}, goog:chromeOptions: {debuggerAddress: localhost:49894}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:virtualAuthenticators: true}
+Session ID: 76da5f6a5f20fb972d71c1eeb086cb9f
+*** Element info: {Using=xpath, value=//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']}
+ene 05, 2021 10:27:18 PM cl.ctl.scrapper.scrappers.ConstrumartScrapper generateScrap
+GRAVE: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']"}
+  (Session info: chrome=87.0.4280.88)
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
+System info: host: 'DESKTOP-PPQDG3J', ip: '10.0.2.15', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '1.8.0_271'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 87.0.4280.88, chrome: {chromedriverVersion: 87.0.4280.88 (89e2380a3e36c..., userDataDir: C:\Users\HOME-U~1\AppData\L...}, goog:chromeOptions: {debuggerAddress: localhost:49894}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:virtualAuthenticators: true}
+Session ID: 76da5f6a5f20fb972d71c1eeb086cb9f
+*** Element info: {Using=xpath, value=//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']}
+ene 05, 2021 10:27:18 PM cl.ctl.scrapper.scrappers.ConstrumartScrapper generateScrap
+GRAVE: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']"}
+  (Session info: chrome=87.0.4280.88)
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
+System info: host: 'DESKTOP-PPQDG3J', ip: '10.0.2.15', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '1.8.0_271'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 87.0.4280.88, chrome: {chromedriverVersion: 87.0.4280.88 (89e2380a3e36c..., userDataDir: C:\Users\HOME-U~1\AppData\L...}, goog:chromeOptions: {debuggerAddress: localhost:49894}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:virtualAuthenticators: true}
+Session ID: 76da5f6a5f20fb972d71c1eeb086cb9f
+*** Element info: {Using=xpath, value=//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']}
+ene 05, 2021 10:27:18 PM cl.ctl.scrapper.scrappers.ConstrumartScrapper generateScrap
+GRAVE: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']"}
+  (Session info: chrome=87.0.4280.88)
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
+System info: host: 'DESKTOP-PPQDG3J', ip: '10.0.2.15', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '1.8.0_271'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 87.0.4280.88, chrome: {chromedriverVersion: 87.0.4280.88 (89e2380a3e36c..., userDataDir: C:\Users\HOME-U~1\AppData\L...}, goog:chromeOptions: {debuggerAddress: localhost:49894}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:virtualAuthenticators: true}
+Session ID: 76da5f6a5f20fb972d71c1eeb086cb9f
+*** Element info: {Using=xpath, value=//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']}
+ene 05, 2021 10:27:18 PM cl.ctl.scrapper.scrappers.ConstrumartScrapper generateScrap
+GRAVE: no such element: Unable to locate element: {"method":"xpath","selector":"//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']"}
+  (Session info: chrome=87.0.4280.88)
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
+System info: host: 'DESKTOP-PPQDG3J', ip: '10.0.2.15', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '1.8.0_271'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 87.0.4280.88, chrome: {chromedriverVersion: 87.0.4280.88 (89e2380a3e36c..., userDataDir: C:\Users\HOME-U~1\AppData\L...}, goog:chromeOptions: {debuggerAddress: localhost:49894}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:virtualAuthenticators: true}
+Session ID: 76da5f6a5f20fb972d71c1eeb086cb9f
+*** Element info: {Using=xpath, value=//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']}

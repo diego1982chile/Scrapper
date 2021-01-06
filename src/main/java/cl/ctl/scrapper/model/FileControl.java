@@ -8,9 +8,11 @@ import java.util.List;
  */
 public class FileControl {
 
+    String process;
     String processDay;
     String dayOfWeekProcess;
     String dayOfWeek;
+    String executionDay;
     String frequency;
     String holding;
     String fileName;
@@ -18,7 +20,8 @@ public class FileControl {
 
     List<FileControlError> errors = new ArrayList<FileControlError>();
 
-    public FileControl(String processDay, String dayOfWeekProcess, String dayOfWeek, String frequency, String holding, String fileName, String status) {
+    public FileControl(String process, String processDay, String dayOfWeekProcess, String dayOfWeek, String frequency, String holding, String fileName, String status) {
+        this.process = process;
         this.processDay = processDay;
         this.dayOfWeekProcess = dayOfWeekProcess;
         this.dayOfWeek = dayOfWeek;
@@ -90,5 +93,13 @@ public class FileControl {
 
     public void setErrors(List<FileControlError> errors) {
         this.errors = errors;
+    }
+
+    public String getProcess() {
+        return process;
+    }
+
+    public void setProcess(String process) {
+        this.process = process;
     }
 }

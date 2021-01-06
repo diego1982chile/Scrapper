@@ -14,8 +14,13 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  * Created by des01c7 on 16-12-20.
@@ -27,16 +32,36 @@ public class EasyScrapper {
     LocalDate processDate  = LocalDate.now().minusDays(1);
     private static final String CADENA = "Easy";
 
-    public EasyScrapper() {
-        WebDriverManager.chromedriver().setup();
+    /** Logger para la clase */
+    private static final Logger logger = Logger.getLogger(EasyScrapper.class.getName());
+    FileHandler fh;
 
-        ChromeOptions chrome_options = new ChromeOptions();
-        chrome_options.addArguments("--start-maximized");
-        //chrome_options.addArguments("--headless");
-        chrome_options.addArguments("--no-sandbox");
-        chrome_options.addArguments("--disable-dev-shm-usage");
+    public EasyScrapper() throws IOException {
 
-        driver = new ChromeDriver(chrome_options);
+        // This block configure the logger with handler and formatter
+        try {
+            fh = new FileHandler("Scrapper.log");
+            SimpleFormatter formatter = new SimpleFormatter();
+            fh.setFormatter(formatter);
+            logger.addHandler(fh);
+
+            WebDriverManager.chromedriver().setup();
+
+            ChromeOptions chrome_options = new ChromeOptions();
+            chrome_options.addArguments("--start-maximized");
+            //chrome_options.addArguments("--headless");
+            chrome_options.addArguments("--no-sandbox");
+            chrome_options.addArguments("--disable-dev-shm-usage");
+
+            driver = new ChromeDriver(chrome_options);
+
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            throw e;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     public void scrap() throws Exception {
@@ -84,7 +109,7 @@ public class EasyScrapper {
         // Si es proceso de Domingo
         // Generar Scrap Semanal
         if(processDate.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-            generateScrap(processDate.minusDays(7).getDayOfMonth(), 3);
+            generateScrap(processDate.minusDays(6).getDayOfMonth(), 3);
             Thread.sleep(5000);
             FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "WEEK");
         }
@@ -93,32 +118,61 @@ public class EasyScrapper {
     }
 
     private void login() {
-        driver.findElement(By.id("username")).sendKeys("michel.lotissier@legrand.cl");
-        driver.findElement(By.id("password")).sendKeys("diy12easy2020");
-        driver.getPageSource();
-        driver.findElement(By.id("kc-login")).click();
+        try {
+            driver.findElement(By.id("username")).sendKeys("michel.lotissier@legrand.cl");
+            driver.findElement(By.id("password")).sendKeys("diy12easy2020");
+            driver.getPageSource();
+            driver.findElement(By.id("kc-login")).click();
+        }
+        catch(Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
+            throw e;
+        }
     }
 
     private void redirectHome() {
-        driver.get("https://www.cenconlineb2b.com/");
+        try {
+            driver.get("https://www.cenconlineb2b.com/");
+        }
+        catch(Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
+            throw e;
+        }
     }
 
     private void selectCountry() throws InterruptedException {
-        Select pais = new Select(driver.findElement(By.id("pais")));
-        Thread.sleep(3000);
-        pais.selectByValue("chi");
-        Thread.sleep(2000);
-        driver.findElement(By.id("btnIngresar")).click();
+        try {
+            Select pais = new Select(driver.findElement(By.id("pais")));
+            Thread.sleep(3000);
+            pais.selectByValue("chi");
+            Thread.sleep(2000);
+            driver.findElement(By.id("btnIngresar")).click();
+        }
+        catch(Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
+            throw e;
+        }
     }
 
     private void closeTab() throws InterruptedException {
-        driver.findElement(By.xpath("//span[@class='v-tabsheet-caption-close']")).click();
-        Thread.sleep(5000);
+        try {
+            driver.findElement(By.xpath("//span[@class='v-tabsheet-caption-close']")).click();
+            Thread.sleep(5000);
+        }
+        catch(Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
+            throw e;
+        }
     }
 
     private void generateScrap(int startDay, int count) throws InterruptedException {
         // GoTo Comercial
-        while(true) {
+        int cont = 0;
+
+        while(cont < 10) {
+
+            cont++;
+
             try {
                 WebElement menuCommerce = driver.findElement(By.xpath("//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']")).findElements(By.cssSelector("span:nth-child(3)")).get(0);
                 WebDriverWait wait = new WebDriverWait(driver, 10);
@@ -140,8 +194,11 @@ public class EasyScrapper {
 
                 break;
             }
-            catch (Exception e) {
-                System.out.println(e.getMessage());
+            catch(Exception e) {
+                logger.log(Level.SEVERE, e.getMessage());
+                if(cont >= 10) {
+                    throw e;
+                }
             }
 
         }
@@ -163,13 +220,18 @@ public class EasyScrapper {
                 check2Id = "gwt-uid-26";
                 break;
             case 3:
-                check1Id = "gwt-uid-37";
-                check2Id = "gwt-uid-38";
+                check1Id = "gwt-uid-42";
+                check2Id = "gwt-uid-43";
                 break;
         }
 
+        cont = 0;
+
         // *SelectParameters
-        while(true) {
+        while(cont < 10) {
+
+            cont++;
+
             try {
                 WebElement checkDisplayStock = driver.findElement(By.xpath("//input[@id='" + check1Id + "']"));
                 actions = new Actions(driver);
@@ -196,7 +258,10 @@ public class EasyScrapper {
                 break;
             }
             catch (Exception e) {
-                System.out.println(e.getMessage());
+                logger.log(Level.SEVERE, e.getMessage());
+                if(cont >= 10) {
+                    throw e;
+                }
             }
 
         }
@@ -205,7 +270,12 @@ public class EasyScrapper {
 
         // GenerateFile
 
+        cont = 0;
+
         while(true) {
+
+            cont++;
+
             try {
                 WebElement generateReport = driver.findElement(By.xpath("//div[@class='v-button v-widget btn-filter-search v-button-btn-filter-search']"));
                 actions = new Actions(driver);
@@ -238,7 +308,10 @@ public class EasyScrapper {
                 break;
             }
             catch (Exception e) {
-                System.out.println(e.getMessage());
+                logger.log(Level.SEVERE, e.getMessage());
+                if(cont >= 10) {
+                    throw e;
+                }
             }
 
         }

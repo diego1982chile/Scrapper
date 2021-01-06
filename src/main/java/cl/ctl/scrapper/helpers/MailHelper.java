@@ -1,183 +1,224 @@
 package cl.ctl.scrapper.helpers;
 
 import cl.ctl.scrapper.model.FileControl;
-import org.apache.commons.lang.SystemUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileReader;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.TextStyle;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Locale;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-import java.util.regex.Pattern;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.List;
+import java.util.Properties;
 
 /**
- * Created by des01c7 on 17-12-20.
+ * @author Diego Soto
  */
 public class MailHelper {
 
-    String DOWNLOAD_PATH = System.getProperty("user.home");;
-    String DOWNLOAD_PATH_ALT = System.getProperty("user.home");;
-
-    JSONParser parser = new JSONParser();
-    LocalDate processDate  = LocalDate.now().minusDays(1);
-    static String SEPARATOR;
-
-    /** Logger para la clase */
-    private static final Logger logger = Logger.getLogger(MailHelper.class.getName());
-
-    FileHandler fh;
-
     private static final MailHelper instance = new MailHelper();
+
+    private static Session session;
+
+    private static Properties prop;
+
+    //private static final String from = "sistemas@minsal.cl";//"semantikos.minsal@gmail.com";
+
+    private static final String from = "diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
+
+    //private static final String to = "diego.abelardo.soto@gmail.com";
+
+    private static final String to = "cristian.fiedler@fiedler-bi.com";//"semantikos.minsal@gmail.com";
+
+    private static final String username = "diego.abelardo.soto@gmail.com";
+
+    private static final String password = "1eurides9";
+
+    private static final String subject = "CTL - Descarga Scraps: OK";
+
+    //private static String body = "<b>Bienvenido a Semantikos</b><br><br>Una cuenta asociada a este correo ha sido creada. <ul><li>Para activar su cuenta, por favor pinche el siguiente link: <br>%link%</li><li>Su contraseña inicial es: %password%</li><li>Cambie su contraseña inicial</li><li>Configure sus preguntas de seguridad</li></ul>El Equipo Semantikos";
+
+    private static String body; //= "<table style='border-collapse:collapse;table-layout:fixed;min-width:320px;width:100%;background-color:#f5f7fa;' cellpadding='0' cellspacing='0'><tr><td><table style='background:white;border-collapse:collapse;table-layout:fixed;max-width:600px;min-width:320px;width:100%;font-family:Impact, Charcoal, sans-serif;color:#283593' align='center' cellpadding='0' cellspacing='0'><tr><td align='center' style='width:100%' colspan='3'><img src=\"cid:image2\" style='width:230px'></td></tr><tr><td colspan=3 style='padding-left:2em;padding-right:2em'><hr style='padding: 2px; background: #283593;' /><br/><br/>Estimado(a) %username%, una cuenta asociada a este correo ha sido creada en el Sistema.</p><ul><li>Su contraseña inicial es: %password%</li><li>Cambie su contraseña inicial</li><li>Configure sus preguntas de seguridad</li></ul><p>El equipo Semantikos</p><br/></td></tr><tr><td style='width:30%'></td><td style='background: #283593;width:40%;text-align:center;font-family:arial;font-size:13px;border-radius: 15px;-moz-border-radius: 15px;' align='center' height=31><a style='color: white;text-decoration:none;text-align:center' href='%link%'><strong>Activar Cuenta</strong></a></td><td></td></tr><tr><td colspan='3' align='center'><br/><div>©2016 Ministerio de Salud</div></td></tr></table></td></tr></table>";
+
+    BufferedReader reader;
+
+    private static final Logger logger = LoggerFactory.getLogger(MailHelper.class);
+
+    public MailHelper() {
+
+         prop = System.getProperties();
+
+        //Get the session object
+        prop.put("mail.smtp.host", "smtp.gmail.com");
+        prop.put("mail.smtp.port", "587");
+        prop.put("mail.smtp.auth", "true");
+        prop.put("mail.smtp.starttls.enable", "true");
+
+        session = Session.getInstance(prop,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+    }
 
     public static MailHelper getInstance() {
         return instance;
     }
 
-    public MailHelper() {
+    public void sendMail() throws IOException {
 
-        String homePath = System.getProperty("user.home");;
-        String preferencesPath = null;
+        this.body = "";
+        loadMailBody();
 
-        // This block configure the logger with handler and formatter
-        try {
-            fh = new FileHandler("Scrapper.log");
-            SimpleFormatter formatter = new SimpleFormatter();
-            fh.setFormatter(formatter);
-            logger.addHandler(fh);
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        List<FileControl> fileControlList = LogHelper.getInstance().getFileControlList();
+
+        if(!fileControlList.isEmpty()) {
+            this.body = this.body.replace("[Process]", fileControlList.get(0).getProcess());
+            this.body = this.body.replace("[ProcessDay]", fileControlList.get(0).getProcessDay());
+            this.body = this.body.replace("[ProcessWeekDay]", fileControlList.get(0).getDayOfWeekProcess());
+            this.body = this.body.replace("[ExecutionDay]", fileControlList.get(0).getDayOfWeek());
+            this.body = this.body.replace("%email%", to);
         }
 
-        try {
-            if (SystemUtils.IS_OS_LINUX) {
-                preferencesPath = "/.config/google-chrome/Default/Preferences";
-                preferencesPath = homePath + preferencesPath;
-                SEPARATOR = "/";
-            } else if (SystemUtils.IS_OS_WINDOWS) {
-                preferencesPath = "\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Preferences";
-                preferencesPath = homePath + preferencesPath;
-                SEPARATOR = "\\";
-            } else {
-                //throw new Exception("Plataforma no soportada. No se puede determinar el HOME de este sistema");
-                logger.log(Level.SEVERE, "Plataforma no soportada. No se puede determinar el HOME de este sistema");
-            }
+        addRecords();
 
-            JSONObject preferences = (JSONObject) parser.parse(new FileReader(preferencesPath));
+        send();
+    }
 
-            JSONObject download = (JSONObject) preferences.get("download");
+    public void addRecords() {
 
-            String defaultDirectory = (String) download.get("default_directory");
+        String html = "";
 
-            if(defaultDirectory != null) {
-                DOWNLOAD_PATH = defaultDirectory;
-                DOWNLOAD_PATH_ALT = DOWNLOAD_PATH_ALT + SEPARATOR + "Downloads";
-            }
-            else {
-                // Si se alcanzó esta excepción es porque el directorio de descargas corresponde a las descargas del sistema
-                if(Locale.getDefault().toLanguageTag().equals("es-CL")) {
-                    DOWNLOAD_PATH = homePath + SEPARATOR + "Descargas";
+        for (FileControl fileControl : LogHelper.getInstance().getFileControlList()) {
+            String frequency = fileControl.getFrequency();
+            String holding = fileControl.getHolding();
+            String fileName = fileControl.getFileName();
+
+            html = html + "<tr>";
+
+            html = html + "<td style='padding: 0 0 0 0;'>" + frequency + "</td>";
+            html = html + "<td style='padding: 0 0 0 0;'>" + holding + "</td>";
+            html = html + "<td style='padding: 0 0 0 0;'>" + fileName + "</td>";
+
+            html = html + "</tr>";
+        }
+
+        this.body = this.body.replace("[rows]", html);
+    }
+
+    private void send() {
+
+        logger.info("Enviando correo a destinatario: " + to);
+
+        int count = 0;
+        int maxTries = 5;
+
+        while(true) {
+
+            try {
+
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(from));
+                Address toAddress= new InternetAddress(to);
+                message.addRecipient(Message.RecipientType.TO, toAddress);
+                message.setSubject(subject);
+                message.setContent(body, "text/html; charset=utf-8");
+                //Transport.send(message);
+
+                //Transport transport = mySession.getTransport();
+
+                //
+                // This HTML mail have to 2 part, the BODY and the embedded image
+                //
+                MimeMultipart multipart = new MimeMultipart("related");
+
+                // first part  (the html)
+                BodyPart messageBodyPart = new MimeBodyPart();
+                messageBodyPart.setContent(body, "text/html; charset=utf-8");
+
+                // add it
+                multipart.addBodyPart(messageBodyPart);
+
+                // attach images
+                attachImage(multipart, "<image1>", "/Images/Logo_CTL.webp");
+
+                // put everything together
+                message.setContent(multipart);
+
+                //transport.connect();
+                Transport.send(message, message.getRecipients(Message.RecipientType.TO));
+                //transport.close();
+
+                break;
+
+            } catch (Exception e) {
+                // handle exception
+                logger.info((count+1)+"° intento enviando correo a destinatario: " + to + " - " + e.getMessage());
+                if (++count == maxTries) try {
+                    logger.error("Error al enviar correo a destinatario: " + to + " - " + e.getMessage());
+                    throw e;
+                } catch (MessagingException e1) {
+                    logger.error("Error: "+e1.getMessage());
+                    e1.printStackTrace();
                 }
-                if(Locale.getDefault().toLanguageTag().equals("en-US")) {
-                    DOWNLOAD_PATH = homePath + SEPARATOR + "Downloads";
-                }
-                DOWNLOAD_PATH_ALT = DOWNLOAD_PATH_ALT + SEPARATOR + "Downloads";
             }
         }
-        catch (Exception e) {
-            logger.log(Level.SEVERE, e.getMessage());
-        }
-
     }
 
-    public void processFiles() {
-
-        // Descomprimir archivos descargados
-
-
-        // Renombrar archivos dentro de las carpetas descomprimidas
-
-        // Mover archivos a carpeta padre
-
-        // Subir archivos a servidor
-    }
-
-    // Renombrar archivos descargados
-    public void renameLastDownloadedFile(String holding, String frequency) {
+    private void attachImage(MimeMultipart multipart, String cid, String fileName) {
 
         try {
-            String baseName = "Legrand_" + holding;
 
-            switch(frequency) {
-                case "DAY":
-                    baseName = baseName + "_Dia";
-                    break;
-                case "MONTH":
-                    baseName = baseName + "_Mes";
-                    break;
-                case "WEEK":
-                    baseName = baseName + "_Dom";
-                    break;
-            }
+            // second part (the image)
+            BodyPart messageBodyPart = new MimeBodyPart();
 
-            String processName = String.valueOf(processDate.getYear()) + String.valueOf(processDate.getMonthValue()) + String.valueOf(processDate.getDayOfMonth());
+            InputStream stream = this.getClass().getResourceAsStream(fileName);
 
-            File directory = new File(DOWNLOAD_PATH + SEPARATOR + processName);
-
-            if (! directory.exists()){
-                directory.mkdir();
-            }
-
-            String fileName;
-
-            File downloadDir;
-
-            if(holding.equals("Sodimac")) {
-                fileName = DOWNLOAD_PATH + SEPARATOR + processName + SEPARATOR + baseName + "_" + processName + ".txt";
-                downloadDir = new File(DOWNLOAD_PATH_ALT);
-            }
-            else {
-                fileName = DOWNLOAD_PATH + SEPARATOR + processName + SEPARATOR + baseName + "_" + processName + ".zip";
-                downloadDir = new File(DOWNLOAD_PATH);
-            }
-
-            File[] files = downloadDir.listFiles();
-
-            Arrays.sort(files, new Comparator<File>() {
-                public int compare(File f1, File f2)
-                {
-                    return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
+            if (stream == null) {
+                ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                if (classLoader == null) {
+                    classLoader = this.getClass().getClassLoader();
                 }
-            });
 
-            files[0].renameTo(new File(fileName));
+                stream = classLoader.getResourceAsStream(fileName);
+            }
 
-            String processDay = processDate.toString();
-            String dayOfWeekProcess = processDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault());
-            String dayOfWeek = LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault());
-            String fileNameShort = fileName.split(Pattern.quote(SEPARATOR))[fileName.split(Pattern.quote(SEPARATOR)).length - 1];
-            String status = "OK";
+            DataSource ds = new ByteArrayDataSource(stream, "image/*");
 
-            ProcessHelper.getInstance().registerFileControl(new FileControl(processDay, dayOfWeekProcess, dayOfWeek, frequency, holding, fileNameShort, status));
+            messageBodyPart.setDataHandler(new DataHandler(ds));
+            messageBodyPart.setHeader("Content-ID", cid);
+
+            // add it
+            multipart.addBodyPart(messageBodyPart);
         }
-        catch (Exception e) {
-            logger.log(Level.SEVERE, e.getMessage());
+        catch (MessagingException e1) {
+            logger.error("Error: "+e1.getMessage());
+            e1.printStackTrace();
         }
-
+        catch (IOException e1) {
+            logger.error("Error: "+e1.getMessage());
+            e1.printStackTrace();
+        }
     }
 
-    public String getDownloadPath() {
-        return DOWNLOAD_PATH + SEPARATOR;
+    private void loadMailBody() throws IOException {
+        reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/Mail/mail.html")));
+        String line = "";
+        while ((line = reader.readLine()) != null) {
+            if(line.trim().isEmpty()) {
+                continue;
+            }
+            body = body + line;
+        }
+        reader.close();
     }
-
 }

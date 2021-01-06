@@ -1,29 +1,23 @@
 package cl.ctl.scrapper.helpers;
 
 import cl.ctl.scrapper.model.FileControl;
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.lang.SystemUtils;
-import org.json.simple.JSONObject;
+import org.apache.commons.lang.WordUtils;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.Locale;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
 
 /**
  * Created by des01c7 on 17-12-20.
@@ -34,6 +28,8 @@ public class FilesHelper {
 
     String DOWNLOAD_PATH = "C:\\Users\\home-user\\Downloads";
 
+    String PROCESS_NAME;
+
     JSONParser parser = new JSONParser();
     LocalDate processDate  = LocalDate.now().minusDays(1);
     static String SEPARATOR;
@@ -41,7 +37,7 @@ public class FilesHelper {
     /** Logger para la clase */
     private static final Logger logger = Logger.getLogger(FilesHelper.class.getName());
 
-    FileHandler fh;
+    static LogHelper fh = LogHelper.getInstance();
 
     private static final FilesHelper instance = new FilesHelper();
 
@@ -56,9 +52,6 @@ public class FilesHelper {
 
         // This block configure the logger with handler and formatter
         try {
-            fh = new FileHandler("Scrapper.log");
-            SimpleFormatter formatter = new SimpleFormatter();
-            fh.setFormatter(formatter);
             logger.addHandler(fh);
 
             if (SystemUtils.IS_OS_LINUX) {
@@ -67,8 +60,6 @@ public class FilesHelper {
                 SEPARATOR = "\\";
             }
         } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -113,7 +104,7 @@ public class FilesHelper {
 
     }
 
-    public void processFiles() {
+    public void processFiles() throws ZipException {
 
         String processName = String.valueOf(processDate.getYear()) + String.valueOf(processDate.getMonthValue()) + String.valueOf(processDate.getDayOfMonth());
 
@@ -126,56 +117,36 @@ public class FilesHelper {
                 file.delete();
             }
         }
+
+        // Renombrar archivos descomprimidos
+        for (File file : directory.listFiles()) {
+            if(file.isDirectory()) {
+                for (File file2 : file.listFiles()) {
+                    file2.renameTo(new File(file.getAbsolutePath() + ".csv"));
+                }
+                file.delete();
+            }
+        }
+
+        LogHelper.getInstance().updateFileNames();
     }
 
-    public void uncompress(File zipFile) {
+    public void uncompress(File zipFile) throws ZipException {
 
-        try(ZipFile file = new ZipFile(zipFile))
-        {
+        try {
             String processName = String.valueOf(processDate.getYear()) + String.valueOf(processDate.getMonthValue()) + String.valueOf(processDate.getDayOfMonth());
 
             File directory = new File(DOWNLOAD_PATH + SEPARATOR + processName);
 
-            FileSystem fileSystem = FileSystems.getDefault();
-            //Get file entries
-            Enumeration<? extends ZipEntry> entries = file.entries();
+            ZipFile file = new ZipFile(zipFile);
 
-            //We will unzip files in this folder
-            String uncompressedDirectory = directory.getAbsolutePath();
-            //Files.createDirectory(fileSystem.getPath(uncompressedDirectory));
+            file.extractAll(directory.getAbsolutePath() + SEPARATOR + zipFile.getName().replace(".zip", "").replace(".csv", ""));
 
-            //Iterate over entries
-            while (entries.hasMoreElements())
-            {
-                ZipEntry entry = entries.nextElement();
-                //If directory then create a new directory in uncompressed folder
-                if (entry.isDirectory())
-                {
-                    System.out.println("Creating Directory:" + uncompressedDirectory + entry.getName());
-                    Files.createDirectories(fileSystem.getPath(uncompressedDirectory + entry.getName()));
-                }
-                //Else create the file
-                else
-                {
-                    InputStream is = file.getInputStream(entry);
-                    BufferedInputStream bis = new BufferedInputStream(is);
-                    String uncompressedFileName = uncompressedDirectory + SEPARATOR + zipFile.getName().replace("zip","csv");
-                    Path uncompressedFilePath = fileSystem.getPath(uncompressedFileName);
-                    Files.createFile(uncompressedFilePath);
-                    FileOutputStream fileOutput = new FileOutputStream(uncompressedFileName);
-                    while (bis.available() > 0)
-                    {
-                        fileOutput.write(bis.read());
-                    }
-                    fileOutput.close();
-                    System.out.println("Written :" + entry.getName());
-                }
-            }
         }
         catch(IOException e)
         {
-            System.out.println(e.getMessage());
             logger.log(Level.SEVERE, e.getMessage());
+            throw e;
         }
 
     }
@@ -184,25 +155,30 @@ public class FilesHelper {
     public void renameLastDownloadedFile(String holding, String frequency) {
 
         logger.log(Level.INFO, "Moviendo archivo cadena = " + holding + " frecuencia = " + frequency);
-
+        
+        String frec = null;
+        
         try {
             String baseName = "Legrand_" + holding;
 
             switch(frequency) {
                 case "DAY":
                     baseName = baseName + "_Dia";
+                    frec = "Día";
                     break;
                 case "MONTH":
                     baseName = baseName + "_Mes";
+                    frec = "Mes";
                     break;
                 case "WEEK":
                     baseName = baseName + "_Dom";
+                    frec = "Dom";
                     break;
             }
 
-            String processName = String.valueOf(processDate.getYear()) + String.valueOf(processDate.getMonthValue()) + String.valueOf(processDate.getDayOfMonth());
+            PROCESS_NAME = String.valueOf(processDate.getYear()) + String.valueOf(processDate.getMonthValue()) + String.valueOf(processDate.getDayOfMonth());
 
-            File directory = new File(DOWNLOAD_PATH + SEPARATOR + processName);
+            File directory = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME);
 
             if (! directory.exists()) {
                 directory.mkdir();
@@ -213,10 +189,10 @@ public class FilesHelper {
             File downloadDir;
 
             if(holding.equals("Sodimac")) {
-                fileName = DOWNLOAD_PATH + SEPARATOR + processName + SEPARATOR + baseName + "_" + processName + ".txt";
+                fileName = DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + baseName + "_" + PROCESS_NAME + ".txt";
             }
             else {
-                fileName = DOWNLOAD_PATH + SEPARATOR + processName + SEPARATOR + baseName + "_" + processName + ".zip";
+                fileName = DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + baseName + "_" + PROCESS_NAME + ".zip";
             }
 
             downloadDir = new File(DOWNLOAD_PATH);
@@ -237,17 +213,17 @@ public class FilesHelper {
                 }
             }
 
-            String processDay = processDate.toString();
-            String dayOfWeekProcess = processDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault());
-            String dayOfWeek = LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault());
+            String processDay =  processDate.toString();
+            String dayOfWeekProcess = WordUtils.capitalize(processDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+            String dayOfWeek = WordUtils.capitalize(LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
             String fileNameShort = fileName.split(Pattern.quote(SEPARATOR))[fileName.split(Pattern.quote(SEPARATOR)).length - 1];
             String status = "OK";
 
-
-            ProcessHelper.getInstance().registerFileControl(new FileControl(processDay, dayOfWeekProcess, dayOfWeek, frequency, holding, fileNameShort, status));
+            LogHelper.getInstance().registerFileControl(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, frec, holding, fileNameShort, status));
         }
         catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage());
+            throw  e;
         }
 
     }
@@ -258,6 +234,10 @@ public class FilesHelper {
 
     public long countFiles() {
         return  new File(DOWNLOAD_PATH).listFiles().length;
+    }
+
+    public String getUploadPath() {
+        return DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR;
     }
 
 }
