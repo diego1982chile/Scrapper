@@ -1,67 +1,25 @@
 package cl.ctl.scrapper.scrappers;
 
-import cl.ctl.scrapper.helpers.CaptchaSolver;
 import cl.ctl.scrapper.helpers.FilesHelper;
-import io.github.bonigarcia.wdm.WebDriverManager;
+import cl.ctl.scrapper.helpers.ProcessHelper;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.File;
 import java.io.IOException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.logging.FileHandler;
+import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 /**
  * Created by des01c7 on 16-12-20.
  */
-public class SodimacScrapper {
+public class SodimacScrapper extends AbstractScrapper {
 
-    WebDriver driver;
     private static  final String URL = "https://b2b.sodimac.com/b2bsocopr/grafica/html/index.html";
-    LocalDate processDate  = LocalDate.now().minusDays(1);
     private static final String CADENA = "Sodimac";
 
-    /** Logger para la clase */
-    private static final Logger logger = Logger.getLogger(ConstrumartScrapper.class.getName());
-    FileHandler fh;
-
     public SodimacScrapper() throws IOException {
-
-        // This block configure the logger with handler and formatter
-        try {
-            fh = new FileHandler("Scrapper.log");
-            SimpleFormatter formatter = new SimpleFormatter();
-            fh.setFormatter(formatter);
-            logger.addHandler(fh);
-
-            WebDriverManager.chromedriver().setup();
-
-            ChromeOptions chrome_options = new ChromeOptions();
-            chrome_options.addArguments("--start-maximized");
-            //chrome_options.addArguments("--headless");
-            chrome_options.addArguments("--no-sandbox");
-            chrome_options.addArguments("--disable-dev-shm-usage");
-
-            driver = new ChromeDriver(chrome_options);
-        } catch (SecurityException e) {
-            e.printStackTrace();
-            throw e;
-        } catch (
-        IOException e) {
-            e.printStackTrace();
-            throw e;
-        }
+        super();
     }
 
     public void scrap() throws Exception {
@@ -74,7 +32,7 @@ public class SodimacScrapper {
         Thread.sleep(5000);
 
         // Generar Scrap Diario
-        generateScrap(processDate.getDayOfMonth());
+        generateScrap(ProcessHelper.getInstance().getProcessDate().getDayOfMonth());
         FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "DAY");
 
         Thread.sleep(2000);
@@ -120,7 +78,7 @@ public class SodimacScrapper {
         Thread.sleep(2000);
         driver.findElement(By.id("usuario")).sendKeys("128088660");
         Thread.sleep(2000);
-        driver.findElement(By.id("clave")).sendKeys("diy122020");
+        driver.findElement(By.id("clave")).sendKeys("diy012021");
         Thread.sleep(2000);
         driver.findElement(By.id("entrar2")).click();
     }
@@ -162,7 +120,13 @@ public class SodimacScrapper {
 
         while(flag) {
             try {
-                driver.findElement(By.className("tablaDatos")).findElements(By.tagName("tbody")).get(0).findElements(By.tagName("tr")).get(0).findElements(By.tagName("td")).get(0).findElements(By.tagName("a")).get(0).click();
+                //driver.findElement(By.className("tablaDatos")).findElements(By.tagName("tbody")).get(0).findElements(By.tagName("tr")).get(0).findElements(By.tagName("td")).get(0).findElements(By.tagName("a")).get(0).click();
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
+
+                String fecha = formatter.format(ProcessHelper.getInstance().getProcessDate().plusDays(1));
+
+                driver.findElement(By.xpath("//a[contains(text(), '" + fecha + "')]")).click();
 
                 Thread.sleep(5000);
 

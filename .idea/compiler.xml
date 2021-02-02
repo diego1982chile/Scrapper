@@ -7,11 +7,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="mouse-robot" />
+        <module name="Scrapper" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="8">
       <module name="mouse-robot" target="1.8" />
+      <module name="Scrapper" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

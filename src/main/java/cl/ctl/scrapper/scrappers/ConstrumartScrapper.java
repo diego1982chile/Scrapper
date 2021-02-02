@@ -1,66 +1,33 @@
 package cl.ctl.scrapper.scrappers;
 
-import cl.ctl.scrapper.helpers.CaptchaSolver;
+import cl.ctl.scrapper.helpers.CaptchaHelper;
 import cl.ctl.scrapper.helpers.FilesHelper;
-import io.github.bonigarcia.wdm.WebDriverManager;
+import cl.ctl.scrapper.helpers.ProcessHelper;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 /**
  * Created by des01c7 on 16-12-20.
  */
-public class ConstrumartScrapper {
+public class ConstrumartScrapper extends AbstractScrapper {
 
-    WebDriver driver;
     private static  final String URL = "https://sso.bbr.cl/auth/realms/construmart/protocol/openid-connect/auth?response_type=code&client_id=construmart-client-prod&redirect_uri=https%3A%2F%2Fb2b.construmart.cl%2FBBRe-commerce%2Fmain&state=5d08ee52-2336-4ed0-abc4-b431ee1e3a55&login=true&scope=openid";
-    LocalDate processDate  = LocalDate.now().minusDays(1);
-    private static final String CADENA = "Easy";
-
-    /** Logger para la clase */
-    private static final Logger logger = Logger.getLogger(ConstrumartScrapper.class.getName());
-    FileHandler fh;
+    private static final String CADENA = "Construmart";
 
     public ConstrumartScrapper() throws IOException {
+        super();
+    }
 
-        // This block configure the logger with handler and formatter
-        try {
-            fh = new FileHandler("Scrapper.log");
-            SimpleFormatter formatter = new SimpleFormatter();
-            fh.setFormatter(formatter);
-            logger.addHandler(fh);
-
-            WebDriverManager.chromedriver().setup();
-
-            ChromeOptions chrome_options = new ChromeOptions();
-            chrome_options.addArguments("--start-maximized");
-            //chrome_options.addArguments("--headless");
-            chrome_options.addArguments("--no-sandbox");
-            chrome_options.addArguments("--disable-dev-shm-usage");
-
-            driver = new ChromeDriver(chrome_options);
-
-        } catch (SecurityException e) {
-            e.printStackTrace();
-            throw e;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw e;
-        }
+    public ConstrumartScrapper(LocalDate processDate) throws IOException {
+        super();
     }
 
     public void scrap() throws Exception {
@@ -68,8 +35,8 @@ public class ConstrumartScrapper {
         driver.get(URL);
 
         // *SolveCaptcha
-        CaptchaSolver captchaSolver = new CaptchaSolver(driver, URL);
-        captchaSolver.solveCaptcha();
+        CaptchaHelper captchaHelper = new CaptchaHelper(driver, URL);
+        captchaHelper.solveCaptcha();
 
         Thread.sleep(2000);
 
@@ -78,8 +45,13 @@ public class ConstrumartScrapper {
 
         Thread.sleep(2000);
 
+        // *Redirect
+        redirectHome();
+
+        Thread.sleep(5000);
+
         // Generar Scrap Diario
-        generateScrap(processDate.getDayOfMonth(), 1);
+        generateScrap(ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 1);
         Thread.sleep(5000);
         FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "DAY");
 
@@ -91,14 +63,14 @@ public class ConstrumartScrapper {
         Thread.sleep(2000);
 
         // Generar Scrap Mensual
-        generateScrap(1, 2);
+        generateScrap(1, ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 2);
         Thread.sleep(5000);
         FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "MONTH");
 
         // Si es proceso de Domingo
         // Generar Scrap Semanal
-        if(processDate.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-            generateScrap(processDate.minusDays(6).getDayOfMonth(), 3);
+        if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+            generateScrap(ProcessHelper.getInstance().getProcessDate().minusDays(6).getDayOfMonth(), ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 3);
             Thread.sleep(5000);
             FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "WEEK");
         }
@@ -117,27 +89,15 @@ public class ConstrumartScrapper {
         }
         catch(Exception e) {
             logger.log(Level.SEVERE, e.getMessage());
+            e.printStackTrace();
             throw e;
         }
     }
 
     private void redirectHome() {
         try {
-            driver.get("https://www.cenconlineb2b.com/");
-        }
-        catch(Exception e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            throw e;
-        }
-    }
-
-    private void selectCountry() throws InterruptedException {
-        try {
-            Select pais = new Select(driver.findElement(By.id("pais")));
-            Thread.sleep(3000);
-            pais.selectByValue("chi");
-            Thread.sleep(2000);
-            driver.findElement(By.id("btnIngresar")).click();
+            // https://b2b.construmart.cl/BBRe-commerce/main
+            driver.get("https://b2b.construmart.cl/Construccion/BBRe-commerce/access/login.do");
         }
         catch(Exception e) {
             logger.log(Level.SEVERE, e.getMessage());
@@ -156,7 +116,7 @@ public class ConstrumartScrapper {
         }
     }
 
-    private void generateScrap(int startDay, int count) throws InterruptedException {
+    private void generateScrap(int startDay, int endDay, int count) throws InterruptedException {
         // GoTo Comercial
         int cont = 0;
 
@@ -186,8 +146,9 @@ public class ConstrumartScrapper {
                 break;
             }
             catch(Exception e) {
-                logger.log(Level.SEVERE, e.getMessage());
+                e.printStackTrace();
                 if(cont >= 10) {
+                    logger.log(Level.SEVERE, e.getMessage());
                     throw e;
                 }
             }
@@ -207,19 +168,29 @@ public class ConstrumartScrapper {
 
                 Thread.sleep(1000);
 
-                WebElement sinceCalendar = driver.findElement(By.xpath("//button[@class='v-datefield-button']"));
+                WebElement sinceCalendar = driver.findElements(By.xpath("//button[@class='v-datefield-button']")).get(0);
 
                 sinceCalendar.click();
 
                 Thread.sleep(1000);
 
-                WebElement day = driver.findElement(By.xpath("//span[text()='" + startDay + "']"));
+                WebElement day = driver.findElements(By.xpath("//span[text()='" + startDay + "']")).get(driver.findElements(By.xpath("//span[text()='" + startDay + "']")).size()-1);
+                actions = new Actions(driver);
+                actions.moveToElement(day).click().build().perform();
+
+                WebElement toCalendar = driver.findElements(By.xpath("//button[@class='v-datefield-button']")).get(1);
+
+                toCalendar.click();
+
+                Thread.sleep(1000);
+
+                day = driver.findElements(By.xpath("//span[text()='" + endDay + "']")).get(driver.findElements(By.xpath("//span[text()='" + endDay + "']")).size()-1);
                 actions = new Actions(driver);
                 actions.moveToElement(day).click().build().perform();
 
                 break;
             }
-            catch (Exception e) {
+            catch (Throwable e) {
                 logger.log(Level.SEVERE, e.getMessage());
                 if(cont >= 10) {
                     throw e;
@@ -257,21 +228,22 @@ public class ConstrumartScrapper {
 
                 Thread.sleep(2000);
 
-                WebElement downloadReportButton = driver.findElement(By.xpath("//div[@class='v-button v-widget primary v-button-primary btn-generic v-button-btn-generic v-has-width']"));
+                WebElement downloadReportButton = driver.findElement(By.xpath("//div[@class='v-button v-widget yesIcon v-button-yesIcon messageBoxIcon v-button-messageBoxIcon']"));
                 actions = new Actions(driver);
                 actions.moveToElement(downloadReportButton).click().build().perform();
 
                 Thread.sleep(30000);
 
-                WebElement downloadReportLink = driver.findElement(By.xpath("//div[@class='v-horizontallayout v-layout v-horizontal v-widget']")).findElements(By.xpath("//div[@class='v-slot']")).get(0).findElements(By.xpath("//div[@class='v-link v-widget']")).get(0);
+                WebElement downloadReportLink = driver.findElement(By.xpath("//div[@class='v-link v-widget']"));
                 actions = new Actions(driver);
                 actions.moveToElement(downloadReportLink).click().build().perform();
 
                 break;
             }
-            catch (Exception e) {
+            catch (Throwable e) {
                 logger.log(Level.SEVERE, e.getMessage());
                 if(cont >= 10) {
+                    logger.log(Level.SEVERE, e.getMessage());
                     throw e;
                 }
             }

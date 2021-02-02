@@ -1,67 +1,29 @@
 package cl.ctl.scrapper.scrappers;
 
-import cl.ctl.scrapper.helpers.CaptchaSolver;
+import cl.ctl.scrapper.helpers.CaptchaHelper;
 import cl.ctl.scrapper.helpers.FilesHelper;
-import io.github.bonigarcia.wdm.WebDriverManager;
+import cl.ctl.scrapper.helpers.ProcessHelper;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 /**
  * Created by des01c7 on 16-12-20.
  */
-public class EasyScrapper {
+public class EasyScrapper extends AbstractScrapper {
 
-    WebDriver driver;
     private static  final String URL = "https://www.cenconlineb2b.com/auth/realms/cencosud/protocol/openid-connect/auth?response_type=code&client_id=easycl-client-prod&redirect_uri=https%3A%2F%2Fwww.cenconlineb2b.com%2FEasyCL%2FBBRe-commerce%2Fswf%2Fmain.html&state=bad15b30-d2d2-4738-8409-ffaad6602ac6&login=true&scope=openid";
-    LocalDate processDate  = LocalDate.now().minusDays(1);
     private static final String CADENA = "Easy";
 
-    /** Logger para la clase */
-    private static final Logger logger = Logger.getLogger(EasyScrapper.class.getName());
-    FileHandler fh;
-
     public EasyScrapper() throws IOException {
-
-        // This block configure the logger with handler and formatter
-        try {
-            fh = new FileHandler("Scrapper.log");
-            SimpleFormatter formatter = new SimpleFormatter();
-            fh.setFormatter(formatter);
-            logger.addHandler(fh);
-
-            WebDriverManager.chromedriver().setup();
-
-            ChromeOptions chrome_options = new ChromeOptions();
-            chrome_options.addArguments("--start-maximized");
-            //chrome_options.addArguments("--headless");
-            chrome_options.addArguments("--no-sandbox");
-            chrome_options.addArguments("--disable-dev-shm-usage");
-
-            driver = new ChromeDriver(chrome_options);
-
-        } catch (SecurityException e) {
-            e.printStackTrace();
-            throw e;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw e;
-        }
+        super();
     }
 
     public void scrap() throws Exception {
@@ -69,8 +31,8 @@ public class EasyScrapper {
         driver.get(URL);
 
         // *SolveCaptcha
-        CaptchaSolver captchaSolver = new CaptchaSolver(driver, URL);
-        captchaSolver.solveCaptcha();
+        CaptchaHelper captchaHelper = new CaptchaHelper(driver, URL);
+        captchaHelper.solveCaptcha();
 
         Thread.sleep(2000);
 
@@ -82,7 +44,7 @@ public class EasyScrapper {
         // Redirect Home
         redirectHome();
 
-        Thread.sleep(2000);
+        Thread.sleep(5000);
 
         // Select country
         selectCountry();
@@ -90,7 +52,7 @@ public class EasyScrapper {
         Thread.sleep(2000);
 
         // Generar Scrap Diario
-        generateScrap(processDate.getDayOfMonth(), 1);
+        generateScrap(ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 1);
         Thread.sleep(5000);
         FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "DAY");
 
@@ -102,14 +64,14 @@ public class EasyScrapper {
         Thread.sleep(2000);
 
         // Generar Scrap Mensual
-        generateScrap(1, 2);
+        generateScrap(1, ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 2);
         Thread.sleep(5000);
         FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "MONTH");
 
         // Si es proceso de Domingo
         // Generar Scrap Semanal
-        if(processDate.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-            generateScrap(processDate.minusDays(6).getDayOfMonth(), 3);
+        if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+            generateScrap(ProcessHelper.getInstance().getProcessDate().minusDays(6).getDayOfMonth(), ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 3);
             Thread.sleep(5000);
             FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "WEEK");
         }
@@ -165,7 +127,7 @@ public class EasyScrapper {
         }
     }
 
-    private void generateScrap(int startDay, int count) throws InterruptedException {
+    private void generateScrap(int startDay, int endDay, int count) throws InterruptedException {
         // GoTo Comercial
         int cont = 0;
 
@@ -245,28 +207,39 @@ public class EasyScrapper {
 
                 Thread.sleep(1000);
 
-                WebElement sinceCalendar = driver.findElement(By.xpath("//button[@class='v-datefield-button']"));
+                WebElement sinceCalendar = driver.findElements(By.xpath("//button[@class='v-datefield-button']")).get(0);
 
                 sinceCalendar.click();
 
                 Thread.sleep(1000);
 
-                WebElement day = driver.findElement(By.xpath("//span[text()='" + startDay + "']"));
+                WebElement day = driver.findElements(By.xpath("//span[text()='" + startDay + "']")).get(driver.findElements(By.xpath("//span[text()='" + startDay + "']")).size()-1);
+                actions = new Actions(driver);
+                actions.moveToElement(day).click().build().perform();
+
+                WebElement toCalendar = driver.findElements(By.xpath("//button[@class='v-datefield-button']")).get(1);
+
+                toCalendar.click();
+
+                Thread.sleep(1000);
+
+                day = driver.findElements(By.xpath("//span[text()='" + endDay + "']")).get(driver.findElements(By.xpath("//span[text()='" + endDay + "']")).size()-1);
                 actions = new Actions(driver);
                 actions.moveToElement(day).click().build().perform();
 
                 break;
             }
-            catch (Exception e) {
-                logger.log(Level.SEVERE, e.getMessage());
+            catch (Throwable e) {
+                e.printStackTrace();
                 if(cont >= 10) {
+                    logger.log(Level.SEVERE, e.getMessage());
                     throw e;
                 }
             }
 
         }
 
-        Thread.sleep(1000);
+        Thread.sleep(10000);
 
         // GenerateFile
 
@@ -307,9 +280,10 @@ public class EasyScrapper {
 
                 break;
             }
-            catch (Exception e) {
-                logger.log(Level.SEVERE, e.getMessage());
+            catch (Throwable e) {
+                e.printStackTrace();
                 if(cont >= 10) {
+                    logger.log(Level.SEVERE, e.getMessage());
                     throw e;
                 }
             }

@@ -21,17 +21,15 @@ public class UploadHelper {
     private static ChannelSftp sftpChannel;
 
     private static String destiny = "/di/projects/Legrand/_Scraps_Hoy/";
-    private static String remote = "/home/dsoto/temp/";
+    private static String remote = ConfigHelper.getInstance().CONFIG.get("upload.path");//"/home/dsoto/temp/";
 
-    private static String local = "/tmp/scp/local/";
-
-    private static String user = "dsoto";
-    private static String host = "cfiedler.dyndns.org";
+    private static String user =  ConfigHelper.getInstance().CONFIG.get("upload.user");//"dsoto";
+    private static String host = ConfigHelper.getInstance().CONFIG.get("upload.host");//"cfiedler.dyndns.org";
     int port = 22;
 
     private static final int CHANNEL_TIMEOUT = 5000;
 
-    private static String keyPassword = "diegoabelardo";
+    private static String keyPassword = ConfigHelper.getInstance().CONFIG.get("upload.password");//"diegoabelardo";
 
     /** Logger para la clase */
     private static final Logger logger = Logger.getLogger(UploadHelper.class.getName());

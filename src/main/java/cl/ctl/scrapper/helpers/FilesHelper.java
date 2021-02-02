@@ -26,12 +26,12 @@ public class FilesHelper {
 
     //String DOWNLOAD_PATH = System.getProperty("user.home");;
 
-    String DOWNLOAD_PATH = "C:\\Users\\home-user\\Downloads";
+    String DOWNLOAD_PATH = ConfigHelper.getInstance().CONFIG.get("file.download_path");//"C:\\Users\\home-user\\Downloads";
 
     String PROCESS_NAME;
 
     JSONParser parser = new JSONParser();
-    LocalDate processDate  = LocalDate.now().minusDays(1);
+
     static String SEPARATOR;
 
     /** Logger para la clase */
@@ -106,7 +106,19 @@ public class FilesHelper {
 
     public void processFiles() throws ZipException {
 
-        String processName = String.valueOf(processDate.getYear()) + String.valueOf(processDate.getMonthValue()) + String.valueOf(processDate.getDayOfMonth());
+        String month = String.valueOf(ProcessHelper.getInstance().getProcessDate().getMonthValue());
+
+        if(ProcessHelper.getInstance().getProcessDate().getMonthValue() < 10) {
+            month = "0" + month;
+        }
+
+        String day = String.valueOf(ProcessHelper.getInstance().getProcessDate().getDayOfMonth());
+
+        if(ProcessHelper.getInstance().getProcessDate().getDayOfMonth() < 10) {
+            day = "0" + day;
+        }
+
+        String processName = String.valueOf(ProcessHelper.getInstance().getProcessDate().getYear()) + month + day;
 
         File directory = new File(DOWNLOAD_PATH + SEPARATOR + processName);
 
@@ -134,7 +146,19 @@ public class FilesHelper {
     public void uncompress(File zipFile) throws ZipException {
 
         try {
-            String processName = String.valueOf(processDate.getYear()) + String.valueOf(processDate.getMonthValue()) + String.valueOf(processDate.getDayOfMonth());
+            String month = String.valueOf(ProcessHelper.getInstance().getProcessDate().getMonthValue());
+
+            if(ProcessHelper.getInstance().getProcessDate().getMonthValue() < 10) {
+                month = "0" + month;
+            }
+
+            String day = String.valueOf(ProcessHelper.getInstance().getProcessDate().getDayOfMonth());
+
+            if(ProcessHelper.getInstance().getProcessDate().getDayOfMonth() < 10) {
+                day = "0" + day;
+            }
+
+            String processName = String.valueOf(ProcessHelper.getInstance().getProcessDate().getYear()) + month + day;
 
             File directory = new File(DOWNLOAD_PATH + SEPARATOR + processName);
 
@@ -176,7 +200,19 @@ public class FilesHelper {
                     break;
             }
 
-            PROCESS_NAME = String.valueOf(processDate.getYear()) + String.valueOf(processDate.getMonthValue()) + String.valueOf(processDate.getDayOfMonth());
+            String month = String.valueOf(ProcessHelper.getInstance().getProcessDate().getMonthValue());
+
+            if(ProcessHelper.getInstance().getProcessDate().getMonthValue() < 10) {
+                month = "0" + month;
+            }
+
+            String day = String.valueOf(ProcessHelper.getInstance().getProcessDate().getDayOfMonth());
+
+            if(ProcessHelper.getInstance().getProcessDate().getDayOfMonth() < 10) {
+                day = "0" + day;
+            }
+
+            PROCESS_NAME = String.valueOf(ProcessHelper.getInstance().getProcessDate().getYear()) + month + day;
 
             File directory = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME);
 
@@ -213,8 +249,8 @@ public class FilesHelper {
                 }
             }
 
-            String processDay =  processDate.toString();
-            String dayOfWeekProcess = WordUtils.capitalize(processDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+            String processDay = ProcessHelper.getInstance().getProcessDate().toString();
+            String dayOfWeekProcess = WordUtils.capitalize(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
             String dayOfWeek = WordUtils.capitalize(LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
             String fileNameShort = fileName.split(Pattern.quote(SEPARATOR))[fileName.split(Pattern.quote(SEPARATOR)).length - 1];
             String status = "OK";

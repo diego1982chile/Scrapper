@@ -37,13 +37,15 @@ public class ErrorHelper {
 
     //private static final String to = "diego.abelardo.soto@gmail.com";
 
-    private static final String to = "cristian.fiedler@fiedler-bi.com";//"semantikos.minsal@gmail.com";
+    //private static final String to = "cristian.fiedler@fiedler-bi.com";//"semantikos.minsal@gmail.com";
+
+    private static final String to = ConfigHelper.getInstance().CONFIG.get("mail.to");//"diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
 
     private static final String username = "diego.abelardo.soto@gmail.com";
 
     private static final String password = "1eurides9";
 
-    private static final String subject = "CTL - Descarga Scraps: Error";
+    private static final String subject = "CTL - Descarga Scraps";
 
     //private static String body = "<b>Bienvenido a Semantikos</b><br><br>Una cuenta asociada a este correo ha sido creada. <ul><li>Para activar su cuenta, por favor pinche el siguiente link: <br>%link%</li><li>Su contraseña inicial es: %password%</li><li>Cambie su contraseña inicial</li><li>Configure sus preguntas de seguridad</li></ul>El Equipo Semantikos";
 
@@ -55,7 +57,7 @@ public class ErrorHelper {
 
     public ErrorHelper() {
 
-         prop = System.getProperties();
+        prop = System.getProperties();
 
         //Get the session object
         prop.put("mail.smtp.host", "smtp.gmail.com");

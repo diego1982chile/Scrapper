@@ -3,6 +3,7 @@ package cl.ctl.scrapper.helpers;
 import cl.ctl.scrapper.model.FileControl;
 import cl.ctl.scrapper.model.Log;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -10,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 /**
@@ -93,6 +95,14 @@ public class LogHelper extends Handler {
         String string = localDateTime.format(formatter);
 
         logs.add(new Log(string, record.getSourceClassName(), record.getSourceMethodName(), record.getMessage()));
+
+        if(record.getLevel().equals(Level.SEVERE)) {
+            try {
+                ErrorHelper.getInstance().sendMail();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
