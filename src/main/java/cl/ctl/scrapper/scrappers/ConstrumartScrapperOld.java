@@ -1,3 +1,4 @@
+/*
 package cl.ctl.scrapper.scrappers;
 
 import cl.ctl.scrapper.helpers.FilesHelper;
@@ -24,10 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+*/
 
-/**
- * Created by des01c7 on 16-12-20.
- */
+
+// Created by des01c7 on 16-12-20.
+/*
 public class ConstrumartScrapperOld {
 
     WebDriver driver;
@@ -37,7 +39,7 @@ public class ConstrumartScrapperOld {
 
     Screen screen;
 
-    /** Logger para la clase */
+    // Logger para la clase
     private static final Logger logger = Logger.getLogger(ConstrumartScrapperOld.class.getName());
     static LogHelper fh = LogHelper.getInstance();
 
@@ -322,3 +324,4 @@ public class ConstrumartScrapperOld {
     }
 
 }
+*/

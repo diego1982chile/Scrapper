@@ -2,6 +2,7 @@ package cl.ctl.scrapper.scrappers;
 
 import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
+import cl.ctl.scrapper.model.BusinessException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
@@ -16,28 +17,36 @@ import java.util.logging.Level;
 public class SodimacScrapper extends AbstractScrapper {
 
     private static  final String URL = "https://b2b.sodimac.com/b2bsocopr/grafica/html/index.html";
-    private static final String CADENA = "Sodimac";
 
     public SodimacScrapper() throws IOException {
         super();
+        CADENA = "Sodimac";
     }
 
     public void scrap() throws Exception {
 
-        driver.get(URL);
+        try {
+            checkScraps();
 
-        // *Login
-        login();
+            driver.get(URL);
 
-        Thread.sleep(5000);
+            // *Login
+            login();
 
-        // Generar Scrap Diario
-        generateScrap(ProcessHelper.getInstance().getProcessDate().getDayOfMonth());
-        FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "DAY");
+            Thread.sleep(5000);
 
-        Thread.sleep(2000);
+            // Generar Scrap Diario
+            generateScrap(ProcessHelper.getInstance().getProcessDate().getDayOfMonth());
+            FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "DAY");
 
-        driver.quit();
+            Thread.sleep(2000);
+
+            driver.quit();
+        }
+        catch(BusinessException e) {
+            logger.log(Level.WARNING, e.getMessage());
+        }
+
     }
 
     private void login() throws InterruptedException {
@@ -84,60 +93,67 @@ public class SodimacScrapper extends AbstractScrapper {
     }
 
     private void generateScrap(int startDay) throws InterruptedException {
-        // GoTo Comercial
-        int cont = 0;
 
         try {
-            Thread.sleep(3000);
+            checkScrap(1);
 
-            driver.switchTo().frame(0);
+            // GoTo Comercial
+            int cont = 0;
 
-            driver.switchTo().parentFrame();
-
-        }
-        catch (Exception e) {
-            logger.log(Level.WARNING, e.getMessage());
-
-            Thread.sleep(3000);
-
-            driver.switchTo().parentFrame();
-
-            driver.switchTo().frame(0);
-        }
-
-
-        Actions actions = new Actions(driver);
-        actions.moveToElement(driver.findElement(By.id("Bar2"))).perform();
-
-        Thread.sleep(3000);
-
-        driver.findElement(By.id("menuItem223_6")).click();
-
-        Thread.sleep(3000);
-
-        long numberOfFiles = FilesHelper.getInstance().countFiles();
-        boolean flag = true;
-
-        while(flag) {
             try {
-                //driver.findElement(By.className("tablaDatos")).findElements(By.tagName("tbody")).get(0).findElements(By.tagName("tr")).get(0).findElements(By.tagName("td")).get(0).findElements(By.tagName("a")).get(0).click();
+                Thread.sleep(3000);
 
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
+                driver.switchTo().frame(0);
 
-                String fecha = formatter.format(ProcessHelper.getInstance().getProcessDate().plusDays(1));
+                driver.switchTo().parentFrame();
 
-                driver.findElement(By.xpath("//a[contains(text(), '" + fecha + "')]")).click();
+            }
+            catch (Exception e) {
+                logger.log(Level.WARNING, e.getMessage());
 
-                Thread.sleep(5000);
+                Thread.sleep(3000);
 
-                if(FilesHelper.getInstance().countFiles() > numberOfFiles) {
-                   flag = false;
+                driver.switchTo().parentFrame();
+
+                driver.switchTo().frame(0);
+            }
+
+            Actions actions = new Actions(driver);
+            actions.moveToElement(driver.findElement(By.id("Bar2"))).perform();
+
+            Thread.sleep(3000);
+
+            driver.findElement(By.id("menuItem223_6")).click();
+
+            Thread.sleep(3000);
+
+            long numberOfFiles = FilesHelper.getInstance().countFiles();
+            boolean flag = true;
+
+            while(flag) {
+                try {
+                    //driver.findElement(By.className("tablaDatos")).findElements(By.tagName("tbody")).get(0).findElements(By.tagName("tr")).get(0).findElements(By.tagName("td")).get(0).findElements(By.tagName("a")).get(0).click();
+
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
+
+                    String fecha = formatter.format(ProcessHelper.getInstance().getProcessDate().plusDays(1));
+
+                    driver.findElement(By.xpath("//a[contains(text(), '" + fecha + "')]")).click();
+
+                    Thread.sleep(5000);
+
+                    if(FilesHelper.getInstance().countFiles() > numberOfFiles) {
+                        flag = false;
+                    }
+                }
+                catch(Exception e) {
+                    logger.log(Level.SEVERE, e.getMessage());
+                    throw e;
                 }
             }
-            catch(Exception e) {
-                logger.log(Level.SEVERE, e.getMessage());
-                throw e;
-            }
+        }
+        catch (BusinessException e) {
+            logger.log(Level.WARNING, e.getMessage());
         }
     }
 

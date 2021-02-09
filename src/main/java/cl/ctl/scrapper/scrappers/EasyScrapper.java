@@ -3,6 +3,7 @@ package cl.ctl.scrapper.scrappers;
 import cl.ctl.scrapper.helpers.CaptchaHelper;
 import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
+import cl.ctl.scrapper.model.BusinessException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -19,64 +20,85 @@ import java.util.logging.Level;
  */
 public class EasyScrapper extends AbstractScrapper {
 
-    private static  final String URL = "https://www.cenconlineb2b.com/auth/realms/cencosud/protocol/openid-connect/auth?response_type=code&client_id=easycl-client-prod&redirect_uri=https%3A%2F%2Fwww.cenconlineb2b.com%2FEasyCL%2FBBRe-commerce%2Fswf%2Fmain.html&state=bad15b30-d2d2-4738-8409-ffaad6602ac6&login=true&scope=openid";
-    private static final String CADENA = "Easy";
+    private static final String URL = "https://www.cenconlineb2b.com/auth/realms/cencosud/protocol/openid-connect/auth?response_type=code&client_id=easycl-client-prod&redirect_uri=https%3A%2F%2Fwww.cenconlineb2b.com%2FEasyCL%2FBBRe-commerce%2Fswf%2Fmain.html&state=bad15b30-d2d2-4738-8409-ffaad6602ac6&login=true&scope=openid";
 
     public EasyScrapper() throws IOException {
         super();
+        CADENA = "Easy";
     }
 
     public void scrap() throws Exception {
 
-        driver.get(URL);
+        try {
+            super.checkScraps();
 
-        // *SolveCaptcha
-        CaptchaHelper captchaHelper = new CaptchaHelper(driver, URL);
-        captchaHelper.solveCaptcha();
+            driver.get(URL);
 
-        Thread.sleep(2000);
+            // *SolveCaptcha
+            CaptchaHelper captchaHelper = new CaptchaHelper(driver, URL);
+            captchaHelper.solveCaptcha();
 
-        // *Login
-        login();
+            Thread.sleep(2000);
 
-        Thread.sleep(2000);
+            // *Login
+            login();
 
-        // Redirect Home
-        redirectHome();
+            Thread.sleep(2000);
 
-        Thread.sleep(5000);
+            // Redirect Home
+            redirectHome();
 
-        // Select country
-        selectCountry();
-
-        Thread.sleep(2000);
-
-        // Generar Scrap Diario
-        generateScrap(ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 1);
-        Thread.sleep(5000);
-        FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "DAY");
-
-        Thread.sleep(2000);
-
-        // Cerrar Tab
-        closeTab();
-
-        Thread.sleep(2000);
-
-        // Generar Scrap Mensual
-        generateScrap(1, ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 2);
-        Thread.sleep(5000);
-        FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "MONTH");
-
-        // Si es proceso de Domingo
-        // Generar Scrap Semanal
-        if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-            generateScrap(ProcessHelper.getInstance().getProcessDate().minusDays(6).getDayOfMonth(), ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 3);
             Thread.sleep(5000);
-            FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "WEEK");
+
+            // Select country
+            selectCountry();
+
+            Thread.sleep(2000);
+
+            // Generar Scrap Diario
+
+            generateScrap(ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 1);
+            Thread.sleep(5000);
+
+            FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "DAY");
+
+            // Cerrar Tab
+            closeTab();
+
+            Thread.sleep(2000);
+
+            // Generar Scrap Mensual
+
+            generateScrap(1, ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 2);
+            Thread.sleep(5000);
+
+            FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "MONTH");
+
+            // Cerrar Tab
+            closeTab();
+
+            Thread.sleep(2000);
+
+            // Si es proceso de Domingo
+            // Generar Scrap Semanal
+            if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+                generateScrap(ProcessHelper.getInstance().getProcessDate().minusDays(6).getDayOfMonth(), ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 3);
+                Thread.sleep(5000);
+
+                FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "WEEK");
+
+                // Cerrar Tab
+                closeTab();
+            }
+
+            Thread.sleep(2000);
+
+            driver.quit();
+        }
+        catch (BusinessException e) {
+            logger.log(Level.WARNING, e.getMessage());
         }
 
-        driver.quit();
     }
 
     private void login() {
@@ -128,166 +150,174 @@ public class EasyScrapper extends AbstractScrapper {
     }
 
     private void generateScrap(int startDay, int endDay, int count) throws InterruptedException {
-        // GoTo Comercial
-        int cont = 0;
 
-        while(cont < 10) {
+        try {
 
-            cont++;
+            super.checkScrap(count);
 
-            try {
-                WebElement menuCommerce = driver.findElement(By.xpath("//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']")).findElements(By.cssSelector("span:nth-child(3)")).get(0);
-                WebDriverWait wait = new WebDriverWait(driver, 10);
-                wait.until(ExpectedConditions.elementToBeClickable(menuCommerce));
+            // GoTo Comercial
+            int cont = 0;
 
-                Thread.sleep(2000);
+            while(cont < 10) {
 
-                menuCommerce.click();
+                cont++;
 
-                Thread.sleep(2000);
+                try {
+                    WebElement menuCommerce = driver.findElement(By.xpath("//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']")).findElements(By.cssSelector("span:nth-child(3)")).get(0);
+                    WebDriverWait wait = new WebDriverWait(driver, 10);
+                    wait.until(ExpectedConditions.elementToBeClickable(menuCommerce));
 
-                WebElement submenuCommerce = driver.findElement(By.xpath("//div[@class='v-menubar-submenu v-widget mainMenuBar v-menubar-submenu-mainMenuBar v-has-width']")).findElements(By.cssSelector("span:nth-child(1)")).get(0);
-                wait = new WebDriverWait(driver, 10);
-                wait.until(ExpectedConditions.elementToBeClickable(submenuCommerce));
+                    Thread.sleep(2000);
 
-                Thread.sleep(2000);
+                    menuCommerce.click();
 
-                submenuCommerce.click();
+                    Thread.sleep(2000);
 
-                break;
+                    WebElement submenuCommerce = driver.findElement(By.xpath("//div[@class='v-menubar-submenu v-widget mainMenuBar v-menubar-submenu-mainMenuBar v-has-width']")).findElements(By.cssSelector("span:nth-child(1)")).get(0);
+                    wait = new WebDriverWait(driver, 10);
+                    wait.until(ExpectedConditions.elementToBeClickable(submenuCommerce));
+
+                    Thread.sleep(2000);
+
+                    submenuCommerce.click();
+
+                    break;
+                }
+                catch(Exception e) {
+                    if(cont >= 10) {
+                        logger.log(Level.SEVERE, e.getMessage());
+                        throw e;
+                    }
+                }
+
             }
-            catch(Exception e) {
-                logger.log(Level.SEVERE, e.getMessage());
-                if(cont >= 10) {
-                    throw e;
+
+            Thread.sleep(3000);
+
+            Actions actions;
+
+            String check1Id = "";
+            String check2Id = "";
+
+            switch(count) {
+                case 1:
+                    check1Id = "gwt-uid-8";
+                    check2Id = "gwt-uid-9";
+                    break;
+                case 2:
+                    check1Id = "gwt-uid-25";
+                    check2Id = "gwt-uid-26";
+                    break;
+                case 3:
+                    check1Id = "gwt-uid-42";
+                    check2Id = "gwt-uid-43";
+                    break;
+            }
+
+            cont = 0;
+
+            // *SelectParameters
+            while(cont < 10) {
+
+                cont++;
+
+                try {
+                    WebElement checkDisplayStock = driver.findElement(By.xpath("//input[@id='" + check1Id + "']"));
+                    actions = new Actions(driver);
+                    actions.moveToElement(checkDisplayStock).click().build().perform();
+
+                    Thread.sleep(1000);
+
+                    WebElement excludeProductsWithoutStock = driver.findElement(By.xpath("//input[@id='" + check2Id + "']"));
+                    actions = new Actions(driver);
+                    actions.moveToElement(excludeProductsWithoutStock).click().build().perform();
+
+                    Thread.sleep(1000);
+
+                    WebElement sinceCalendar = driver.findElements(By.xpath("//button[@class='v-datefield-button']")).get(0);
+
+                    sinceCalendar.click();
+
+                    Thread.sleep(1000);
+
+                    WebElement day = driver.findElements(By.xpath("//span[text()='" + startDay + "']")).get(0);
+                    actions = new Actions(driver);
+                    actions.moveToElement(day).click().build().perform();
+
+                    WebElement toCalendar = driver.findElements(By.xpath("//button[@class='v-datefield-button']")).get(1);
+
+                    toCalendar.click();
+
+                    Thread.sleep(1000);
+
+                    day = driver.findElements(By.xpath("//span[text()='" + endDay + "']")).get(0);
+                    actions = new Actions(driver);
+                    actions.moveToElement(day).click().build().perform();
+
+                    break;
+                }
+                catch (Throwable e) {
+                    e.printStackTrace();
+                    if(cont >= 10) {
+                        logger.log(Level.SEVERE, e.getMessage());
+                        throw e;
+                    }
+                }
+
+            }
+
+            Thread.sleep(10000);
+
+            // GenerateFile
+
+            cont = 0;
+
+            while(true) {
+
+                cont++;
+
+                try {
+                    WebElement generateReport = driver.findElement(By.xpath("//div[@class='v-button v-widget btn-filter-search v-button-btn-filter-search']"));
+                    actions = new Actions(driver);
+                    actions.moveToElement(generateReport).click().build().perform();
+
+                    Thread.sleep(20000);
+
+                    WebElement downloadReportMenu = driver.findElement(By.xpath("//div[@class='v-button v-widget toolbar-button v-button-toolbar-button bbr-popupbutton']"));
+                    actions = new Actions(driver);
+                    actions.moveToElement(downloadReportMenu).click().build().perform();
+
+                    Thread.sleep(2000);
+
+                    WebElement downloadReportOption = driver.findElement(By.xpath("//div[@class='v-verticallayout v-layout v-vertical v-widget v-has-width v-margin-right v-margin-left']")).findElements(By.cssSelector("div:nth-child(2)")).get(0);
+                    actions = new Actions(driver);
+                    actions.moveToElement(downloadReportOption).click().build().perform();
+
+                    Thread.sleep(2000);
+
+                    WebElement downloadReportButton = driver.findElement(By.xpath("//div[@class='v-button v-widget primary v-button-primary btn-generic v-button-btn-generic v-has-width']"));
+                    actions = new Actions(driver);
+                    actions.moveToElement(downloadReportButton).click().build().perform();
+
+                    Thread.sleep(30000);
+
+                    WebElement downloadReportLink = driver.findElement(By.xpath("//div[@class='v-horizontallayout v-layout v-horizontal v-widget']")).findElements(By.xpath("//div[@class='v-slot']")).get(0).findElements(By.xpath("//div[@class='v-link v-widget']")).get(0);
+                    actions = new Actions(driver);
+                    actions.moveToElement(downloadReportLink).click().build().perform();
+
+                    break;
+                }
+                catch (Throwable e) {
+                    e.printStackTrace();
+                    if(cont >= 10) {
+                        logger.log(Level.SEVERE, e.getMessage());
+                        throw e;
+                    }
                 }
             }
-
         }
-
-        Thread.sleep(3000);
-
-        Actions actions;
-
-        String check1Id = "";
-        String check2Id = "";
-
-        switch(count) {
-            case 1:
-                check1Id = "gwt-uid-8";
-                check2Id = "gwt-uid-9";
-                break;
-            case 2:
-                check1Id = "gwt-uid-25";
-                check2Id = "gwt-uid-26";
-                break;
-            case 3:
-                check1Id = "gwt-uid-42";
-                check2Id = "gwt-uid-43";
-                break;
-        }
-
-        cont = 0;
-
-        // *SelectParameters
-        while(cont < 10) {
-
-            cont++;
-
-            try {
-                WebElement checkDisplayStock = driver.findElement(By.xpath("//input[@id='" + check1Id + "']"));
-                actions = new Actions(driver);
-                actions.moveToElement(checkDisplayStock).click().build().perform();
-
-                Thread.sleep(1000);
-
-                WebElement excludeProductsWithoutStock = driver.findElement(By.xpath("//input[@id='" + check2Id + "']"));
-                actions = new Actions(driver);
-                actions.moveToElement(excludeProductsWithoutStock).click().build().perform();
-
-                Thread.sleep(1000);
-
-                WebElement sinceCalendar = driver.findElements(By.xpath("//button[@class='v-datefield-button']")).get(0);
-
-                sinceCalendar.click();
-
-                Thread.sleep(1000);
-
-                WebElement day = driver.findElements(By.xpath("//span[text()='" + startDay + "']")).get(driver.findElements(By.xpath("//span[text()='" + startDay + "']")).size()-1);
-                actions = new Actions(driver);
-                actions.moveToElement(day).click().build().perform();
-
-                WebElement toCalendar = driver.findElements(By.xpath("//button[@class='v-datefield-button']")).get(1);
-
-                toCalendar.click();
-
-                Thread.sleep(1000);
-
-                day = driver.findElements(By.xpath("//span[text()='" + endDay + "']")).get(driver.findElements(By.xpath("//span[text()='" + endDay + "']")).size()-1);
-                actions = new Actions(driver);
-                actions.moveToElement(day).click().build().perform();
-
-                break;
-            }
-            catch (Throwable e) {
-                e.printStackTrace();
-                if(cont >= 10) {
-                    logger.log(Level.SEVERE, e.getMessage());
-                    throw e;
-                }
-            }
-
-        }
-
-        Thread.sleep(10000);
-
-        // GenerateFile
-
-        cont = 0;
-
-        while(true) {
-
-            cont++;
-
-            try {
-                WebElement generateReport = driver.findElement(By.xpath("//div[@class='v-button v-widget btn-filter-search v-button-btn-filter-search']"));
-                actions = new Actions(driver);
-                actions.moveToElement(generateReport).click().build().perform();
-
-                Thread.sleep(20000);
-
-                WebElement downloadReportMenu = driver.findElement(By.xpath("//div[@class='v-button v-widget toolbar-button v-button-toolbar-button bbr-popupbutton']"));
-                actions = new Actions(driver);
-                actions.moveToElement(downloadReportMenu).click().build().perform();
-
-                Thread.sleep(2000);
-
-                WebElement downloadReportOption = driver.findElement(By.xpath("//div[@class='v-verticallayout v-layout v-vertical v-widget v-has-width v-margin-right v-margin-left']")).findElements(By.cssSelector("div:nth-child(2)")).get(0);
-                actions = new Actions(driver);
-                actions.moveToElement(downloadReportOption).click().build().perform();
-
-                Thread.sleep(2000);
-
-                WebElement downloadReportButton = driver.findElement(By.xpath("//div[@class='v-button v-widget primary v-button-primary btn-generic v-button-btn-generic v-has-width']"));
-                actions = new Actions(driver);
-                actions.moveToElement(downloadReportButton).click().build().perform();
-
-                Thread.sleep(30000);
-
-                WebElement downloadReportLink = driver.findElement(By.xpath("//div[@class='v-horizontallayout v-layout v-horizontal v-widget']")).findElements(By.xpath("//div[@class='v-slot']")).get(0).findElements(By.xpath("//div[@class='v-link v-widget']")).get(0);
-                actions = new Actions(driver);
-                actions.moveToElement(downloadReportLink).click().build().perform();
-
-                break;
-            }
-            catch (Throwable e) {
-                e.printStackTrace();
-                if(cont >= 10) {
-                    logger.log(Level.SEVERE, e.getMessage());
-                    throw e;
-                }
-            }
-
+        catch (BusinessException e) {
+            logger.log(Level.WARNING, e.getMessage());
         }
     }
 }

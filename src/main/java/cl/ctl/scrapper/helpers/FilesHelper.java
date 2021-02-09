@@ -8,6 +8,7 @@ import org.apache.commons.lang.WordUtils;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Arrays;
@@ -49,6 +50,20 @@ public class FilesHelper {
 
         String homePath = System.getProperty("user.home");;
         String preferencesPath = null;
+
+        String month = String.valueOf(ProcessHelper.getInstance().getProcessDate().getMonthValue());
+
+        if(ProcessHelper.getInstance().getProcessDate().getMonthValue() < 10) {
+            month = "0" + month;
+        }
+
+        String day = String.valueOf(ProcessHelper.getInstance().getProcessDate().getDayOfMonth());
+
+        if(ProcessHelper.getInstance().getProcessDate().getDayOfMonth() < 10) {
+            day = "0" + day;
+        }
+
+        PROCESS_NAME = String.valueOf(ProcessHelper.getInstance().getProcessDate().getYear()) + month + day;
 
         // This block configure the logger with handler and formatter
         try {
@@ -106,21 +121,7 @@ public class FilesHelper {
 
     public void processFiles() throws ZipException {
 
-        String month = String.valueOf(ProcessHelper.getInstance().getProcessDate().getMonthValue());
-
-        if(ProcessHelper.getInstance().getProcessDate().getMonthValue() < 10) {
-            month = "0" + month;
-        }
-
-        String day = String.valueOf(ProcessHelper.getInstance().getProcessDate().getDayOfMonth());
-
-        if(ProcessHelper.getInstance().getProcessDate().getDayOfMonth() < 10) {
-            day = "0" + day;
-        }
-
-        String processName = String.valueOf(ProcessHelper.getInstance().getProcessDate().getYear()) + month + day;
-
-        File directory = new File(DOWNLOAD_PATH + SEPARATOR + processName);
+        File directory = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME);
 
         // Descomprimir archivos descargados
         for (File file : directory.listFiles()) {
@@ -146,21 +147,8 @@ public class FilesHelper {
     public void uncompress(File zipFile) throws ZipException {
 
         try {
-            String month = String.valueOf(ProcessHelper.getInstance().getProcessDate().getMonthValue());
 
-            if(ProcessHelper.getInstance().getProcessDate().getMonthValue() < 10) {
-                month = "0" + month;
-            }
-
-            String day = String.valueOf(ProcessHelper.getInstance().getProcessDate().getDayOfMonth());
-
-            if(ProcessHelper.getInstance().getProcessDate().getDayOfMonth() < 10) {
-                day = "0" + day;
-            }
-
-            String processName = String.valueOf(ProcessHelper.getInstance().getProcessDate().getYear()) + month + day;
-
-            File directory = new File(DOWNLOAD_PATH + SEPARATOR + processName);
+            File directory = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME);
 
             ZipFile file = new ZipFile(zipFile);
 
@@ -199,20 +187,6 @@ public class FilesHelper {
                     frec = "Dom";
                     break;
             }
-
-            String month = String.valueOf(ProcessHelper.getInstance().getProcessDate().getMonthValue());
-
-            if(ProcessHelper.getInstance().getProcessDate().getMonthValue() < 10) {
-                month = "0" + month;
-            }
-
-            String day = String.valueOf(ProcessHelper.getInstance().getProcessDate().getDayOfMonth());
-
-            if(ProcessHelper.getInstance().getProcessDate().getDayOfMonth() < 10) {
-                day = "0" + day;
-            }
-
-            PROCESS_NAME = String.valueOf(ProcessHelper.getInstance().getProcessDate().getYear()) + month + day;
 
             File directory = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME);
 
@@ -274,6 +248,76 @@ public class FilesHelper {
 
     public String getUploadPath() {
         return DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR;
+    }
+
+    public boolean checkFiles(String cadena) {
+
+        String ext = ".zip";
+
+        if(cadena.equals("Sodimac")) {
+            ext = ".txt";
+        }
+
+        File directory = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME);
+
+        // Comprobar que exista el directorio del proceso, de lo contrario retornar false
+        if(!directory.exists()) {
+            return false;
+        }
+
+        // Comprobar que exista el archivo diario de la cadena, de lo contrario retornar false
+        if(!Arrays.asList(directory.listFiles()).contains(new File("Legrand_" + cadena + "_Dia_" + PROCESS_NAME + ext))) {
+            return false;
+        }
+
+        // Comprobar que exista el archivo mensual de la cadena, de lo contrario retornar false
+        if(!Arrays.asList(directory.listFiles()).contains(new File("Legrand_" + cadena + "_Mes_" + PROCESS_NAME + ext))) {
+            return false;
+        }
+
+        // Si el proceso es del Domingo, Comprobar que exista el archivo semanal de la cadena, de lo contrario retornar false
+        if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+            if(!Arrays.asList(directory.listFiles()).contains(new File("Legrand_" + cadena + "_Dom_" + PROCESS_NAME + ext))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean checkFiles(String cadena, String frequency) {
+
+        String ext = ".zip";
+
+        if(cadena.equals("Sodimac")) {
+            ext = ".txt";
+        }
+
+        switch(frequency) {
+            case "DAY":
+                frequency = "Día";
+                break;
+            case "MONTH":
+                frequency = "Mes";
+                break;
+            case "WEEK":
+                frequency = "Dom";
+                break;
+        }
+
+        File directory = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME);
+
+        // Comprobar que exista el directorio del proceso, de lo contrario retornar false
+        if(!directory.exists()) {
+            return false;
+        }
+
+        // Comprobar que exista el archivo con la frecuencia de la cadena, de lo contrario retornar false
+        if(!Arrays.asList(directory.listFiles()).contains(new File("Legrand_" + cadena + "_" + frequency + "_" + PROCESS_NAME + ext))) {
+            return false;
+        }
+
+        return true;
     }
 
 }

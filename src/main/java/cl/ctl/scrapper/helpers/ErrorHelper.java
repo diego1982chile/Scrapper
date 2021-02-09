@@ -101,7 +101,11 @@ public class ErrorHelper {
 
         String html = "";
 
+        String html2 = "";
+
         for (Log log : LogHelper.getInstance().getLogs()) {
+            html2 = "";
+
             String timestamp = log.getTimestamp();
             String classname = log.getClassname();
             String method = log.getMethod();
@@ -119,17 +123,19 @@ public class ErrorHelper {
                 color = "#eacf0b";
             }
 
-            html = html + "<tr style='color:" + color + "'>";
+            html2 = html2 + "<tr style='color:" + color + "'>";
 
-            html = html + "<td style='padding: 0 0 0 0;'>" + timestamp + "</td>";
-            html = html + "<td style='padding: 0 0 0 0;'>" + classname + "</td>";
-            html = html + "<td style='padding: 0 0 0 0;'>" + method + "</td>";
-            if(message.length() > 180) {
-                message = message.substring(0,180) + " ...";
+            html2 = html2 + "<td style='padding: 0 0 0 0;'>" + timestamp + "</td>";
+            html2 = html2 + "<td style='padding: 0 0 0 0;'>" + classname + "</td>";
+            html2 = html2 + "<td style='padding: 0 0 0 0;'>" + method + "</td>";
+            if(message.length() > 500) {
+                message = message.substring(0, 500) + " ...";
             }
-            html = html + "<tr><td style='padding: 0 0 0 0;' colspan='3'>" + message + "</td></tr>";
+            html2 = html2 + "<tr><td style='padding: 0 0 0 0;' colspan='3'>" + message + "</td></tr>";
 
-            html = html + "</tr>";
+            html2 = html2 + "</tr>";
+
+            html = html + html2;
         }
 
         this.body = this.body.replace("[rows]", html);

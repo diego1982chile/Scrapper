@@ -1,5 +1,6 @@
 package cl.ctl.scrapper.helpers;
 
+import cl.ctl.scrapper.scrappers.ConstrumartScrapper;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
 import org.openqa.selenium.By;
@@ -8,11 +9,18 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.security.GeneralSecurityException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  * Created by des01c7 on 17-12-20.
  */
 public class CaptchaHelper {
+
+    /** Logger para la clase */
+    Logger logger = Logger.getLogger(ConstrumartScrapper.class.getName());
+    LogHelper fh = LogHelper.getInstance();
 
     WebDriver driver;
     WebClient client;
@@ -24,6 +32,9 @@ public class CaptchaHelper {
     String BASE_URL;
 
     public CaptchaHelper(WebDriver driver, String url) throws GeneralSecurityException {
+        SimpleFormatter formatter = new SimpleFormatter();
+        fh.setFormatter(formatter);
+        logger.addHandler(fh);
         this.driver = driver;
         this.BASE_URL = url;
         this.client = new WebClient();
@@ -52,19 +63,20 @@ public class CaptchaHelper {
         Page response = client.getPage(QUERY);
         String stringResponse = response.getWebResponse().getContentAsString();
         String jobId = "";
-        if(!stringResponse.contains("OK")){
+        if(!stringResponse.contains("OK")) {
+            logger.log(Level.WARNING, "Error with 2captcha.com API, received : " + stringResponse);
             throw new Exception("Error with 2captcha.com API, received : " + stringResponse);
-        }else{
+        } else {
             jobId = stringResponse.split("\\|")[1];
         }
 
         boolean captchaSolved = false ;
-        while(!captchaSolved){
+        while(!captchaSolved) {
             response = client.getPage(String.format("%sres.php?key=%s&action=get&id=%s", API_BASE_URL, API_KEY, jobId));
             if (response.getWebResponse().getContentAsString().contains("CAPCHA_NOT_READY")){
                 Thread.sleep(3000);
                 System.out.println("Waiting for 2Captcha.com ...");
-            }else{
+            }else {
                 captchaSolved = true ;
                 System.out.println("Captcha solved !");
             }
@@ -80,9 +92,9 @@ public class CaptchaHelper {
 
         //driver.findElement(By.id("name")).sendKeys("Kevin");
 
-        if(driver.getPageSource().contains("your captcha was successfully submitted")){
+        if(driver.getPageSource().contains("your captcha was successfully submitted")) {
             System.out.println("Captcha successfuly submitted !");
-        }else{
+        }else {
             System.out.println("Error while submitting captcha");
         }
 
