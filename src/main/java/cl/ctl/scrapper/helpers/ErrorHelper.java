@@ -39,7 +39,7 @@ public class ErrorHelper {
 
     //private static final String to = "cristian.fiedler@fiedler-bi.com";//"semantikos.minsal@gmail.com";
 
-    private static final String to = ConfigHelper.getInstance().CONFIG.get("mail.to");//"diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
+    private static final String to = ConfigHelper.getInstance().CONFIG.get("error.to");//"diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
 
     private static final String username = "diego.abelardo.soto@gmail.com";
 
@@ -77,7 +77,7 @@ public class ErrorHelper {
         return instance;
     }
 
-    public void sendMail() throws IOException {
+    public void sendMail() throws Exception {
 
         this.body = "";
         loadMailBody();
@@ -95,6 +95,8 @@ public class ErrorHelper {
         addRecords();
 
         send();
+
+        throw new Exception("Ha ocurrido una excepción irrecuperable durante el proceso. Se ha enviado un correo al Adminsitrador con el log adjunto.");
     }
 
     public void addRecords() {
@@ -130,8 +132,9 @@ public class ErrorHelper {
             html2 = html2 + "<td style='padding: 0 0 0 0;'>" + method + "</td>";
             if(message.length() > 500) {
                 message = message.substring(0, 500) + " ...";
+
             }
-            html2 = html2 + "<tr><td style='padding: 0 0 0 0;' colspan='3'>" + message + "</td></tr>";
+            html2 = html2 + "<tr style='background: #e8e5e5a8;'><td style='padding: 0 0 0 0;' colspan='3'>" + message + "</td></tr>";
 
             html2 = html2 + "</tr>";
 

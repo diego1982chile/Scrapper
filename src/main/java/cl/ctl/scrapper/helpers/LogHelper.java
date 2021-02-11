@@ -1,5 +1,6 @@
 package cl.ctl.scrapper.helpers;
 
+import cl.ctl.scrapper.model.BusinessException;
 import cl.ctl.scrapper.model.FileControl;
 import cl.ctl.scrapper.model.Log;
 
@@ -99,7 +100,7 @@ public class LogHelper extends Handler {
         if(record.getLevel().equals(Level.SEVERE)) {
             try {
                 ErrorHelper.getInstance().sendMail();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
