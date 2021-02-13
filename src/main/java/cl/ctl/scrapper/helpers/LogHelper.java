@@ -71,6 +71,15 @@ public class LogHelper extends Handler {
         fileControlList.add(fileControl);
     }
 
+    public FileControl findByFileName(String fileName) {
+        for (FileControl fileControl : fileControlList) {
+            if(fileControl.getFileName().equals(fileName)) {
+                return fileControl;
+            }
+        }
+        return null;
+    }
+
     public void updateFileNames() {
         /* Se actualiza el mapa por nombres */
         for (FileControl fileControl : fileControlList) {

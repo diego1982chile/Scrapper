@@ -125,6 +125,9 @@ public class FilesHelper {
 
         // Descomprimir archivos descargados
         for (File file : directory.listFiles()) {
+            if(LogHelper.getInstance().findByFileName(file.getName()) != null) {
+                continue;
+            }
             if(file.getName().contains(".zip")) {
                 uncompress(file);
                 file.delete();
@@ -133,6 +136,9 @@ public class FilesHelper {
 
         // Renombrar archivos descomprimidos
         for (File file : directory.listFiles()) {
+            if(LogHelper.getInstance().findByFileName(file.getName()) != null) {
+                continue;
+            }
             if(file.isDirectory()) {
                 for (File file2 : file.listFiles()) {
                     file2.renameTo(new File(file.getAbsolutePath() + ".csv"));
@@ -252,7 +258,7 @@ public class FilesHelper {
 
     public boolean checkFiles(String cadena) {
 
-        String ext = ".zip";
+        String ext = ".csv";
 
         if(cadena.equals("Sodimac")) {
             ext = ".txt";
@@ -266,20 +272,38 @@ public class FilesHelper {
         }
 
         // Comprobar que exista el archivo diario de la cadena, de lo contrario retornar false
-        if(!Arrays.asList(directory.listFiles()).contains(new File("Legrand_" + cadena + "_Dia_" + PROCESS_NAME + ext))) {
+        File diario = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Dia_" + PROCESS_NAME + ext);
+
+        String processDay = ProcessHelper.getInstance().getProcessDate().toString();
+        String dayOfWeekProcess = WordUtils.capitalize(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+        String dayOfWeek = WordUtils.capitalize(LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+        String fileNameShort = diario.getName().split(Pattern.quote(SEPARATOR))[diario.getName().split(Pattern.quote(SEPARATOR)).length - 1];
+        String status = "OK";
+
+        if(!Arrays.asList(directory.listFiles()).contains(diario)) {
             return false;
         }
 
+        LogHelper.getInstance().registerFileControl(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, "Dia", cadena, fileNameShort, status));
+
+        File mensual = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Mes_" + PROCESS_NAME + ext);
+
         // Comprobar que exista el archivo mensual de la cadena, de lo contrario retornar false
-        if(!Arrays.asList(directory.listFiles()).contains(new File("Legrand_" + cadena + "_Mes_" + PROCESS_NAME + ext))) {
+        if(!Arrays.asList(directory.listFiles()).contains(mensual)) {
             return false;
         }
+
+        LogHelper.getInstance().registerFileControl(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, "Mes", cadena, fileNameShort, status));
 
         // Si el proceso es del Domingo, Comprobar que exista el archivo semanal de la cadena, de lo contrario retornar false
         if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-            if(!Arrays.asList(directory.listFiles()).contains(new File("Legrand_" + cadena + "_Dom_" + PROCESS_NAME + ext))) {
+            File semanal = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Dom_" + PROCESS_NAME + ext);
+
+            if(!Arrays.asList(directory.listFiles()).contains(semanal)) {
                 return false;
             }
+
+            LogHelper.getInstance().registerFileControl(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, "Dom", cadena, fileNameShort, status));
         }
 
         return true;
@@ -313,9 +337,19 @@ public class FilesHelper {
         }
 
         // Comprobar que exista el archivo con la frecuencia de la cadena, de lo contrario retornar false
-        if(!Arrays.asList(directory.listFiles()).contains(new File("Legrand_" + cadena + "_" + frequency + "_" + PROCESS_NAME + ext))) {
+        if(!Arrays.asList(directory.listFiles()).contains(new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_" + frequency + "_" + PROCESS_NAME + ext))) {
             return false;
         }
+
+        File file = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_" + frequency + "_" + PROCESS_NAME + ext);
+
+        String processDay = ProcessHelper.getInstance().getProcessDate().toString();
+        String dayOfWeekProcess = WordUtils.capitalize(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+        String dayOfWeek = WordUtils.capitalize(LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+        String fileNameShort = file.getName().split(Pattern.quote(SEPARATOR))[file.getName().split(Pattern.quote(SEPARATOR)).length - 1];
+        String status = "OK";
+
+        LogHelper.getInstance().registerFileControl(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, frequency, cadena, fileNameShort, status));
 
         return true;
     }

@@ -50,7 +50,7 @@ public class CaptchaHelper {
         Thread.sleep(10000);
 
         WebElement elem = driver.findElement(By.xpath("//div[@class='g-recaptcha']"));
-        if(elem.isDisplayed()){
+        if(elem.isDisplayed()) {
             // do something
         }
         try {

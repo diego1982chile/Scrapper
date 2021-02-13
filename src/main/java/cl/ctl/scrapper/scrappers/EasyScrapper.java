@@ -20,28 +20,22 @@ import java.util.logging.Level;
  */
 public class EasyScrapper extends AbstractScrapper {
 
-    private static final String URL = "https://www.cenconlineb2b.com/auth/realms/cencosud/protocol/openid-connect/auth?response_type=code&client_id=easycl-client-prod&redirect_uri=https%3A%2F%2Fwww.cenconlineb2b.com%2FEasyCL%2FBBRe-commerce%2Fswf%2Fmain.html&state=bad15b30-d2d2-4738-8409-ffaad6602ac6&login=true&scope=openid";
-
     public EasyScrapper() throws IOException {
         super();
         CADENA = "Easy";
+        URL = "https://www.cenconlineb2b.com/auth/realms/cencosud/protocol/openid-connect/auth?response_type=code&client_id=easycl-client-prod&redirect_uri=https%3A%2F%2Fwww.cenconlineb2b.com%2FEasyCL%2FBBRe-commerce%2Fswf%2Fmain.html&state=bad15b30-d2d2-4738-8409-ffaad6602ac6&login=true&scope=openid";
     }
 
-    public void scrap() throws Exception {
-
+     void login() throws Exception {
         try {
-            super.checkScraps();
-
-            driver.get(URL);
-
             // *SolveCaptcha
             CaptchaHelper captchaHelper = new CaptchaHelper(driver, URL);
             captchaHelper.solveCaptcha();
-
             Thread.sleep(2000);
-
-            // *Login
-            login();
+            driver.findElement(By.id("username")).sendKeys("michel.lotissier@legrand.cl");
+            driver.findElement(By.id("password")).sendKeys("diy12easy2020");
+            driver.getPageSource();
+            driver.findElement(By.id("kc-login")).click();
 
             Thread.sleep(2000);
 
@@ -55,58 +49,6 @@ public class EasyScrapper extends AbstractScrapper {
 
             Thread.sleep(2000);
 
-            // Generar Scrap Diario
-
-            generateScrap(ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 1);
-            Thread.sleep(5000);
-
-            FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "DAY");
-
-            // Cerrar Tab
-            closeTab();
-
-            Thread.sleep(2000);
-
-            // Generar Scrap Mensual
-
-            generateScrap(1, ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 2);
-            Thread.sleep(5000);
-
-            FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "MONTH");
-
-            // Cerrar Tab
-            closeTab();
-
-            Thread.sleep(2000);
-
-            // Si es proceso de Domingo
-            // Generar Scrap Semanal
-            if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-                generateScrap(ProcessHelper.getInstance().getProcessDate().minusDays(6).getDayOfMonth(), ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 3);
-                Thread.sleep(5000);
-
-                FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "WEEK");
-
-                // Cerrar Tab
-                closeTab();
-            }
-
-            Thread.sleep(2000);
-
-            driver.quit();
-        }
-        catch (BusinessException e) {
-            logger.log(Level.WARNING, e.getMessage());
-        }
-
-    }
-
-    private void login() {
-        try {
-            driver.findElement(By.id("username")).sendKeys("michel.lotissier@legrand.cl");
-            driver.findElement(By.id("password")).sendKeys("diy12easy2020");
-            driver.getPageSource();
-            driver.findElement(By.id("kc-login")).click();
         }
         catch(Exception e) {
             logger.log(Level.SEVERE, e.getMessage());
@@ -149,11 +91,7 @@ public class EasyScrapper extends AbstractScrapper {
         }
     }
 
-    private void generateScrap(int startDay, int endDay, int count) throws InterruptedException {
-
-        try {
-
-            super.checkScrap(count);
+    void doScrap(int startDay, int endDay, int count) throws InterruptedException {
 
             // GoTo Comercial
             int cont = 0;
@@ -315,9 +253,9 @@ public class EasyScrapper extends AbstractScrapper {
                     }
                 }
             }
-        }
-        catch (BusinessException e) {
-            logger.log(Level.WARNING, e.getMessage());
-        }
+
+        Thread.sleep(2000);
+        // Cerrar Tab
+        closeTab();
     }
 }

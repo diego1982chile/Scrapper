@@ -20,104 +20,38 @@ import java.util.logging.Level;
  */
 public class ConstrumartScrapper extends AbstractScrapper {
 
-    private static  final String URL = "https://sso.bbr.cl/auth/realms/construmart/protocol/openid-connect/auth?response_type=code&client_id=construmart-client-prod&redirect_uri=https%3A%2F%2Fb2b.construmart.cl%2FBBRe-commerce%2Fmain&state=5d08ee52-2336-4ed0-abc4-b431ee1e3a55&login=true&scope=openid";
-
     public ConstrumartScrapper() throws IOException {
         super();
         CADENA = "Construmart";
+        URL = "https://sso.bbr.cl/auth/realms/construmart/protocol/openid-connect/auth?response_type=code&client_id=construmart-client-prod&redirect_uri=https%3A%2F%2Fb2b.construmart.cl%2FBBRe-commerce%2Fmain&state=5d08ee52-2336-4ed0-abc4-b431ee1e3a55&login=true&scope=openid";
     }
 
     public ConstrumartScrapper(LocalDate processDate) throws IOException {
         super();
     }
 
-    public void scrap() throws Exception {
-
+     void login() throws Exception {
         try {
-            super.checkScraps();
-
-            driver.get(URL);
-
             // *SolveCaptcha
             CaptchaHelper captchaHelper = new CaptchaHelper(driver, URL);
             captchaHelper.solveCaptcha();
-
             Thread.sleep(2000);
 
-            // *Login
-            login();
-
-            Thread.sleep(2000);
-
-            // *Redirect
-            redirectHome();
-
-            Thread.sleep(5000);
-
-            // Generar Scrap Diario
-            generateScrap(ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 1);
-            Thread.sleep(5000);
-            FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "DAY");
-
-            Thread.sleep(2000);
-
-            // Cerrar Tab
-            closeTab();
-
-            Thread.sleep(2000);
-
-            // Generar Scrap Mensual
-            generateScrap(1, ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 2);
-            Thread.sleep(5000);
-            FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "MONTH");
-            // Cerrar Tab
-            closeTab();
-
-            Thread.sleep(2000);
-
-            // Si es proceso de Domingo
-            // Generar Scrap Semanal
-            if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-                generateScrap(ProcessHelper.getInstance().getProcessDate().minusDays(6).getDayOfMonth(), ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 3);
-                Thread.sleep(5000);
-                FilesHelper.getInstance().renameLastDownloadedFile(CADENA, "WEEK");
-                // Cerrar Tab
-                closeTab();
-            }
-
-            Thread.sleep(2000);
-
-            driver.quit();
-        }
-        catch(BusinessException e) {
-            logger.log(Level.WARNING, e.getMessage());
-        }
-
-    }
-
-    private void login() throws InterruptedException {
-        try {
             driver.findElement(By.id("username")).sendKeys("brenda.gimenez@legrand.cl");
             Thread.sleep(2000);
             driver.findElement(By.id("password")).sendKeys("diy012021");
             Thread.sleep(2000);
             driver.getPageSource();
             driver.findElement(By.id("kc-login")).click();
-        }
-        catch(Exception e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
-    }
 
-    private void redirectHome() {
-        try {
+            Thread.sleep(5000);
+            //Redirigir al home
             // https://b2b.construmart.cl/BBRe-commerce/main
             driver.get("https://b2b.construmart.cl/Construccion/BBRe-commerce/access/login.do");
         }
         catch(Exception e) {
             logger.log(Level.SEVERE, e.getMessage());
+            e.printStackTrace();
             throw e;
         }
     }
@@ -133,10 +67,7 @@ public class ConstrumartScrapper extends AbstractScrapper {
         }
     }
 
-    private void generateScrap(int startDay, int endDay, int count) throws InterruptedException {
-
-        try {
-            checkScrap(count);
+    void doScrap(int startDay, int endDay, int count) throws Exception {
 
             // GoTo Comercial
             int cont = 0;
@@ -269,11 +200,12 @@ public class ConstrumartScrapper extends AbstractScrapper {
                     }
                 }
             }
-        }
-        catch(BusinessException e) {
-            logger.log(Level.WARNING, e.getMessage());
-        }
 
+            Thread.sleep(2000);
+            // Cerrar Tab
+            closeTab();
+
+        }
 
     }
-}
+

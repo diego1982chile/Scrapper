@@ -46,17 +46,17 @@ public class Main {
         logger.log(Level.INFO, "Scrapper Construmart -> Inicializando");
 
         ConstrumartScrapper construmartScrapper = new ConstrumartScrapper();
-        construmartScrapper.scrap();
+        construmartScrapper.process();
 
         logger.log(Level.INFO, "Scrapper Easy -> Inicializando");
 
         EasyScrapper easyScrapper = new EasyScrapper();
-        easyScrapper.scrap();
+        easyScrapper.process();
 
         logger.log(Level.INFO, "Scrapper Sodimac -> Inicializando");
 
         SodimacScrapper sodimacScrapper = new SodimacScrapper();
-        sodimacScrapper.scrap();
+        sodimacScrapper.process();
 
         logger.log(Level.INFO, "Descomprimiendo y renombrando archivos");
 
