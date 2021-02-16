@@ -28,7 +28,8 @@ public class ConfigHelper {
      */
     public ConfigHelper() {
 
-        try (InputStream input = new FileInputStream("config.properties")) {
+        try (//InputStream input = new FileInputStream("config.properties")
+             InputStream input = this.getClass().getResourceAsStream("/config.properties")) {
 
             Properties prop = new Properties();
 
