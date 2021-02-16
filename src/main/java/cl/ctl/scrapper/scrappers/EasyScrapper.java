@@ -47,7 +47,11 @@ public class EasyScrapper extends AbstractScrapper {
             // Select country
             selectCountry();
 
-            Thread.sleep(2000);
+            Thread.sleep(5000);
+
+            driver.findElement(By.xpath("//div[@class='v-window-closebox']")).click();
+
+            Thread.sleep(5000);
 
         }
         catch(Exception e) {
@@ -134,24 +138,6 @@ public class EasyScrapper extends AbstractScrapper {
 
             Actions actions;
 
-            String check1Id = "";
-            String check2Id = "";
-
-            switch(count) {
-                case 1:
-                    check1Id = "gwt-uid-8";
-                    check2Id = "gwt-uid-9";
-                    break;
-                case 2:
-                    check1Id = "gwt-uid-25";
-                    check2Id = "gwt-uid-26";
-                    break;
-                case 3:
-                    check1Id = "gwt-uid-42";
-                    check2Id = "gwt-uid-43";
-                    break;
-            }
-
             cont = 0;
 
             // *SelectParameters
@@ -160,13 +146,13 @@ public class EasyScrapper extends AbstractScrapper {
                 cont++;
 
                 try {
-                    WebElement checkDisplayStock = driver.findElement(By.xpath("//input[@id='" + check1Id + "']"));
+                    WebElement checkDisplayStock = driver.findElement(By.xpath(".//*[contains(text(),'Mostrar inventario al')]/parent::div/preceding-sibling::div"));
                     actions = new Actions(driver);
                     actions.moveToElement(checkDisplayStock).click().build().perform();
 
                     Thread.sleep(1000);
 
-                    WebElement excludeProductsWithoutStock = driver.findElement(By.xpath("//input[@id='" + check2Id + "']"));
+                    WebElement excludeProductsWithoutStock = driver.findElement(By.xpath(".//*[contains(text(),'Excluir productos sin ventas y sin stock')]/parent::div/preceding-sibling::div"));
                     actions = new Actions(driver);
                     actions.moveToElement(excludeProductsWithoutStock).click().build().perform();
 

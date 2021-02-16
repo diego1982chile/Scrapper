@@ -55,6 +55,8 @@ public class ErrorHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(ErrorHelper.class);
 
+    private static boolean flag = false;
+
     public ErrorHelper() {
 
         prop = System.getProperties();
@@ -80,6 +82,13 @@ public class ErrorHelper {
     public void sendMail() throws Exception {
 
         this.body = "";
+
+        if(flag) {
+           return;
+        }
+
+        flag = true;
+
         loadMailBody();
 
         List<FileControl> fileControlList = LogHelper.getInstance().getFileControlList();

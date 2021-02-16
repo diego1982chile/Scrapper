@@ -1,6 +1,5 @@
 package cl.ctl.scrapper.scrappers;
 
-import cl.ctl.scrapper.helpers.CaptchaHelper;
 import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.LogHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
@@ -12,8 +11,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -105,7 +102,7 @@ public abstract class AbstractScrapper {
                 throw new IllegalStateException("Unexpected value: " + count);
         }
 
-        FilesHelper.getInstance().renameLastDownloadedFile(cadena, freq);
+        FilesHelper.getInstance().renameLastFile(cadena, freq);
     }
 
     void scrap() throws Exception {
@@ -132,6 +129,7 @@ public abstract class AbstractScrapper {
 
         // Si la cadena genera solo scraps diarios retornar en este punto
         if(onlyDiary) {
+            driver.quit();
             return;
         }
 
@@ -163,7 +161,12 @@ public abstract class AbstractScrapper {
         }
         catch(BusinessException e) {
             logger.log(Level.WARNING, e.getMessage());
-            driver.quit();
+            try {
+                driver.quit();
+            }
+            catch(Exception ex) {
+                ex.printStackTrace();
+            }
         }
         finally {
             renameFile(CADENA, count);
@@ -181,7 +184,12 @@ public abstract class AbstractScrapper {
         }
         catch(BusinessException e) {
             logger.log(Level.WARNING, e.getMessage());
-            driver.quit();
+            try {
+                driver.quit();
+            }
+            catch(Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }

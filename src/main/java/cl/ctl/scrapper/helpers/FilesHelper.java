@@ -125,9 +125,6 @@ public class FilesHelper {
 
         // Descomprimir archivos descargados
         for (File file : directory.listFiles()) {
-            if(LogHelper.getInstance().findByFileName(file.getName()) != null) {
-                continue;
-            }
             if(file.getName().contains(".zip")) {
                 uncompress(file);
                 file.delete();
@@ -136,9 +133,6 @@ public class FilesHelper {
 
         // Renombrar archivos descomprimidos
         for (File file : directory.listFiles()) {
-            if(LogHelper.getInstance().findByFileName(file.getName()) != null) {
-                continue;
-            }
             if(file.isDirectory()) {
                 for (File file2 : file.listFiles()) {
                     file2.renameTo(new File(file.getAbsolutePath() + ".csv"));
@@ -170,7 +164,7 @@ public class FilesHelper {
     }
 
     // Renombrar archivos descargados
-    public void renameLastDownloadedFile(String holding, String frequency) {
+    public void renameLastFile(String holding, String frequency) {
 
         logger.log(Level.INFO, "Moviendo archivo cadena = " + holding + " frecuencia = " + frequency);
         
