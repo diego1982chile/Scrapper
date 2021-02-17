@@ -3,6 +3,7 @@ package cl.ctl.scrapper.helpers;
 import cl.ctl.scrapper.model.FileControl;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.WordUtils;
 import org.json.simple.parser.JSONParser;
@@ -252,12 +253,6 @@ public class FilesHelper {
 
     public boolean checkFiles(String cadena) {
 
-        String ext = ".csv";
-
-        if(cadena.equals("Sodimac")) {
-            ext = ".txt";
-        }
-
         File directory = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME);
 
         // Comprobar que exista el directorio del proceso, de lo contrario retornar false
@@ -265,8 +260,8 @@ public class FilesHelper {
             return false;
         }
 
-        // Comprobar que exista el archivo diario de la cadena, de lo contrario retornar false
-        File diario = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Dia_" + PROCESS_NAME + ext);
+
+        File diario = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Dia_" + PROCESS_NAME);
 
         String processDay = ProcessHelper.getInstance().getProcessDate().toString();
         String dayOfWeekProcess = WordUtils.capitalize(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
@@ -274,16 +269,33 @@ public class FilesHelper {
         String fileNameShort = diario.getName().split(Pattern.quote(SEPARATOR))[diario.getName().split(Pattern.quote(SEPARATOR)).length - 1];
         String status = "OK";
 
-        if(!Arrays.asList(directory.listFiles()).contains(diario)) {
+        boolean flag = false;
+
+        // Comprobar que exista el archivo diario de la cadena, de lo contrario retornar false
+        for (String s : directory.list()) {
+            if(diario.getName().equals(s.split("\\.")[0])) {
+                flag = true;
+                break;
+            }
+        }
+
+        if(!flag) {
             return false;
         }
 
         LogHelper.getInstance().registerFileControl(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, "Dia", cadena, fileNameShort, status));
 
-        File mensual = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Mes_" + PROCESS_NAME + ext);
+        File mensual = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Mes_" + PROCESS_NAME);
 
         // Comprobar que exista el archivo mensual de la cadena, de lo contrario retornar false
-        if(!Arrays.asList(directory.listFiles()).contains(mensual)) {
+        for (String s : directory.list()) {
+            if(mensual.getName().equals(s.split("\\.")[0])) {
+                flag = true;
+                break;
+            }
+        }
+
+        if(!flag) {
             return false;
         }
 
@@ -291,9 +303,16 @@ public class FilesHelper {
 
         // Si el proceso es del Domingo, Comprobar que exista el archivo semanal de la cadena, de lo contrario retornar false
         if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-            File semanal = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Dom_" + PROCESS_NAME + ext);
+            File semanal = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Dom_" + PROCESS_NAME);
 
-            if(!Arrays.asList(directory.listFiles()).contains(semanal)) {
+            for (String s : directory.list()) {
+                if(semanal.getName().equals(s.split("\\.")[0])) {
+                    flag = true;
+                    break;
+                }
+            }
+
+            if(!flag) {
                 return false;
             }
 
@@ -305,11 +324,6 @@ public class FilesHelper {
 
     public boolean checkFiles(String cadena, String frequency) {
 
-        String ext = ".zip";
-
-        if(cadena.equals("Sodimac")) {
-            ext = ".txt";
-        }
 
         switch(frequency) {
             case "DAY":
@@ -331,11 +345,24 @@ public class FilesHelper {
         }
 
         // Comprobar que exista el archivo con la frecuencia de la cadena, de lo contrario retornar false
-        if(!Arrays.asList(directory.listFiles()).contains(new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_" + frequency + "_" + PROCESS_NAME + ext))) {
+        File file = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_" + frequency + "_" + PROCESS_NAME);
+
+        if(!Arrays.asList(directory.listFiles()).contains(file)) {
             return false;
         }
 
-        File file = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_" + frequency + "_" + PROCESS_NAME + ext);
+        boolean flag = false;
+
+        for (String s : directory.list()) {
+            if(file.getName().equals(s.split("\\.")[0])) {
+                flag = true;
+                break;
+            }
+        }
+
+        if(!flag) {
+            return false;
+        }
 
         String processDay = ProcessHelper.getInstance().getProcessDate().toString();
         String dayOfWeekProcess = WordUtils.capitalize(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
