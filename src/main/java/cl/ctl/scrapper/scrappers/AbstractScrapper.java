@@ -57,7 +57,7 @@ public abstract class AbstractScrapper {
 
     void checkScraps() throws BusinessException {
         if(FilesHelper.getInstance().checkFiles(CADENA)) {
-            throw new BusinessException("Scrapper" + CADENA + " -> Archivos ya fueron generados! se omite el proceso");
+            throw new BusinessException("Scrapper '" + CADENA + "' -> Archivos ya fueron generados! se omite el proceso");
         }
     }
 
@@ -80,7 +80,7 @@ public abstract class AbstractScrapper {
         }
 
         if(FilesHelper.getInstance().checkFiles(CADENA, freq)) {
-            throw new BusinessException("Scrapper " + CADENA + " -> Archivo diario ya fue generado! se omite el proceso diario");
+            throw new BusinessException("Scrapper " + CADENA + " -> Archivo de frecuencia '" + freq + "' ya fue generado! se omite el proceso diario");
         }
     }
 

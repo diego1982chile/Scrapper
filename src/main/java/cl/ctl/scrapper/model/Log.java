@@ -6,12 +6,15 @@ public class Log {
     String classname;
     String method;
     String message;
+    String level;
 
-    public Log(String timestamp, String classname, String method, String message) {
+    public Log(String timestamp, String classname, String method, String message, String level) {
         this.timestamp = timestamp;
         this.classname = classname;
         this.method = method;
         this.message = message;
+        this.level = level;
+
     }
 
     public String getTimestamp() {
@@ -44,5 +47,13 @@ public class Log {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
     }
 }

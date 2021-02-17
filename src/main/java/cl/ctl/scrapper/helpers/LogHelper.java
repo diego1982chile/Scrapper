@@ -106,7 +106,20 @@ public class LogHelper extends Handler {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm:ss");
         String string = localDateTime.format(formatter);
 
-        logs.add(new Log(string, record.getSourceClassName(), record.getSourceMethodName(), record.getMessage()));
+        String level = "INFO";
+
+        switch (record.getLevel().getName()) {
+            case "SEVERE":
+                level = "ERROR";
+                break;
+            case "WARNING":
+                level = "WARNING";
+                break;
+            default:
+                break;
+        }
+
+        logs.add(new Log(string, record.getSourceClassName(), record.getSourceMethodName(), record.getMessage(), level));
 
         if(record.getLevel().equals(Level.SEVERE)) {
             try {
