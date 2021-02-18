@@ -26,9 +26,11 @@ public abstract class AbstractScrapper {
     Logger logger = Logger.getLogger(ConstrumartScrapper.class.getName());
     LogHelper fh = LogHelper.getInstance();
 
-    String CADENA;
+    String cadena;
 
-    String URL;
+    String url;
+
+    String fileExt = ".csv";
 
     boolean onlyDiary = false;
 
@@ -55,9 +57,41 @@ public abstract class AbstractScrapper {
         }
     }
 
+    public String getCadena() {
+        return cadena;
+    }
+
+    public void setCadena(String cadena) {
+        this.cadena = cadena;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getFileExt() {
+        return fileExt;
+    }
+
+    public void setFileExt(String fileExt) {
+        this.fileExt = fileExt;
+    }
+
+    public boolean isOnlyDiary() {
+        return onlyDiary;
+    }
+
+    public void setOnlyDiary(boolean onlyDiary) {
+        this.onlyDiary = onlyDiary;
+    }
+
     void checkScraps() throws BusinessException {
-        if(FilesHelper.getInstance().checkFiles(CADENA)) {
-            throw new BusinessException("Scrapper '" + CADENA + "' -> Archivos ya fueron generados! se omite el proceso");
+        if(FilesHelper.getInstance().checkFiles(this)) {
+            throw new BusinessException("Scrapper '" + cadena + "' -> Archivos ya fueron generados! se omite el proceso");
         }
     }
 
@@ -79,8 +113,8 @@ public abstract class AbstractScrapper {
                 throw new IllegalStateException("Unexpected value: " + count);
         }
 
-        if(FilesHelper.getInstance().checkFiles(CADENA, freq)) {
-            throw new BusinessException("Scrapper " + CADENA + " -> Archivo de frecuencia '" + freq + "' ya fue generado! se omite el proceso diario");
+        if(FilesHelper.getInstance().checkFile(cadena, freq, fileExt)) {
+            throw new BusinessException("Scrapper " + cadena + " -> Archivo de frecuencia '" + freq + "' ya fue generado! se omite el proceso diario");
         }
     }
 
@@ -102,7 +136,7 @@ public abstract class AbstractScrapper {
                 throw new IllegalStateException("Unexpected value: " + count);
         }
 
-        FilesHelper.getInstance().renameLastFile(cadena, freq);
+        FilesHelper.getInstance().renameLastFile(cadena, freq, fileExt);
     }
 
     void scrap() throws Exception {
@@ -111,7 +145,7 @@ public abstract class AbstractScrapper {
 
         Thread.sleep(2000);
 
-        driver.get(URL);
+        driver.get(url);
 
         Thread.sleep(2000);
 
@@ -122,6 +156,8 @@ public abstract class AbstractScrapper {
         // Generar Scrap Diario
         int since = ProcessHelper.getInstance().getProcessDate().getDayOfMonth();
         int until = since;
+
+        logger.log(Level.INFO, "Descargando Scrap Diario...");
 
         generateScrap(since, until, 1);
 
@@ -136,6 +172,8 @@ public abstract class AbstractScrapper {
         // Generar Scrap Mensual
         since = 1;
 
+        logger.log(Level.INFO, "Descargando Scrap Mensual...");
+
         generateScrap(since, until, 2);
 
         Thread.sleep(2000);
@@ -144,6 +182,7 @@ public abstract class AbstractScrapper {
         // Generar Scrap Semanal
         if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
             since = ProcessHelper.getInstance().getProcessDate().minusDays(6).getDayOfMonth();
+            logger.log(Level.INFO, "Descargando Scrap Semanal...");
             generateScrap(since, ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 3);
         }
 
@@ -169,7 +208,7 @@ public abstract class AbstractScrapper {
             }
         }
         finally {
-            renameFile(CADENA, count);
+            renameFile(cadena, count);
         }
     }
 
@@ -192,4 +231,6 @@ public abstract class AbstractScrapper {
             }
         }
     }
+
+
 }

@@ -20,7 +20,7 @@ public class Executor {
 
     static LogHelper fh = LogHelper.getInstance();
 
-    public void process(Date date) throws Exception {
+    public void process(LocalDate date) throws Exception {
 
         // This block configure the logger with handler and formatter
         try {
@@ -29,9 +29,7 @@ public class Executor {
             e.printStackTrace();
         }
 
-        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-        ProcessHelper.getInstance().setProcessDate(localDate);
+        ProcessHelper.getInstance().setProcessDate(date);
         scrap();
 
         return;

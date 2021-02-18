@@ -18,9 +18,10 @@ public class SodimacScrapper extends AbstractScrapper {
 
     public SodimacScrapper() throws IOException {
         super();
-        CADENA = "Sodimac";
-        URL = "https://b2b.sodimac.com/b2bsocopr/grafica/html/index.html";
+        cadena = "Sodimac";
+        url = "https://b2b.sodimac.com/b2bsocopr/grafica/html/index.html";
         onlyDiary = true;
+        fileExt = ".txt";
     }
 
     void login() throws InterruptedException {

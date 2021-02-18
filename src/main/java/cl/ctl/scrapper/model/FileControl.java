@@ -102,4 +102,20 @@ public class FileControl {
     public void setProcess(String process) {
         this.process = process;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FileControl that = (FileControl) o;
+
+        return fileName != null ? fileName.equals(that.fileName) : that.fileName == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return fileName != null ? fileName.hashCode() : 0;
+    }
 }

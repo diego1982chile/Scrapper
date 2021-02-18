@@ -22,14 +22,14 @@ public class EasyScrapper extends AbstractScrapper {
 
     public EasyScrapper() throws IOException {
         super();
-        CADENA = "Easy";
-        URL = "https://www.cenconlineb2b.com/auth/realms/cencosud/protocol/openid-connect/auth?response_type=code&client_id=easycl-client-prod&redirect_uri=https%3A%2F%2Fwww.cenconlineb2b.com%2FEasyCL%2FBBRe-commerce%2Fswf%2Fmain.html&state=bad15b30-d2d2-4738-8409-ffaad6602ac6&login=true&scope=openid";
+        cadena = "Easy";
+        url = "https://www.cenconlineb2b.com/auth/realms/cencosud/protocol/openid-connect/auth?response_type=code&client_id=easycl-client-prod&redirect_uri=https%3A%2F%2Fwww.cenconlineb2b.com%2FEasyCL%2FBBRe-commerce%2Fswf%2Fmain.html&state=bad15b30-d2d2-4738-8409-ffaad6602ac6&login=true&scope=openid";
     }
 
      void login() throws Exception {
         try {
             // *SolveCaptcha
-            CaptchaHelper captchaHelper = new CaptchaHelper(driver, URL);
+            CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
             captchaHelper.solveCaptcha();
             Thread.sleep(2000);
             driver.findElement(By.id("username")).sendKeys("michel.lotissier@legrand.cl");
