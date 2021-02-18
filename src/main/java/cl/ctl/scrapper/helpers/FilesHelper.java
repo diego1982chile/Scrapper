@@ -200,6 +200,10 @@ public class FilesHelper {
 
             File downloadDir;
 
+            if(ext.equals(".csv")) {
+                ext = ".zip";
+            }
+
             fileName = DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + baseName + "_" + PROCESS_NAME + ext;
 
             downloadDir = new File(DOWNLOAD_PATH);
