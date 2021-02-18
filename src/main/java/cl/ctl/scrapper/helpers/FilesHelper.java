@@ -1,6 +1,7 @@
 package cl.ctl.scrapper.helpers;
 
 import cl.ctl.scrapper.model.FileControl;
+import cl.ctl.scrapper.scrappers.AbstractScrapper;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FilenameUtils;
@@ -165,7 +166,7 @@ public class FilesHelper {
     }
 
     // Renombrar archivos descargados
-    public void renameLastFile(String holding, String frequency) {
+    public void renameLastFile(String holding, String frequency, String ext) {
 
         logger.log(Level.INFO, "Moviendo archivo cadena = " + holding + " frecuencia = " + frequency);
         
@@ -199,12 +200,7 @@ public class FilesHelper {
 
             File downloadDir;
 
-            if(holding.equals("Sodimac")) {
-                fileName = DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + baseName + "_" + PROCESS_NAME + ".txt";
-            }
-            else {
-                fileName = DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + baseName + "_" + PROCESS_NAME + ".zip";
-            }
+            fileName = DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + baseName + "_" + PROCESS_NAME + ext;
 
             downloadDir = new File(DOWNLOAD_PATH);
 
@@ -251,7 +247,11 @@ public class FilesHelper {
         return DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR;
     }
 
-    public boolean checkFiles(String cadena) {
+    public boolean checkFiles(AbstractScrapper scrapper) {
+
+        String cadena = scrapper.getCadena();
+
+        String ext = scrapper.getFileExt();
 
         File directory = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME);
 
@@ -260,12 +260,12 @@ public class FilesHelper {
             return false;
         }
 
-
-        File diario = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Dia_" + PROCESS_NAME);
+        File diario = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Dia_" + PROCESS_NAME + ext);
 
         String processDay = ProcessHelper.getInstance().getProcessDate().toString();
         String dayOfWeekProcess = WordUtils.capitalize(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
         String dayOfWeek = WordUtils.capitalize(LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+
         String fileNameShort = diario.getName().split(Pattern.quote(SEPARATOR))[diario.getName().split(Pattern.quote(SEPARATOR)).length - 1];
         String status = "OK";
 
@@ -273,7 +273,7 @@ public class FilesHelper {
 
         // Comprobar que exista el archivo diario de la cadena, de lo contrario retornar false
         for (String s : directory.list()) {
-            if(diario.getName().equals(s.split("\\.")[0])) {
+            if(diario.getName().split("\\.")[0].equals(s.split("\\.")[0])) {
                 flag = true;
                 break;
             }
@@ -285,11 +285,18 @@ public class FilesHelper {
 
         LogHelper.getInstance().registerFileControl(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, "Dia", cadena, fileNameShort, status));
 
-        File mensual = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Mes_" + PROCESS_NAME);
+        if(scrapper.isOnlyDiary()) {
+            return true;
+        }
+
+        File mensual = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Mes_" + PROCESS_NAME + ext);
+        fileNameShort = mensual.getName().split(Pattern.quote(SEPARATOR))[mensual.getName().split(Pattern.quote(SEPARATOR)).length - 1];
+
+        flag = false;
 
         // Comprobar que exista el archivo mensual de la cadena, de lo contrario retornar false
         for (String s : directory.list()) {
-            if(mensual.getName().equals(s.split("\\.")[0])) {
+            if(mensual.getName().split("\\.")[0].equals(s.split("\\.")[0])) {
                 flag = true;
                 break;
             }
@@ -303,10 +310,13 @@ public class FilesHelper {
 
         // Si el proceso es del Domingo, Comprobar que exista el archivo semanal de la cadena, de lo contrario retornar false
         if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-            File semanal = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Dom_" + PROCESS_NAME);
+            File semanal = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_Dom_" + PROCESS_NAME + ext);
+            fileNameShort = semanal.getName().split(Pattern.quote(SEPARATOR))[semanal.getName().split(Pattern.quote(SEPARATOR)).length - 1];
+
+            flag = false;
 
             for (String s : directory.list()) {
-                if(semanal.getName().equals(s.split("\\.")[0])) {
+                if(semanal.getName().split("\\.")[0].equals(s.split("\\.")[0])) {
                     flag = true;
                     break;
                 }
@@ -322,7 +332,7 @@ public class FilesHelper {
         return true;
     }
 
-    public boolean checkFiles(String cadena, String frequency) {
+    public boolean checkFile(String cadena, String frequency, String ext) {
 
 
         switch(frequency) {
@@ -345,16 +355,12 @@ public class FilesHelper {
         }
 
         // Comprobar que exista el archivo con la frecuencia de la cadena, de lo contrario retornar false
-        File file = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_" + frequency + "_" + PROCESS_NAME);
-
-        if(!Arrays.asList(directory.listFiles()).contains(file)) {
-            return false;
-        }
+        File file = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + "Legrand_" + cadena + "_" + frequency + "_" + PROCESS_NAME + ext);
 
         boolean flag = false;
 
         for (String s : directory.list()) {
-            if(file.getName().equals(s.split("\\.")[0])) {
+            if(file.getName().split("\\.")[0].equals(s.split("\\.")[0])) {
                 flag = true;
                 break;
             }

@@ -45,6 +45,8 @@ public class CaptchaHelper {
 
     public void solveCaptcha() throws Exception {
 
+        logger.log(Level.INFO, "Resolviendo Captcha...");
+
         String siteId = "" ;
 
         Thread.sleep(10000);

@@ -68,19 +68,11 @@ public class LogHelper extends Handler {
      */
     public void registerFileControl(FileControl fileControl) {
         /* Se actualiza el mapa por nombres */
-        if(findByFileName(fileControl.getFileName()) == null) {
+        if(!fileControlList.contains(fileControl)) {
             fileControlList.add(fileControl);
         }
     }
 
-    public FileControl findByFileName(String fileName) {
-        for (FileControl fileControl : fileControlList) {
-            if(fileControl.getFileName().equals(fileName)) {
-                return fileControl;
-            }
-        }
-        return null;
-    }
 
     public void updateFileNames() {
         /* Se actualiza el mapa por nombres */
@@ -119,7 +111,11 @@ public class LogHelper extends Handler {
                 break;
         }
 
-        logs.add(new Log(string, record.getSourceClassName(), record.getSourceMethodName(), record.getMessage(), level));
+        Log log = new Log(string, record.getSourceClassName(), record.getSourceMethodName(), record.getMessage(), level);
+
+        if(!logs.contains(log)) {
+            logs.add(log);
+        }
 
         if(record.getLevel().equals(Level.SEVERE)) {
             try {
