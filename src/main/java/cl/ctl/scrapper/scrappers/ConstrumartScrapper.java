@@ -5,6 +5,7 @@ import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
 import cl.ctl.scrapper.model.BusinessException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -67,7 +68,7 @@ public class ConstrumartScrapper extends AbstractScrapper {
         }
     }
 
-    void doScrap(int startDay, int endDay, int count) throws Exception {
+    void doScrap(String since, String until) throws Exception {
 
             // GoTo Comercial
             int cont = 0;
@@ -120,25 +121,25 @@ public class ConstrumartScrapper extends AbstractScrapper {
 
                     Thread.sleep(1000);
 
-                    WebElement sinceCalendar = driver.findElements(By.xpath("//button[@class='v-datefield-button']")).get(0);
+                    String script = "document.getElementsByClassName('v-textfield v-datefield-textfield')[0].removeAttribute('disabled')";
+                    JavascriptExecutor js = (JavascriptExecutor) driver;
+                    js.executeScript(script);
 
-                    sinceCalendar.click();
-
-                    Thread.sleep(1000);
-
-                    WebElement day = driver.findElements(By.xpath("//span[text()='" + startDay + "']")).get(0);
-                    actions = new Actions(driver);
-                    actions.moveToElement(day).click().build().perform();
-
-                    WebElement toCalendar = driver.findElements(By.xpath("//button[@class='v-datefield-button']")).get(1);
-
-                    toCalendar.click();
+                    WebElement sinceInput = driver.findElement(By.xpath("//input[@class='v-textfield v-datefield-textfield']"));
+                    sinceInput.clear();
+                    js.executeScript(script);
+                    sinceInput.sendKeys(since);
 
                     Thread.sleep(1000);
 
-                    day = driver.findElements(By.xpath("//span[text()='" + endDay + "']")).get(0);
-                    actions = new Actions(driver);
-                    actions.moveToElement(day).click().build().perform();
+                    script = "document.getElementsByClassName('v-textfield v-datefield-textfield')[1].removeAttribute('disabled')";
+                    js = (JavascriptExecutor) driver;
+                    js.executeScript(script);
+
+                    WebElement untilInput = driver.findElement(By.xpath("//input[@class='v-textfield v-datefield-textfield']"));
+                    untilInput.clear();
+                    js.executeScript(script);
+                    untilInput.sendKeys(until);
 
                     break;
                 }

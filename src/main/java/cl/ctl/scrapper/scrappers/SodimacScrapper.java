@@ -65,7 +65,7 @@ public class SodimacScrapper extends AbstractScrapper {
             driver.findElement(By.id("entrar2")).click();
     }
 
-    void doScrap(int since, int until, int count) throws InterruptedException {
+    void doScrap(String since, String until) throws InterruptedException {
 
         // GoTo Comercial
         int cont = 0;

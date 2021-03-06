@@ -11,6 +11,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
+import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -153,9 +154,11 @@ public abstract class AbstractScrapper {
 
         Thread.sleep(2000);
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-YYYY");
+
         // Generar Scrap Diario
-        int since = ProcessHelper.getInstance().getProcessDate().getDayOfMonth();
-        int until = since;
+        String since = formatter.format(ProcessHelper.getInstance().getProcessDate());
+        String until = since;
 
         logger.log(Level.INFO, "Descargando Scrap Diario...");
 
@@ -170,7 +173,7 @@ public abstract class AbstractScrapper {
         }
 
         // Generar Scrap Mensual
-        since = 1;
+        since = formatter.format(ProcessHelper.getInstance().getProcessDate().minusDays(ProcessHelper.getInstance().getProcessDate().getDayOfMonth()).plusDays(1));
 
         logger.log(Level.INFO, "Descargando Scrap Mensual...");
 
@@ -181,9 +184,9 @@ public abstract class AbstractScrapper {
         // Si es proceso de Domingo
         // Generar Scrap Semanal
         if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-            since = ProcessHelper.getInstance().getProcessDate().minusDays(6).getDayOfMonth();
+            since = formatter.format(ProcessHelper.getInstance().getProcessDate().minusDays(6));
             logger.log(Level.INFO, "Descargando Scrap Semanal...");
-            generateScrap(since, ProcessHelper.getInstance().getProcessDate().getDayOfMonth(), 3);
+            generateScrap(since, until, 3);
         }
 
         Thread.sleep(2000);
@@ -192,11 +195,11 @@ public abstract class AbstractScrapper {
 
     }
 
-    void generateScrap(int since, int until, int count) throws Exception {
+    void generateScrap(String since, String until, int count) throws Exception {
 
         try {
             checkScrap(count);
-            doScrap(since, until, count);
+            doScrap(since, until);
         }
         catch(BusinessException e) {
             logger.log(Level.WARNING, e.getMessage());
@@ -212,7 +215,7 @@ public abstract class AbstractScrapper {
         }
     }
 
-    abstract void doScrap(int since, int until, int count) throws Exception;
+    abstract void doScrap(String since, String until) throws Exception;
 
     abstract void login() throws Exception;
 
