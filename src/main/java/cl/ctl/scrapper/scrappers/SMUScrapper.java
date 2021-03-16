@@ -1,9 +1,6 @@
 package cl.ctl.scrapper.scrappers;
 
 import cl.ctl.scrapper.helpers.CaptchaHelper;
-import cl.ctl.scrapper.helpers.FilesHelper;
-import cl.ctl.scrapper.helpers.ProcessHelper;
-import cl.ctl.scrapper.model.BusinessException;
 import cl.ctl.scrapper.model.DateOutOfRangeException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -14,17 +11,16 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
-import java.time.DayOfWeek;
 import java.util.logging.Level;
 
 /**
  * Created by des01c7 on 16-12-20.
  */
-public class EasyScrapper extends AbstractScrapper {
+public class SMUScrapper extends AbstractScrapper {
 
-    public EasyScrapper() throws IOException {
+    public SMUScrapper() throws IOException {
         super();
-        cadena = "Easy";
+        cadena = "SMU";
         url = "https://www.cenconlineb2b.com/auth/realms/cencosud/protocol/openid-connect/auth?response_type=code&client_id=easycl-client-prod&redirect_uri=https%3A%2F%2Fwww.cenconlineb2b.com%2FEasyCL%2FBBRe-commerce%2Fswf%2Fmain.html&state=bad15b30-d2d2-4738-8409-ffaad6602ac6&login=true&scope=openid";
     }
 
@@ -191,7 +187,7 @@ public class EasyScrapper extends AbstractScrapper {
                 Thread.sleep(1000);
 
                 if(!driver.findElements(By.xpath("//div[@class='v-datefield v-datefield-popupcalendar v-widget v-has-width v-has-height v-datefield-error-error v-datefield-error v-datefield-day']")).isEmpty()) {
-                    throw new DateOutOfRangeException(since);
+                    throw new DateOutOfRangeException("La Fecha está fuera del rango permitido");
                 }
 
                 script = "document.getElementsByClassName('v-textfield v-datefield-textfield')[1].removeAttribute('disabled')";
@@ -206,7 +202,7 @@ public class EasyScrapper extends AbstractScrapper {
                 Thread.sleep(1000);
 
                 if(!driver.findElements(By.xpath("//div[@class='v-datefield v-datefield-popupcalendar v-widget v-has-width v-has-height v-datefield-error-error v-datefield-error v-datefield-day']")).isEmpty()) {
-                    throw new DateOutOfRangeException(until);
+                    throw new DateOutOfRangeException("La Fecha está fuera del rango permitido");
                 }
 
                 break;

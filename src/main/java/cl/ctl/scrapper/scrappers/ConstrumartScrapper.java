@@ -4,6 +4,7 @@ import cl.ctl.scrapper.helpers.CaptchaHelper;
 import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
 import cl.ctl.scrapper.model.BusinessException;
+import cl.ctl.scrapper.model.DateOutOfRangeException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
@@ -112,6 +113,8 @@ public class ConstrumartScrapper extends AbstractScrapper {
 
             Actions actions;
 
+            cont = 0;
+
             // *SelectParameters
             while(cont < 10) {
 
@@ -132,6 +135,10 @@ public class ConstrumartScrapper extends AbstractScrapper {
 
                     Thread.sleep(1000);
 
+                    if(!driver.findElements(By.xpath("//div[@class='v-datefield v-datefield-popupcalendar v-widget v-has-width v-has-height v-datefield-error-error v-datefield-error v-datefield-day']")).isEmpty()) {
+                        throw new DateOutOfRangeException(since);
+                    }
+
                     script = "document.getElementsByClassName('v-textfield v-datefield-textfield')[1].removeAttribute('disabled')";
                     js = (JavascriptExecutor) driver;
                     js.executeScript(script);
@@ -141,11 +148,24 @@ public class ConstrumartScrapper extends AbstractScrapper {
                     js.executeScript(script);
                     untilInput.sendKeys(until);
 
+                    Thread.sleep(1000);
+
+                    if(!driver.findElements(By.xpath("//div[@class='v-datefield v-datefield-popupcalendar v-widget v-has-width v-has-height v-datefield-error-error v-datefield-error v-datefield-day']")).isEmpty()) {
+                        throw new DateOutOfRangeException(until);
+                    }
+
                     break;
                 }
                 catch (Throwable e) {
-                    logger.log(Level.SEVERE, e.getMessage());
+                    e.printStackTrace();
+
+                    if(e instanceof DateOutOfRangeException) {
+                        logger.log(Level.SEVERE, e.getMessage());
+                        throw e;
+                    }
+
                     if(cont >= 10) {
+                        logger.log(Level.SEVERE, e.getMessage());
                         throw e;
                     }
                 }
@@ -194,7 +214,7 @@ public class ConstrumartScrapper extends AbstractScrapper {
                     break;
                 }
                 catch (Throwable e) {
-                    logger.log(Level.SEVERE, e.getMessage());
+                    e.printStackTrace();
                     if(cont >= 10) {
                         logger.log(Level.SEVERE, e.getMessage());
                         throw e;

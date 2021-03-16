@@ -135,4 +135,10 @@ public class LogHelper extends Handler {
     }
 
 
+    public void reset() {
+        fileControlList.clear();
+        logs.clear();
+    }
+
+
 }

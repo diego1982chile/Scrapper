@@ -42,16 +42,6 @@ public abstract class AbstractScrapper {
             fh.setFormatter(formatter);
             logger.addHandler(fh);
 
-            WebDriverManager.chromedriver().setup();
-
-            ChromeOptions chrome_options = new ChromeOptions();
-            chrome_options.addArguments("--start-maximized");
-            //chrome_options.addArguments("--headless");
-            chrome_options.addArguments("--no-sandbox");
-            chrome_options.addArguments("--disable-dev-shm-usage");
-
-            driver = new ChromeDriver(chrome_options);
-
         } catch (SecurityException e) {
             e.printStackTrace();
             throw e;
@@ -119,6 +109,19 @@ public abstract class AbstractScrapper {
         }
     }
 
+
+    private void initializeDriver() {
+        WebDriverManager.chromedriver().setup();
+
+        ChromeOptions chrome_options = new ChromeOptions();
+        chrome_options.addArguments("--start-maximized");
+        //chrome_options.addArguments("--headless");
+        chrome_options.addArguments("--no-sandbox");
+        chrome_options.addArguments("--disable-dev-shm-usage");
+
+        driver = new ChromeDriver(chrome_options);
+    }
+
     void renameFile(String cadena, int count) {
 
         String freq;
@@ -141,6 +144,8 @@ public abstract class AbstractScrapper {
     }
 
     void scrap() throws Exception {
+
+        initializeDriver();
 
         checkScraps();
 
@@ -233,6 +238,11 @@ public abstract class AbstractScrapper {
                 ex.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return cadena;
     }
 
 

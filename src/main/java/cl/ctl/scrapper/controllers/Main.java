@@ -1,6 +1,7 @@
 package cl.ctl.scrapper.controllers;
 
 import cl.ctl.scrapper.helpers.*;
+import cl.ctl.scrapper.scrappers.AbstractScrapper;
 import cl.ctl.scrapper.scrappers.ConstrumartScrapper;
 import cl.ctl.scrapper.scrappers.EasyScrapper;
 import cl.ctl.scrapper.scrappers.SodimacScrapper;
@@ -27,7 +28,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        LocalDate localDate = LocalDate.of(2021, 2, 24);
+        LocalDate localDate = LocalDate.of(2021, 3, 15);
         LocalDate today = LocalDate.now();
 
         while(localDate.isBefore(today)) {
@@ -41,22 +42,10 @@ public class Main {
 
     public static void scrap() throws Exception {
 
-
-
-        logger.log(Level.INFO, "Scrapper Construmart -> Inicializando");
-
-        ConstrumartScrapper construmartScrapper = new ConstrumartScrapper();
-        construmartScrapper.process();
-
-        logger.log(Level.INFO, "Scrapper Easy -> Inicializando");
-
-        EasyScrapper easyScrapper = new EasyScrapper();
-        easyScrapper.process();
-
-        logger.log(Level.INFO, "Scrapper Sodimac -> Inicializando");
-
-        SodimacScrapper sodimacScrapper = new SodimacScrapper();
-        sodimacScrapper.process();
+        for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+            scrapper.process();
+            //ProcessHelper.getInstance().getExecutor().execute(scrapper);
+        }
 
         logger.log(Level.INFO, "Descomprimiendo y renombrando archivos");
 
