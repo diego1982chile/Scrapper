@@ -21,7 +21,7 @@ public class SMUScrapper extends AbstractScrapper {
     public SMUScrapper() throws IOException {
         super();
         cadena = "SMU";
-        url = "https://www.cenconlineb2b.com/auth/realms/cencosud/protocol/openid-connect/auth?response_type=code&client_id=easycl-client-prod&redirect_uri=https%3A%2F%2Fwww.cenconlineb2b.com%2FEasyCL%2FBBRe-commerce%2Fswf%2Fmain.html&state=bad15b30-d2d2-4738-8409-ffaad6602ac6&login=true&scope=openid";
+        url = "https://sso.bbr.cl/auth/realms/unimarc/protocol/openid-connect/auth?response_type=code&client_id=unimarc-client-prod&redirect_uri=https%3A%2F%2Fb2b.smu.cl%2FBBRe-commerce%2Fmain&state=175f2d2f-36ee-4575-aae0-28075fd437ab&login=true&scope=openid";
     }
 
     void login() throws Exception {
@@ -30,51 +30,33 @@ public class SMUScrapper extends AbstractScrapper {
             CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
             captchaHelper.solveCaptcha();
             Thread.sleep(2000);
-            driver.findElement(By.id("username")).sendKeys("michel.lotissier@legrand.cl");
-            driver.findElement(By.id("password")).sendKeys("diy12easy2020");
+            driver.findElement(By.id("username")).sendKeys("proyectos@nutrisa.cl");
+            driver.findElement(By.id("password")).sendKeys("Nutrisa.2021");
             driver.getPageSource();
             driver.findElement(By.id("kc-login")).click();
 
+            Thread.sleep(5000);
+
+            driver.get("https://b2b.smu.cl/BBRe-commerce/main");
+
+            Thread.sleep(10000);
+
+            Actions actions;
+
+            driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(2).click();
+
             Thread.sleep(2000);
 
-            // Redirect Home
-            redirectHome();
+            driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(1).click();
 
-            Thread.sleep(5000);
+            Thread.sleep(2000);
 
-            // Select country
-            selectCountry();
+            driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(0).click();
 
-            Thread.sleep(5000);
-
-            //driver.findElement(By.xpath("//div[@class='v-window-closebox']")).click();
+            Thread.sleep(2000);
 
             //Thread.sleep(5000);
 
-        }
-        catch(Exception e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            throw e;
-        }
-    }
-
-    private void redirectHome() {
-        try {
-            driver.get("https://www.cenconlineb2b.com/");
-        }
-        catch(Exception e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            throw e;
-        }
-    }
-
-    private void selectCountry() throws InterruptedException {
-        try {
-            Select pais = new Select(driver.findElement(By.id("pais")));
-            Thread.sleep(3000);
-            pais.selectByValue("chi");
-            Thread.sleep(2000);
-            driver.findElement(By.id("btnIngresar")).click();
         }
         catch(Exception e) {
             logger.log(Level.SEVERE, e.getMessage());
@@ -113,7 +95,7 @@ public class SMUScrapper extends AbstractScrapper {
 
                 Thread.sleep(2000);
 
-                WebElement submenuCommerce = driver.findElement(By.xpath("//div[@class='v-menubar-submenu v-widget mainMenuBar v-menubar-submenu-mainMenuBar v-has-width']")).findElements(By.cssSelector("span:nth-child(1)")).get(0);
+                WebElement submenuCommerce = driver.findElement(By.xpath("//div[@class='v-menubar-submenu v-widget mainMenuBar v-menubar-submenu-mainMenuBar v-has-width']")).findElements(By.cssSelector("span:nth-child(2)")).get(0);
                 wait = new WebDriverWait(driver, 10);
                 wait.until(ExpectedConditions.elementToBeClickable(submenuCommerce));
 
@@ -142,13 +124,15 @@ public class SMUScrapper extends AbstractScrapper {
             cont++;
 
             try {
+                /*
                 WebElement checkDisplayStock = driver.findElement(By.xpath(".//*[contains(text(),'Mostrar inventario al')]/parent::div/preceding-sibling::div"));
                 actions = new Actions(driver);
                 actions.moveToElement(checkDisplayStock).click().build().perform();
 
                 Thread.sleep(1000);
+                */
 
-                WebElement excludeProductsWithoutStock = driver.findElement(By.xpath(".//*[contains(text(),'Excluir productos sin ventas y sin stock')]/parent::div/preceding-sibling::div"));
+                WebElement excludeProductsWithoutStock = driver.findElement(By.xpath(".//div[contains(text(),'Excluir productos sin ventas')]/parent::div/parent::div/parent::div/preceding-sibling::div/preceding-sibling::div/child::span"));
                 actions = new Actions(driver);
                 actions.moveToElement(excludeProductsWithoutStock).click().build().perform();
 

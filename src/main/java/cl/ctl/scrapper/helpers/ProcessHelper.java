@@ -2,10 +2,7 @@ package cl.ctl.scrapper.helpers;
 
 import cl.ctl.scrapper.model.FileControl;
 import cl.ctl.scrapper.model.Log;
-import cl.ctl.scrapper.scrappers.AbstractScrapper;
-import cl.ctl.scrapper.scrappers.ConstrumartScrapper;
-import cl.ctl.scrapper.scrappers.EasyScrapper;
-import cl.ctl.scrapper.scrappers.SodimacScrapper;
+import cl.ctl.scrapper.scrappers.*;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -53,10 +50,14 @@ public class ProcessHelper {
             ConstrumartScrapper construmartScrapper = new ConstrumartScrapper();
             EasyScrapper easyScrapper = new EasyScrapper();
             SodimacScrapper sodimacScrapper = new SodimacScrapper();
+            SMUScrapper smuScrapper = new SMUScrapper();
+            TottusScrapper tottusScrapper = new TottusScrapper();
 
-            scrappers.put(construmartScrapper.getCadena(), construmartScrapper);
-            scrappers.put(easyScrapper.getCadena(), easyScrapper);
-            scrappers.put(sodimacScrapper.getCadena(), sodimacScrapper);
+            //scrappers.put(construmartScrapper.getCadena(), construmartScrapper);
+            //scrappers.put(easyScrapper.getCadena(), easyScrapper);
+            //scrappers.put(sodimacScrapper.getCadena(), sodimacScrapper);
+            //scrappers.put(smuScrapper.getCadena(), smuScrapper);
+            scrappers.put(tottusScrapper.getCadena(), tottusScrapper);
 
             executor = Executors.newFixedThreadPool(scrappers.size());
 
