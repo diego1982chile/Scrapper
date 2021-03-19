@@ -24,6 +24,7 @@ public class ConstrumartScrapper extends AbstractScrapper {
 
     public ConstrumartScrapper() throws IOException {
         super();
+        holding = "Legrand";
         cadena = "Construmart";
         url = "https://sso.bbr.cl/auth/realms/construmart/protocol/openid-connect/auth?response_type=code&client_id=construmart-client-prod&redirect_uri=https%3A%2F%2Fb2b.construmart.cl%2FBBRe-commerce%2Fmain&state=5d08ee52-2336-4ed0-abc4-b431ee1e3a55&login=true&scope=openid";
     }

@@ -11,10 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
@@ -31,7 +28,7 @@ public class ProcessHelper {
 
     private LocalDate processDate  = LocalDate.now().minusDays(1);
 
-    private Map<String, AbstractScrapper> scrappers = new HashMap<>();
+    private Map<String, AbstractScrapper> scrappers = new TreeMap<>();
 
     private ExecutorService executor;
 
@@ -53,10 +50,10 @@ public class ProcessHelper {
             SMUScrapper smuScrapper = new SMUScrapper();
             TottusScrapper tottusScrapper = new TottusScrapper();
 
-            //scrappers.put(construmartScrapper.getCadena(), construmartScrapper);
-            //scrappers.put(easyScrapper.getCadena(), easyScrapper);
-            //scrappers.put(sodimacScrapper.getCadena(), sodimacScrapper);
-            //scrappers.put(smuScrapper.getCadena(), smuScrapper);
+            scrappers.put(construmartScrapper.getCadena(), construmartScrapper);
+            scrappers.put(easyScrapper.getCadena(), easyScrapper);
+            scrappers.put(sodimacScrapper.getCadena(), sodimacScrapper);
+            scrappers.put(smuScrapper.getCadena(), smuScrapper);
             scrappers.put(tottusScrapper.getCadena(), tottusScrapper);
 
             executor = Executors.newFixedThreadPool(scrappers.size());

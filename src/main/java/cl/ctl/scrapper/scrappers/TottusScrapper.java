@@ -19,6 +19,7 @@ public class TottusScrapper extends AbstractScrapper {
     public TottusScrapper() throws IOException {
         super();
         cadena = "Tottus";
+        holding = "Nutrisa";
         url = "https://b2b.tottus.com/b2btoclpr/grafica/html/index.html";
         onlyDiary = true;
         fileExt = ".txt";

@@ -4,6 +4,7 @@ import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.LogHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
 import cl.ctl.scrapper.model.BusinessException;
+import cl.ctl.scrapper.model.FileControl;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -12,6 +13,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -27,6 +30,8 @@ public abstract class AbstractScrapper {
     Logger logger = Logger.getLogger(ConstrumartScrapper.class.getName());
     LogHelper fh = LogHelper.getInstance();
 
+    String holding;
+
     String cadena;
 
     String url;
@@ -34,6 +39,9 @@ public abstract class AbstractScrapper {
     String fileExt = ".csv";
 
     boolean onlyDiary = false;
+
+    List<FileControl> fileControlList = new ArrayList<>();
+
 
     public AbstractScrapper() throws IOException {
         // This block configure the logger with handler and formatter
@@ -80,32 +88,32 @@ public abstract class AbstractScrapper {
         this.onlyDiary = onlyDiary;
     }
 
+    public String getHolding() {
+        return holding;
+    }
+
+    public void setHolding(String holding) {
+        this.holding = holding;
+    }
+
+    public List<FileControl> getFileControlList() {
+        return fileControlList;
+    }
+
+    public void setFileControlList(List<FileControl> fileControlList) {
+        this.fileControlList = fileControlList;
+    }
+
     void checkScraps() throws BusinessException {
         if(FilesHelper.getInstance().checkFiles(this)) {
             throw new BusinessException("Scrapper '" + cadena + "' -> Archivos ya fueron generados! se omite el proceso");
         }
     }
 
-    void checkScrap(int count) throws BusinessException {
+    void checkScrap(String freq) throws BusinessException {
 
-        String freq;
-
-        switch (count) {
-            case 1:
-                freq = "DAY";
-                break;
-            case 2:
-                freq = "MONTH";
-                break;
-            case 3:
-                freq = "WEEK";
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + count);
-        }
-
-        if(FilesHelper.getInstance().checkFile(cadena, freq, fileExt)) {
-            throw new BusinessException("Scrapper " + cadena + " -> Archivo de frecuencia '" + freq + "' ya fue generado! se omite el proceso diario");
+        if(FilesHelper.getInstance().checkFile(this, freq)) {
+            throw new BusinessException("Scrapper " + this.getCadena() + " -> Archivo de frecuencia '" + freq + "' ya fue generado! se omite el proceso diario");
         }
     }
 
@@ -140,7 +148,7 @@ public abstract class AbstractScrapper {
                 throw new IllegalStateException("Unexpected value: " + count);
         }
 
-        FilesHelper.getInstance().renameLastFile(cadena, freq, fileExt);
+        FilesHelper.getInstance().renameLastFile(this, freq);
     }
 
     void scrap() throws Exception {
@@ -202,12 +210,40 @@ public abstract class AbstractScrapper {
 
     void generateScrap(String since, String until, int count) throws Exception {
 
+        String freq;
+
+        switch (count) {
+            case 1:
+                freq = "DAY";
+                break;
+            case 2:
+                freq = "MONTH";
+                break;
+            case 3:
+                freq = "WEEK";
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + count);
+        }
+
         try {
-            checkScrap(count);
+            checkScrap(freq);
             doScrap(since, until);
+            FilesHelper.getInstance().registerFileControlOK(this, freq);
         }
         catch(BusinessException e) {
             logger.log(Level.WARNING, e.getMessage());
+            FilesHelper.getInstance().registerFileControlOK(this, freq);
+            try {
+                driver.quit();
+            }
+            catch(Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        catch(Exception e2) {
+            logger.log(Level.SEVERE, e2.getMessage());
+            FilesHelper.getInstance().registerFileControlError(this, freq, e2.getMessage());
             try {
                 driver.quit();
             }

@@ -18,6 +18,7 @@ public class SodimacScrapper extends AbstractScrapper {
 
     public SodimacScrapper() throws IOException {
         super();
+        holding = "Legrand";
         cadena = "Sodimac";
         url = "https://b2b.sodimac.com/b2bsocopr/grafica/html/index.html";
         onlyDiary = true;

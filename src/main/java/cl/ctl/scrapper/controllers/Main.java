@@ -28,7 +28,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        LocalDate localDate = LocalDate.of(2021, 3, 15);
+        LocalDate localDate = LocalDate.of(2021, 3, 18);
         LocalDate today = LocalDate.now();
 
         while(localDate.isBefore(today)) {
@@ -62,6 +62,7 @@ public class Main {
         logger.log(Level.INFO, "Proceso finalizado con éxito. Enviando correo");
 
         MailHelper.getInstance().sendMail();
+
 
         LogHelper.getInstance().getFileControlList().clear();
 

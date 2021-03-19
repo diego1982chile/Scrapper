@@ -1,6 +1,7 @@
 package cl.ctl.scrapper.helpers;
 
 import cl.ctl.scrapper.model.FileControl;
+import cl.ctl.scrapper.scrappers.AbstractScrapper;
 import com.jcraft.jsch.*;
 
 import java.io.*;
@@ -55,15 +56,19 @@ public class UploadHelper {
     public void uploadFiles() throws JSchException, IOException {
         String local = FilesHelper.getInstance().getUploadPath();
 
-        for (FileControl fileControl : LogHelper.getInstance().getFileControlList()) {
-            try {
-                copyLocalToRemote(local, remote, fileControl.getFileName());
-            } catch (JSchException e) {
-                logger.log(Level.SEVERE, e.getMessage());
-                throw e;
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, e.getMessage());
-                throw e;
+        for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+            for (FileControl fileControl : scrapper.getFileControlList()) {
+                if(!fileControl.getStatus().equalsIgnoreCase("Error")) {
+                    try {
+                        copyLocalToRemote(local, remote, fileControl.getFileName());
+                    } catch (JSchException e) {
+                        logger.log(Level.SEVERE, e.getMessage());
+                        throw e;
+                    } catch (IOException e) {
+                        logger.log(Level.SEVERE, e.getMessage());
+                        throw e;
+                    }
+                }
             }
         }
     }

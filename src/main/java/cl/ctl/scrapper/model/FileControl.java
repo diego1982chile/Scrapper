@@ -15,20 +15,31 @@ public class FileControl {
     String executionDay;
     String frequency;
     String holding;
+    String chain;
     String fileName;
     String status;
 
-    List<FileControlError> errors = new ArrayList<FileControlError>();
+    List<String> errors = new ArrayList<String>();
 
-    public FileControl(String process, String processDay, String dayOfWeekProcess, String dayOfWeek, String frequency, String holding, String fileName, String status) {
+    public FileControl(String process, String processDay, String dayOfWeekProcess, String dayOfWeek, String executionDay, String frequency, String holding, String chain, String fileName, String status) {
         this.process = process;
         this.processDay = processDay;
         this.dayOfWeekProcess = dayOfWeekProcess;
         this.dayOfWeek = dayOfWeek;
+        this.executionDay = executionDay;
         this.frequency = frequency;
         this.holding = holding;
+        this.chain = chain;
         this.fileName = fileName;
         this.status = status;
+    }
+
+    public String getChain() {
+        return chain;
+    }
+
+    public void setChain(String chain) {
+        this.chain = chain;
     }
 
     public String getProcessDay() {
@@ -87,20 +98,20 @@ public class FileControl {
         this.status = status;
     }
 
-    public List<FileControlError> getErrors() {
-        return errors;
-    }
-
-    public void setErrors(List<FileControlError> errors) {
-        this.errors = errors;
-    }
-
     public String getProcess() {
         return process;
     }
 
     public void setProcess(String process) {
         this.process = process;
+    }
+
+    public List<String> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(List<String> errors) {
+        this.errors = errors;
     }
 
     @Override

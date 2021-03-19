@@ -1,6 +1,7 @@
 package cl.ctl.scrapper.helpers;
 
 import cl.ctl.scrapper.model.FileControl;
+import cl.ctl.scrapper.scrappers.AbstractScrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Properties;
 
@@ -90,6 +92,13 @@ public class MailHelper {
             this.body = this.body.replace("[ExecutionDay]", fileControlList.get(0).getDayOfWeek());
             this.body = this.body.replace("%email%", to);
         }
+        else {
+            this.body = this.body.replace("[Process]", FilesHelper.getInstance().PROCESS_NAME);
+            this.body = this.body.replace("[ProcessDay]", ProcessHelper.getInstance().getProcessDate().toString());
+            this.body = this.body.replace("[ProcessWeekDay]", ProcessHelper.getInstance().getProcessDate().getDayOfWeek().toString());
+            this.body = this.body.replace("[ExecutionDay]", LocalDate.now().toString());
+            this.body = this.body.replace("%email%", to);
+        }
 
         addRecords();
 
@@ -100,18 +109,30 @@ public class MailHelper {
 
         String html = "";
 
-        for (FileControl fileControl : LogHelper.getInstance().getFileControlList()) {
-            String frequency = fileControl.getFrequency();
-            String holding = fileControl.getHolding();
-            String fileName = fileControl.getFileName();
+        for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+            for (FileControl fileControl : scrapper.getFileControlList()) {
+                String fileName = fileControl.getFileName();
+                String status = fileControl.getStatus();
 
-            html = html + "<tr>";
+                String color = "#4CAF50";
 
-            html = html + "<td style='padding: 0 0 0 0;'>" + frequency + "</td>";
-            html = html + "<td style='padding: 0 0 0 0;'>" + holding + "</td>";
-            html = html + "<td style='padding: 0 0 0 0;'>" + fileName + "</td>";
+                if(fileControl.getStatus().equalsIgnoreCase("Error")) {
+                    color = "#F44336";
+                }
 
-            html = html + "</tr>";
+                html = html + "<tr>";
+
+                html = html + "<td style='padding: 0 0 0 0;'>" + fileName + "</td>";
+                html = html + "<td style='padding: 0 0 0 0; color: " + color + "'>" + status + "</td>";
+
+                html = html + "</tr>";
+
+                if(fileControl.getStatus().equalsIgnoreCase("Error")) {
+                    html = html + "<tr style='background: #e8e5e5a8;'>";
+                    html = html + "<td colspan='2'>" + fileControl.getErrors().get(0) + "</td>";
+                    html = html + "</tr>";
+                }
+            }
         }
 
         this.body = this.body.replace("[rows]", html);

@@ -20,6 +20,7 @@ public class SMUScrapper extends AbstractScrapper {
 
     public SMUScrapper() throws IOException {
         super();
+        holding = "Nutrisa";
         cadena = "SMU";
         url = "https://sso.bbr.cl/auth/realms/unimarc/protocol/openid-connect/auth?response_type=code&client_id=unimarc-client-prod&redirect_uri=https%3A%2F%2Fb2b.smu.cl%2FBBRe-commerce%2Fmain&state=175f2d2f-36ee-4575-aae0-28075fd437ab&login=true&scope=openid";
     }
