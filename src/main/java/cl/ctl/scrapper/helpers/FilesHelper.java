@@ -416,8 +416,13 @@ public class FilesHelper {
         String fileNameShort = file.getName().split(Pattern.quote(SEPARATOR))[file.getName().split(Pattern.quote(SEPARATOR)).length - 1];
         String status = "OK";
 
-        LogHelper.getInstance().registerFileControl(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), frequency, scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status));
-        scrapper.getFileControlList().add(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), frequency, scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status));
+        FileControl fileControl = new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), frequency, scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status);
+
+        LogHelper.getInstance().registerFileControl(fileControl);
+
+        if(!scrapper.getFileControlList().contains(fileControl)) {
+            scrapper.getFileControlList().add(fileControl);
+        }
 
     }
 
@@ -449,7 +454,10 @@ public class FilesHelper {
         fileControl.getErrors().add(errorMsg);
 
         LogHelper.getInstance().registerFileControl(fileControl);
-        scrapper.getFileControlList().add(fileControl);
+
+        if(!scrapper.getFileControlList().contains(fileControl)) {
+            scrapper.getFileControlList().add(fileControl);
+        }
     }
 
 }

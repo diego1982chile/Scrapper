@@ -241,7 +241,7 @@ public class SMUScrapper extends AbstractScrapper {
                 actions = new Actions(driver);
                 actions.moveToElement(downloadReportButton).click().build().perform();
 
-                Thread.sleep(30000);
+                Thread.sleep(60000);
 
                 WebElement downloadReportLink = driver.findElement(By.xpath("//div[@class='v-horizontallayout v-layout v-horizontal v-widget']")).findElements(By.xpath("//div[@class='v-slot']")).get(0).findElements(By.xpath("//div[@class='v-link v-widget']")).get(0);
                 actions = new Actions(driver);

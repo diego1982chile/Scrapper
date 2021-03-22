@@ -234,22 +234,10 @@ public abstract class AbstractScrapper {
         catch(BusinessException e) {
             logger.log(Level.WARNING, e.getMessage());
             FilesHelper.getInstance().registerFileControlOK(this, freq);
-            try {
-                driver.quit();
-            }
-            catch(Exception ex) {
-                ex.printStackTrace();
-            }
         }
         catch(Exception e2) {
             logger.log(Level.SEVERE, e2.getMessage());
             FilesHelper.getInstance().registerFileControlError(this, freq, e2.getMessage());
-            try {
-                driver.quit();
-            }
-            catch(Exception ex) {
-                ex.printStackTrace();
-            }
         }
         finally {
             renameFile(cadena, count);
@@ -278,7 +266,7 @@ public abstract class AbstractScrapper {
 
     @Override
     public String toString() {
-        return cadena;
+        return holding + " -> " + cadena;
     }
 
 

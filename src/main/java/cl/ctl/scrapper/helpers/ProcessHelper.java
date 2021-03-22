@@ -50,11 +50,11 @@ public class ProcessHelper {
             SMUScrapper smuScrapper = new SMUScrapper();
             TottusScrapper tottusScrapper = new TottusScrapper();
 
-            scrappers.put(construmartScrapper.getCadena(), construmartScrapper);
-            scrappers.put(easyScrapper.getCadena(), easyScrapper);
-            scrappers.put(sodimacScrapper.getCadena(), sodimacScrapper);
-            scrappers.put(smuScrapper.getCadena(), smuScrapper);
-            scrappers.put(tottusScrapper.getCadena(), tottusScrapper);
+            scrappers.put(construmartScrapper.toString(), construmartScrapper);
+            scrappers.put(easyScrapper.toString(), easyScrapper);
+            scrappers.put(sodimacScrapper.toString(), sodimacScrapper);
+            scrappers.put(smuScrapper.toString(), smuScrapper);
+            scrappers.put(tottusScrapper.toString(), tottusScrapper);
 
             executor = Executors.newFixedThreadPool(scrappers.size());
 
