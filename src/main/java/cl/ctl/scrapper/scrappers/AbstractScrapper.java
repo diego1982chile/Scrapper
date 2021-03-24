@@ -40,6 +40,8 @@ public abstract class AbstractScrapper {
 
     boolean onlyDiary = false;
 
+    boolean onlyWeekly = false;
+
     List<FileControl> fileControlList = new ArrayList<>();
 
 
@@ -117,6 +119,12 @@ public abstract class AbstractScrapper {
         }
     }
 
+    void checkEquivalentScraps() throws BusinessException {
+        if(FilesHelper.getInstance().checkEquivalentScrap(this)) {
+            throw new BusinessException("Scrapper '" + cadena + "' -> Archivos ya fueron generados! se omite el proceso");
+        }
+    }
+
 
     private void initializeDriver() {
         WebDriverManager.chromedriver().setup();
@@ -169,30 +177,39 @@ public abstract class AbstractScrapper {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-YYYY");
 
-        // Generar Scrap Diario
         String since = formatter.format(ProcessHelper.getInstance().getProcessDate());
         String until = since;
 
-        logger.log(Level.INFO, "Descargando Scrap Diario...");
+        // Generar Scrap Diario (Si no es solo semanal)
 
-        generateScrap(since, until, 1);
+        if(!onlyWeekly) {
 
-        Thread.sleep(2000);
+            logger.log(Level.INFO, "Descargando Scrap Diario...");
+
+            generateScrap(since, until, 1);
+
+            Thread.sleep(2000);
+        }
 
         // Si la cadena genera solo scraps diarios retornar en este punto
+
         if(onlyDiary) {
             driver.quit();
             return;
         }
 
-        // Generar Scrap Mensual
-        since = formatter.format(ProcessHelper.getInstance().getProcessDate().minusDays(ProcessHelper.getInstance().getProcessDate().getDayOfMonth()).plusDays(1));
+        // Generar Scrap Mensual (Si no es solo semanal)
 
-        logger.log(Level.INFO, "Descargando Scrap Mensual...");
+        if(!onlyWeekly) {
 
-        generateScrap(since, until, 2);
+            since = formatter.format(ProcessHelper.getInstance().getProcessDate().minusDays(ProcessHelper.getInstance().getProcessDate().getDayOfMonth()).plusDays(1));
 
-        Thread.sleep(2000);
+            logger.log(Level.INFO, "Descargando Scrap Mensual...");
+
+            generateScrap(since, until, 2);
+
+            Thread.sleep(2000);
+        }
 
         // Si es proceso de Domingo
         // Generar Scrap Semanal

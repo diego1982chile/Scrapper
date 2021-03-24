@@ -28,7 +28,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        LocalDate localDate = LocalDate.of(2021, 3, 20);
+        LocalDate localDate = LocalDate.of(2021, 3, 18);
         LocalDate today = LocalDate.now();
 
         while(localDate.isBefore(today)) {

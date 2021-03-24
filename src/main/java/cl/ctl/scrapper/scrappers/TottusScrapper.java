@@ -21,7 +21,7 @@ public class TottusScrapper extends AbstractScrapper {
         cadena = "Tottus";
         holding = "Nutrisa";
         url = "https://b2b.tottus.com/b2btoclpr/grafica/html/index.html";
-        onlyDiary = true;
+        onlyWeekly = true;
         fileExt = ".txt";
     }
 

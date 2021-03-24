@@ -137,7 +137,9 @@ public class FilesHelper {
         for (File file : directory.listFiles()) {
             if(file.isDirectory()) {
                 for (File file2 : file.listFiles()) {
-                    file2.renameTo(new File(file.getAbsolutePath() + ".csv"));
+                    String ext = "." + file2.getPath().split("\\.")[file2.getPath().split("\\.").length-1];
+                    //file2.renameTo(new File(file.getAbsolutePath() + ".csv"));
+                    file2.renameTo(new File(file.getAbsolutePath() + ext));
                 }
                 file.delete();
             }
@@ -194,7 +196,7 @@ public class FilesHelper {
 
             File directory = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME);
 
-            if (! directory.exists()) {
+            if (!directory.exists()) {
                 directory.mkdir();
             }
 
@@ -202,7 +204,7 @@ public class FilesHelper {
 
             File downloadDir;
 
-            if(scrapper.getFileExt().equals(".csv")) {
+            if(scrapper.getFileExt().equals(".csv") || scrapper.getFileExt().equals(".xlsx")) {
                 ext = ".zip";
             }
 
@@ -458,6 +460,22 @@ public class FilesHelper {
         if(!scrapper.getFileControlList().contains(fileControl)) {
             scrapper.getFileControlList().add(fileControl);
         }
+    }
+
+    public boolean checkEquivalentScrap(AbstractScrapper scrapper) {
+
+        boolean flag = false;
+
+        for (FileControl fileControl :LogHelper.getInstance().getFileControlList()) {
+            if(fileControl.getFileName().contains(scrapper.getCadena())) {
+                //TODO: Duplicar archivo con cliente actual
+                String frequency = fileControl.getFrequency();
+                File file = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + scrapper.getHolding() + "_" + scrapper.getCadena() + "_" + frequency + "_" + PROCESS_NAME + scrapper.getFileExt());
+                flag = true;
+            }
+        }
+
+        return flag;
     }
 
 }

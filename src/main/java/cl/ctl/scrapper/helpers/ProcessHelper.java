@@ -1,23 +1,14 @@
 package cl.ctl.scrapper.helpers;
 
-import cl.ctl.scrapper.model.FileControl;
-import cl.ctl.scrapper.model.Log;
 import cl.ctl.scrapper.scrappers.*;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
 /**
  * Created by des01c7 on 18-12-20.
@@ -32,7 +23,7 @@ public class ProcessHelper {
 
     private ExecutorService executor;
 
-    private  CyclicBarrier barrier;
+    private CyclicBarrier barrier;
 
 
     /**
@@ -47,14 +38,16 @@ public class ProcessHelper {
             ConstrumartScrapper construmartScrapper = new ConstrumartScrapper();
             EasyScrapper easyScrapper = new EasyScrapper();
             SodimacScrapper sodimacScrapper = new SodimacScrapper();
-            SMUScrapper smuScrapper = new SMUScrapper();
+            SmuScrapper smuScrapper = new SmuScrapper();
             TottusScrapper tottusScrapper = new TottusScrapper();
+            CencosudScrapper cencosudScrapper = new CencosudScrapper();
 
             scrappers.put(construmartScrapper.toString(), construmartScrapper);
             scrappers.put(easyScrapper.toString(), easyScrapper);
             scrappers.put(sodimacScrapper.toString(), sodimacScrapper);
             scrappers.put(smuScrapper.toString(), smuScrapper);
             scrappers.put(tottusScrapper.toString(), tottusScrapper);
+            scrappers.put(cencosudScrapper.toString(), cencosudScrapper);
 
             executor = Executors.newFixedThreadPool(scrappers.size());
 
@@ -101,7 +94,8 @@ public class ProcessHelper {
         for (String scrapper : scrappers) {
             String className = StringUtils.capitalize(scrapper.toLowerCase());
             className = className + "Scrapper";
-            this.scrappers.put(scrapper.toUpperCase(), (AbstractScrapper) createObject(packageName + "." + className));
+            AbstractScrapper abstractScrapper = (AbstractScrapper) createObject(packageName + "." + className);
+            this.scrappers.put(abstractScrapper.toString(), (AbstractScrapper) createObject(packageName + "." + className));
         }
     }
 
