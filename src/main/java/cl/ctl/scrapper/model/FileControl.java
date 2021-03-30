@@ -1,5 +1,7 @@
 package cl.ctl.scrapper.model;
 
+import cl.ctl.scrapper.scrappers.AbstractScrapper;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +23,8 @@ public class FileControl {
 
     List<String> errors = new ArrayList<String>();
 
+    AbstractScrapper scrapper;
+
     public FileControl(String process, String processDay, String dayOfWeekProcess, String dayOfWeek, String executionDay, String frequency, String holding, String chain, String fileName, String status) {
         this.process = process;
         this.processDay = processDay;
@@ -32,6 +36,14 @@ public class FileControl {
         this.chain = chain;
         this.fileName = fileName;
         this.status = status;
+    }
+
+    public AbstractScrapper getScrapper() {
+        return scrapper;
+    }
+
+    public void setScrapper(AbstractScrapper scrapper) {
+        this.scrapper = scrapper;
     }
 
     public String getChain() {

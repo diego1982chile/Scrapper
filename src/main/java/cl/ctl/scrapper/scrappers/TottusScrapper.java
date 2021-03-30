@@ -4,6 +4,8 @@ import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
 import cl.ctl.scrapper.model.DateOutOfRangeException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
@@ -21,8 +23,6 @@ public class TottusScrapper extends AbstractScrapper {
         cadena = "Tottus";
         holding = "Nutrisa";
         url = "https://b2b.tottus.com/b2btoclpr/grafica/html/index.html";
-        onlyWeekly = true;
-        fileExt = ".txt";
     }
 
     void login() throws InterruptedException {
@@ -95,36 +95,78 @@ public class TottusScrapper extends AbstractScrapper {
 
         Thread.sleep(3000);
 
-        driver.findElement(By.id("menuItem223_5")).click();
+        driver.findElement(By.id("menuItem226_7")).click();
 
         Thread.sleep(3000);
 
-        long numberOfFiles = FilesHelper.getInstance().countFiles();
-        boolean flag = true;
 
-        DateTimeFormatter formatter;
+        cont = 0;
 
-        String fecha = null;
+        while(cont < 10) {
 
-        while(flag) {
+            cont++;
+
             try {
-                //driver.findElement(By.className("tablaDatos")).findElements(By.tagName("tbody")).get(0).findElements(By.tagName("tr")).get(0).findElements(By.tagName("td")).get(0).findElements(By.tagName("a")).get(0).click();
 
-                formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
+                WebElement checkStock = driver.findElement(By.xpath("//input[@id='chkstock']"));
+                actions = new Actions(driver);
+                actions.moveToElement(checkStock).click().build().perform();
 
-                fecha = formatter.format(ProcessHelper.getInstance().getProcessDate().plusDays(1));
+                Thread.sleep(2000);
 
-                driver.findElement(By.xpath("//a[contains(text(), '" + fecha + "')]")).click();
+                WebElement checkActivo = driver.findElement(By.xpath("//input[@id='chksactivo']"));
+                actions = new Actions(driver);
+                actions.moveToElement(checkActivo).click().build().perform();
 
-                Thread.sleep(5000);
+                Thread.sleep(2000);
 
-                if(FilesHelper.getInstance().countFiles() > numberOfFiles) {
-                    flag = false;
+                since = since.replace("-","/");
+
+                WebElement sinceInput = driver.findElement(By.xpath("//input[@id='desde']"));
+                sinceInput.clear();
+                sinceInput.sendKeys(since);
+
+                Thread.sleep(1000);
+
+                if(!driver.findElements(By.xpath("//div[@class='v-datefield v-datefield-popupcalendar v-widget v-has-width v-has-height v-datefield-error-error v-datefield-error v-datefield-day']")).isEmpty()) {
+                    throw new DateOutOfRangeException(since);
                 }
+
+                until = until.replace("-","/");
+
+                WebElement untilInput = driver.findElement(By.xpath("//input[@id='hasta']"));
+                untilInput.clear();
+                untilInput.sendKeys(until);
+
+                Thread.sleep(1000);
+
+                if(!driver.findElements(By.xpath("//div[@class='v-datefield v-datefield-popupcalendar v-widget v-has-width v-has-height v-datefield-error-error v-datefield-error v-datefield-day']")).isEmpty()) {
+                    throw new DateOutOfRangeException(until);
+                }
+
+                Thread.sleep(1000);
+
+                WebElement generateReport = driver.findElement(By.xpath("//input[@name='botonBuscar']"));
+                actions = new Actions(driver);
+                actions.moveToElement(generateReport).click().build().perform();
+
+                Thread.sleep(2000);
+
+                break;
+
             }
-            catch(Throwable e) {
-                logger.log(Level.SEVERE, e.getMessage());
-                throw new DateOutOfRangeException(fecha);
+            catch (Throwable e) {
+                e.printStackTrace();
+
+                if(e instanceof DateOutOfRangeException) {
+                    logger.log(Level.SEVERE, e.getMessage());
+                    throw e;
+                }
+
+                if(cont >= 10) {
+                    logger.log(Level.SEVERE, e.getMessage());
+                    throw e;
+                }
             }
         }
 

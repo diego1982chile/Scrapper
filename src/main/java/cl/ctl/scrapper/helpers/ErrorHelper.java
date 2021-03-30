@@ -122,30 +122,29 @@ public class ErrorHelper {
             String method = log.getMethod();
             String message = log.getMessage();
 
-            String color = "black";
+            String src = "cid:error";
 
-            if(message.contains("INFORMACIÓN")) {
-                color = "#5FA91D";
+            if(log.getLevel().equalsIgnoreCase("INFO")) {
+                src = "cid:info";
             }
-            if(message.contains("GRAVE")) {
-                color = "#e66f08";
+            if(log.getLevel().equalsIgnoreCase("SEVERE")) {
+                src = "cid:error";
             }
-            if(message.contains("ADVERTENCIA")) {
-                color = "#eacf0b";
+            if(log.getLevel().equalsIgnoreCase("WARNING")) {
+                src = "cid:warning";
             }
 
-            html2 = html2 + "<tr style='color:" + color + "'>";
-
-            html2 = html2 + "<td style='padding: 0 0 0 0;'>" + timestamp + "</td>";
-            html2 = html2 + "<td style='padding: 0 0 0 0;'>" + classname + "</td>";
-            html2 = html2 + "<td style='padding: 0 0 0 0;'>" + method + "</td>";
             if(message.length() > 500) {
                 message = message.substring(0, 500) + " ...";
-
             }
-            html2 = html2 + "<tr style='background: #e8e5e5a8;'><td style='padding: 0 0 0 0;' colspan='3'>" + message + "</td></tr>";
 
-            html2 = html2 + "</tr>";
+            html2 = "<tr><td style='padding: 10 10 10 10;' width='19%' align='center'><div><img class='log-icon' height='auto' src='" + src + "' style='border:0;display:block;outline:none;text-decoration:none;width:40%;' /></div>";
+            html2 = html2 + "<div><label style=''>" + timestamp + "</label></div></td><td>";
+            html2 = html2 + "<div style='border-left:1px solid #ecedee;padding-left:12px;color:#009688'>" + method + "</div>";
+            html2 = html2 + "<div style='border-left:1px solid #ecedee;padding-left:12px;color:#757575'>" + classname + "</div>";
+            html2 = html2 + "<div style='border-left:1px solid #ecedee;padding-left:12px'><label>" + message + "</label></div></td></tr>";
+            html2 = html2 + "<tr><td style='padding: 0 0 0 0;' width='19%'></td><td><div style='border-left:1px solid #ecedee;padding-left:12px'><br/></div></td></tr>";
+
 
             html = html + html2;
         }
@@ -188,6 +187,12 @@ public class ErrorHelper {
 
                 // attach images
                 attachImage(multipart, "<image1>", "/Images/Logo_CTL.webp");
+
+                attachImage(multipart, "<info>", "/Images/info.png");
+
+                attachImage(multipart, "<warning>", "/Images/warning.png");
+
+                attachImage(multipart, "<error>", "/Images/error.png");
 
                 // put everything together
                 message.setContent(multipart);
@@ -234,6 +239,8 @@ public class ErrorHelper {
 
             messageBodyPart.setDataHandler(new DataHandler(ds));
             messageBodyPart.setHeader("Content-ID", cid);
+            messageBodyPart.setHeader("Content-Type", ds.getContentType());
+            messageBodyPart.setDisposition(Part.INLINE);
 
             // add it
             multipart.addBodyPart(messageBodyPart);

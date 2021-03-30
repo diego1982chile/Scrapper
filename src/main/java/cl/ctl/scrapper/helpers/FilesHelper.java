@@ -171,9 +171,9 @@ public class FilesHelper {
     public void renameLastFile(AbstractScrapper scrapper, String frequency) {
 
         logger.log(Level.INFO, "Moviendo archivo cadena = " + scrapper.getCadena() + " frecuencia = " + frequency);
-        
+
         String frec = null;
-        
+
         try {
             String baseName = scrapper.getHolding() + "_" + scrapper.getCadena();
 
@@ -223,6 +223,8 @@ public class FilesHelper {
 
             for(int i = 0; i < files.length; ++i) {
                 if(files[i].isFile()) {
+                    ext = "." + files[i].getName().split("\\.")[files[i].getName().split("\\.").length-1];
+                    fileName = DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + baseName + "_" + PROCESS_NAME + ext;
                     files[i].renameTo(new File(fileName));
                     break;
                 }
@@ -234,7 +236,10 @@ public class FilesHelper {
             String fileNameShort = fileName.split(Pattern.quote(SEPARATOR))[fileName.split(Pattern.quote(SEPARATOR)).length - 1];
             String status = "OK";
 
-            LogHelper.getInstance().registerFileControl(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), "DIA", scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status));
+            FileControl fileControl = new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), "DIA", scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status);
+            fileControl.setScrapper(scrapper);
+
+            LogHelper.getInstance().registerFileControl(fileControl);
             //scrapper.getFileControlList().add(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), "DIA", scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status));
         }
         catch (Exception e) {
@@ -292,8 +297,11 @@ public class FilesHelper {
             return false;
         }
 
-        LogHelper.getInstance().registerFileControl(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), "Dia", scrapper.getHolding(), cadena, fileNameShort, status));
-        scrapper.getFileControlList().add(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), "Dia", scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status));
+        FileControl fileControl = new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), "Dia", scrapper.getHolding(), cadena, fileNameShort, status);
+        fileControl.setScrapper(scrapper);
+
+        LogHelper.getInstance().registerFileControl(fileControl);
+        scrapper.getFileControlList().add(fileControl);
 
         if(scrapper.isOnlyDiary()) {
             return true;
@@ -452,6 +460,10 @@ public class FilesHelper {
         String status = "Error";
 
         FileControl fileControl = new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), frequency, scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status);
+
+        if(errorMsg.length() > 180) {
+            errorMsg = errorMsg.substring(0, 180) + " ...";
+        }
 
         fileControl.getErrors().add(errorMsg);
 

@@ -30,24 +30,11 @@ public class ProcessHelper {
      * Constructor privado para el Singleton del Factory.
      */
     private ProcessHelper() {
-        
-        
+
         try {
             processDate  = LocalDate.now().minusDays(1);
 
-            ConstrumartScrapper construmartScrapper = new ConstrumartScrapper();
-            EasyScrapper easyScrapper = new EasyScrapper();
-            SodimacScrapper sodimacScrapper = new SodimacScrapper();
-            SmuScrapper smuScrapper = new SmuScrapper();
-            TottusScrapper tottusScrapper = new TottusScrapper();
-            CencosudScrapper cencosudScrapper = new CencosudScrapper();
-
-            scrappers.put(construmartScrapper.toString(), construmartScrapper);
-            scrappers.put(easyScrapper.toString(), easyScrapper);
-            scrappers.put(sodimacScrapper.toString(), sodimacScrapper);
-            scrappers.put(smuScrapper.toString(), smuScrapper);
-            scrappers.put(tottusScrapper.toString(), tottusScrapper);
-            scrappers.put(cencosudScrapper.toString(), cencosudScrapper);
+            initScrappers();
 
             executor = Executors.newFixedThreadPool(scrappers.size());
 
@@ -67,8 +54,9 @@ public class ProcessHelper {
         return processDate;
     }
 
-    public void setProcessDate(LocalDate processDate) {
+    public void setProcessDate(LocalDate processDate) throws IOException {
         this.processDate = processDate;
+        initScrappers();
     }
 
     public Map<String, AbstractScrapper> getScrappers() {
@@ -112,5 +100,29 @@ public class ProcessHelper {
             System.out.println(e);
         }
         return object;
+    }
+
+
+    private void initScrappers() throws IOException {
+        ConstrumartScrapper construmartScrapper = new ConstrumartScrapper();
+        EasyScrapper easyScrapper = new EasyScrapper();
+        SodimacScrapper sodimacScrapper = new SodimacScrapper();
+        SmuScrapper smuScrapper = new SmuScrapper();
+        TottusScrapper tottusScrapper = new TottusScrapper();
+        CencosudScrapper cencosudScrapper = new CencosudScrapper();
+        WallmartScrapper wallmartScrapper = new WallmartScrapper();
+
+
+        scrappers.put(construmartScrapper.toString(), construmartScrapper);
+        scrappers.put(easyScrapper.toString(), easyScrapper);
+        scrappers.put(sodimacScrapper.toString(), sodimacScrapper);
+        scrappers.put(smuScrapper.toString(), smuScrapper);
+        scrappers.put(cencosudScrapper.toString(), cencosudScrapper);
+        scrappers.put(tottusScrapper.toString(), tottusScrapper);
+        scrappers.put(wallmartScrapper.toString(), wallmartScrapper);
+
+        executor = Executors.newFixedThreadPool(scrappers.size());
+
+        barrier = new CyclicBarrier(scrappers.size() + 1);
     }
 }

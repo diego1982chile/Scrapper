@@ -23,7 +23,7 @@ public class SmuScrapper extends AbstractScrapper {
         holding = "Nutrisa";
         cadena = "SMU";
         url = "https://sso.bbr.cl/auth/realms/unimarc/protocol/openid-connect/auth?response_type=code&client_id=unimarc-client-prod&redirect_uri=https%3A%2F%2Fb2b.smu.cl%2FBBRe-commerce%2Fmain&state=175f2d2f-36ee-4575-aae0-28075fd437ab&login=true&scope=openid";
-        //fileExt = ".xlsx";
+        fileExt = ".xlsx";
     }
 
     void login() throws Exception {
@@ -238,11 +238,13 @@ public class SmuScrapper extends AbstractScrapper {
 
                 Thread.sleep(2000);
 
+                /*
                 WebElement excludeProductsWithoutStock = driver.findElement(By.xpath(".//label[contains(text(),'Archivo de Texto (csv)')]"));
                 actions = new Actions(driver);
                 actions.moveToElement(excludeProductsWithoutStock).click().build().perform();
 
                 Thread.sleep(2000);
+                */
 
                 WebElement downloadReportButton = driver.findElement(By.xpath("//div[@class='v-button v-widget primary v-button-primary btn-generic v-button-btn-generic v-has-width']"));
                 actions = new Actions(driver);
