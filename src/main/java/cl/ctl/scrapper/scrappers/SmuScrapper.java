@@ -27,6 +27,7 @@ public class SmuScrapper extends AbstractScrapper {
     }
 
     void login() throws Exception {
+
         try {
             // *SolveCaptcha
             CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
@@ -44,23 +45,10 @@ public class SmuScrapper extends AbstractScrapper {
             Thread.sleep(10000);
 
             Actions actions;
-
-            driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(2).click();
-
-            Thread.sleep(2000);
-
-            driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(1).click();
-
-            Thread.sleep(2000);
-
-            driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(0).click();
-
-            Thread.sleep(2000);
-
             //Thread.sleep(5000);
 
         }
-        catch(Exception e) {
+        catch(Throwable e) {
             logger.log(Level.SEVERE, e.getMessage());
             throw e;
         }
@@ -87,6 +75,22 @@ public class SmuScrapper extends AbstractScrapper {
             cont++;
 
             try {
+
+                // Cerrar popups!!!
+
+                driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(2).click();
+
+                Thread.sleep(2000);
+
+                driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(1).click();
+
+                Thread.sleep(2000);
+
+                driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(0).click();
+
+                Thread.sleep(2000);
+
+
                 WebElement menuCommerce = driver.findElement(By.xpath("//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']")).findElements(By.cssSelector("span:nth-child(3)")).get(0);
                 WebDriverWait wait = new WebDriverWait(driver, 10);
                 wait.until(ExpectedConditions.elementToBeClickable(menuCommerce));

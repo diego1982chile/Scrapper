@@ -83,6 +83,10 @@ public class ProcessHelper {
             String className = StringUtils.capitalize(scrapper.toLowerCase());
             className = className + "Scrapper";
             AbstractScrapper abstractScrapper = (AbstractScrapper) createObject(packageName + "." + className);
+            if(abstractScrapper == null) {
+                className = scrapper + "Scrapper";
+                abstractScrapper = (AbstractScrapper) createObject(packageName + "." + className);
+            }
             this.scrappers.put(abstractScrapper.toString(), (AbstractScrapper) createObject(packageName + "." + className));
         }
     }
@@ -110,8 +114,7 @@ public class ProcessHelper {
         SmuScrapper smuScrapper = new SmuScrapper();
         TottusScrapper tottusScrapper = new TottusScrapper();
         CencosudScrapper cencosudScrapper = new CencosudScrapper();
-        WallmartScrapper wallmartScrapper = new WallmartScrapper();
-
+        WalMartScrapper walMartScrapper = new WalMartScrapper();
 
         scrappers.put(construmartScrapper.toString(), construmartScrapper);
         scrappers.put(easyScrapper.toString(), easyScrapper);
@@ -119,7 +122,7 @@ public class ProcessHelper {
         scrappers.put(smuScrapper.toString(), smuScrapper);
         scrappers.put(cencosudScrapper.toString(), cencosudScrapper);
         scrappers.put(tottusScrapper.toString(), tottusScrapper);
-        scrappers.put(wallmartScrapper.toString(), wallmartScrapper);
+        scrappers.put(walMartScrapper.toString(), walMartScrapper);
 
         executor = Executors.newFixedThreadPool(scrappers.size());
 

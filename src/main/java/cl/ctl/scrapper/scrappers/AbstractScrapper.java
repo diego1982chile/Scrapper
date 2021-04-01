@@ -58,6 +58,33 @@ public abstract class AbstractScrapper {
         }
     }
 
+    public FileControl getDailyFileControl() {
+        for (FileControl fileControl : fileControlList) {
+            if(fileControl.getFrequency().equalsIgnoreCase("Dia")) {
+                return  fileControl;
+            }
+        }
+        return null;
+    }
+
+    public FileControl getMonthlyFileControl() {
+        for (FileControl fileControl : fileControlList) {
+            if(fileControl.getFrequency().equalsIgnoreCase("Mes")) {
+                return  fileControl;
+            }
+        }
+        return null;
+    }
+
+    public FileControl getWeeklyFileControl() {
+        for (FileControl fileControl : fileControlList) {
+            if(fileControl.getFrequency().equalsIgnoreCase("Dom")) {
+                return  fileControl;
+            }
+        }
+        return null;
+    }
+
     public String getCadena() {
         return cadena;
     }

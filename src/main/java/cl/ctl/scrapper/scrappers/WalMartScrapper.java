@@ -16,11 +16,11 @@ import java.util.logging.Level;
 /**
  * Created by des01c7 on 16-12-20.
  */
-public class WallmartScrapper extends AbstractScrapper {
+public class WalMartScrapper extends AbstractScrapper {
 
-    public WallmartScrapper() throws IOException {
+    public WalMartScrapper() throws IOException {
         super();
-        cadena = "Wallmart";
+        cadena = "WalMart";
         holding = "Nutrisa";
         url = "https://retaillink.login.wal-mart.com/?ServerType=IIS1&CTAuthMode=BASIC&language=en&utm_source=retaillink&utm_medium=redirect&utm_campaign=FalconRelease&CT_ORIG_URL=/&ct_orig_uri=/ ";
         fileExt = ".xlsx";
