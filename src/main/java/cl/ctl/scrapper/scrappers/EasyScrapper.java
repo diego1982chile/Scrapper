@@ -3,6 +3,7 @@ package cl.ctl.scrapper.scrappers;
 import cl.ctl.scrapper.helpers.CaptchaHelper;
 import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
+import cl.ctl.scrapper.model.BadDateException;
 import cl.ctl.scrapper.model.BusinessException;
 import cl.ctl.scrapper.model.DateOutOfRangeException;
 import org.openqa.selenium.By;
@@ -13,6 +14,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.util.logging.Level;
@@ -22,11 +24,14 @@ import java.util.logging.Level;
  */
 public class EasyScrapper extends AbstractScrapper {
 
+    boolean dateOutOfRangeFlag = false;
+
     public EasyScrapper() throws IOException {
         super();
         holding = "Legrand";
         cadena = "Easy";
         url = "https://www.cenconlineb2b.com/auth/realms/cencosud/protocol/openid-connect/auth?response_type=code&client_id=easycl-client-prod&redirect_uri=https%3A%2F%2Fwww.cenconlineb2b.com%2FEasyCL%2FBBRe-commerce%2Fswf%2Fmain.html&state=bad15b30-d2d2-4738-8409-ffaad6602ac6&login=true&scope=openid";
+        logo = "easy.jpg";
     }
 
     void login() throws Exception {
@@ -175,11 +180,16 @@ public class EasyScrapper extends AbstractScrapper {
         cont = 0;
 
         // *SelectParameters
-        while(cont < 10) {
+        while(cont < 20) {
 
             cont++;
 
             try {
+
+                if(dateOutOfRangeFlag) {
+                    throw new DateOutOfRangeException(since);
+                }
+
                 String script = "document.getElementsByClassName('v-textfield v-datefield-textfield')[0].removeAttribute('disabled')";
                 JavascriptExecutor js = (JavascriptExecutor) driver;
                 js.executeScript(script);
@@ -192,6 +202,7 @@ public class EasyScrapper extends AbstractScrapper {
                 Thread.sleep(1000);
 
                 if(!driver.findElements(By.xpath("//div[@class='v-datefield v-datefield-popupcalendar v-widget v-has-width v-has-height v-datefield-error-error v-datefield-error v-datefield-day']")).isEmpty()) {
+                    dateOutOfRangeFlag = true;
                     throw new DateOutOfRangeException(since);
                 }
 
@@ -207,7 +218,12 @@ public class EasyScrapper extends AbstractScrapper {
                 Thread.sleep(1000);
 
                 if(!driver.findElements(By.xpath("//div[@class='v-datefield v-datefield-popupcalendar v-widget v-has-width v-has-height v-datefield-error-error v-datefield-error v-datefield-day']")).isEmpty()) {
+                    dateOutOfRangeFlag = true;
                     throw new DateOutOfRangeException(until);
+                }
+
+                if(sinceInput.getAttribute("value").trim().equals("") || untilInput.getAttribute("value").trim().equals("")) {
+                    throw new Exception("Alguna de las fechas está vacía!!");
                 }
 
                 break;
@@ -242,6 +258,14 @@ public class EasyScrapper extends AbstractScrapper {
                 WebElement generateReport = driver.findElement(By.xpath("//div[@class='v-button v-widget btn-filter-search v-button-btn-filter-search']"));
                 actions = new Actions(driver);
                 actions.moveToElement(generateReport).click().build().perform();
+
+                Thread.sleep(2000);
+
+                // Si se producen errores de fecha levantar excepción
+                if(!driver.findElements(By.xpath(".//div[contains(text(),'Ingrese una fecha Desde válida')]")).isEmpty() ||
+                        !driver.findElements(By.xpath(".//div[contains(text(),'Ingrese una fecha Hasta válida')]")).isEmpty()) {
+                    throw new BadDateException("Alguna de las fechas ingresadas no es válida");
+                }
 
                 Thread.sleep(20000);
 

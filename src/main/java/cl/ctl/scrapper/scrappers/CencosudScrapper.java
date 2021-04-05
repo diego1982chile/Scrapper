@@ -1,6 +1,7 @@
 package cl.ctl.scrapper.scrappers;
 
 import cl.ctl.scrapper.helpers.CaptchaHelper;
+import cl.ctl.scrapper.model.BadDateException;
 import cl.ctl.scrapper.model.DateOutOfRangeException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -10,6 +11,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.util.logging.Level;
 
@@ -18,11 +20,14 @@ import java.util.logging.Level;
  */
 public class CencosudScrapper extends AbstractScrapper {
 
+    boolean dateOutOfRangeFlag = false;
+
     public CencosudScrapper() throws IOException {
         super();
         holding = "Nutrisa";
         cadena = "Cencosud";
         url = "https://www.cenconlineb2b.com/";
+        logo = "cencosud.png";
     }
 
     void login() throws Exception {
@@ -145,11 +150,16 @@ public class CencosudScrapper extends AbstractScrapper {
         cont = 0;
 
         // *SelectParameters
-        while(cont < 10) {
+        while(cont < 20) {
 
             cont++;
 
             try {
+
+                if(dateOutOfRangeFlag) {
+                    throw new DateOutOfRangeException(since);
+                }
+
                 String script = "document.getElementsByClassName('v-textfield v-datefield-textfield')[0].removeAttribute('disabled')";
                 JavascriptExecutor js = (JavascriptExecutor) driver;
                 js.executeScript(script);
@@ -162,6 +172,7 @@ public class CencosudScrapper extends AbstractScrapper {
                 Thread.sleep(1000);
 
                 if(!driver.findElements(By.xpath("//div[@class='v-datefield v-datefield-popupcalendar v-widget v-has-width v-has-height v-datefield-error-error v-datefield-error v-datefield-day']")).isEmpty()) {
+                    dateOutOfRangeFlag = true;
                     throw new DateOutOfRangeException(since);
                 }
 
@@ -177,7 +188,12 @@ public class CencosudScrapper extends AbstractScrapper {
                 Thread.sleep(1000);
 
                 if(!driver.findElements(By.xpath("//div[@class='v-datefield v-datefield-popupcalendar v-widget v-has-width v-has-height v-datefield-error-error v-datefield-error v-datefield-day']")).isEmpty()) {
+                    dateOutOfRangeFlag = true;
                     throw new DateOutOfRangeException(until);
+                }
+
+                if(sinceInput.getAttribute("value").trim().equals("") || untilInput.getAttribute("value").trim().equals("")) {
+                    throw new Exception("Alguna de las fechas está vacía!!");
                 }
 
                 break;
@@ -212,6 +228,14 @@ public class CencosudScrapper extends AbstractScrapper {
                 WebElement generateReport = driver.findElement(By.xpath("//div[@class='v-button v-widget btn-filter-search v-button-btn-filter-search']"));
                 actions = new Actions(driver);
                 actions.moveToElement(generateReport).click().build().perform();
+
+                Thread.sleep(2000);
+
+                // Si se producen errores de fecha levantar excepción
+                if(!driver.findElements(By.xpath(".//div[contains(text(),'Ingrese una fecha Desde válida')]")).isEmpty() ||
+                        !driver.findElements(By.xpath(".//div[contains(text(),'Ingrese una fecha Hasta válida')]")).isEmpty()) {
+                    throw new BadDateException("Alguna de las fechas ingresadas no es válida");
+                }
 
                 Thread.sleep(20000);
 

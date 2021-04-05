@@ -1,6 +1,7 @@
 package cl.ctl.scrapper.controllers;
 
 import cl.ctl.scrapper.helpers.*;
+import cl.ctl.scrapper.model.FileControl;
 import cl.ctl.scrapper.scrappers.AbstractScrapper;
 import cl.ctl.scrapper.scrappers.ConstrumartScrapper;
 import cl.ctl.scrapper.scrappers.EasyScrapper;
@@ -28,7 +29,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        LocalDate localDate = LocalDate.of(2021, 3, 29);
+        LocalDate localDate = LocalDate.of(2021, 4, 3);
         LocalDate today = LocalDate.now();
 
         while(localDate.isBefore(today)) {
@@ -42,11 +43,29 @@ public class Main {
 
     public static void scrap() throws Exception {
 
+        int max = 3;
 
+        for (int i = 0; i < max; i++) {
+            logger.log(Level.INFO, "Descargando scraps -> iteración " + i + 1 + " de " + max);
 
-        for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
-            scrapper.process();
-            //ProcessHelper.getInstance().getExecutor().execute(scrapper);
+            for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+                scrapper.process();
+                //ProcessHelper.getInstance().getExecutor().execute(scrapper);
+            }
+
+            int errors = 0;
+
+            for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+                for (FileControl fileControl : scrapper.getFileControlList()) {
+                    if(!fileControl.getErrors().isEmpty()) {
+                       errors++;
+                    }
+                }
+            }
+
+            if(errors == 0) {
+                break;
+            }
         }
 
         logger.log(Level.INFO, "Descomprimiendo y renombrando archivos");

@@ -3,6 +3,7 @@ package cl.ctl.scrapper.scrappers;
 import cl.ctl.scrapper.helpers.CaptchaHelper;
 import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
+import cl.ctl.scrapper.model.BadDateException;
 import cl.ctl.scrapper.model.BusinessException;
 import cl.ctl.scrapper.model.DateOutOfRangeException;
 import org.openqa.selenium.By;
@@ -12,6 +13,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -22,11 +24,14 @@ import java.util.logging.Level;
  */
 public class ConstrumartScrapper extends AbstractScrapper {
 
+    boolean dateOutOfRangeFlag = false;
+
     public ConstrumartScrapper() throws IOException {
         super();
         holding = "Legrand";
         cadena = "Construmart";
         url = "https://sso.bbr.cl/auth/realms/construmart/protocol/openid-connect/auth?response_type=code&client_id=construmart-client-prod&redirect_uri=https%3A%2F%2Fb2b.construmart.cl%2FBBRe-commerce%2Fmain&state=5d08ee52-2336-4ed0-abc4-b431ee1e3a55&login=true&scope=openid";
+        logo = "construmart.jpg";
     }
 
     public ConstrumartScrapper(LocalDate processDate) throws IOException {
@@ -117,13 +122,17 @@ public class ConstrumartScrapper extends AbstractScrapper {
             cont = 0;
 
             // *SelectParameters
-            while(cont < 10) {
+            while(cont < 20) {
 
                 cont++;
 
                 try {
 
                     Thread.sleep(1000);
+
+                    if(dateOutOfRangeFlag) {
+                        throw new DateOutOfRangeException(since);
+                    }
 
                     String script = "document.getElementsByClassName('v-textfield v-datefield-textfield')[0].removeAttribute('disabled')";
                     JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -137,6 +146,7 @@ public class ConstrumartScrapper extends AbstractScrapper {
                     Thread.sleep(1000);
 
                     if(!driver.findElements(By.xpath("//div[@class='v-datefield v-datefield-popupcalendar v-widget v-has-width v-has-height v-datefield-error-error v-datefield-error v-datefield-day']")).isEmpty()) {
+                        dateOutOfRangeFlag = true;
                         throw new DateOutOfRangeException(since);
                     }
 
@@ -152,7 +162,12 @@ public class ConstrumartScrapper extends AbstractScrapper {
                     Thread.sleep(1000);
 
                     if(!driver.findElements(By.xpath("//div[@class='v-datefield v-datefield-popupcalendar v-widget v-has-width v-has-height v-datefield-error-error v-datefield-error v-datefield-day']")).isEmpty()) {
+                        dateOutOfRangeFlag = true;
                         throw new DateOutOfRangeException(until);
+                    }
+
+                    if(sinceInput.getAttribute("value").trim().equals("") || untilInput.getAttribute("value").trim().equals("")) {
+                        throw new Exception("Alguna de las fechas está vacía!!");
                     }
 
                     break;
@@ -184,9 +199,18 @@ public class ConstrumartScrapper extends AbstractScrapper {
                 cont++;
 
                 try {
+
                     WebElement generateReport = driver.findElement(By.xpath("//div[@class='v-button v-widget btn-filter-search v-button-btn-filter-search']"));
                     actions = new Actions(driver);
                     actions.moveToElement(generateReport).click().build().perform();
+
+                    Thread.sleep(2000);
+
+                    // Si se producen errores de fecha levantar excepción
+                    if(!driver.findElements(By.xpath(".//div[contains(text(),'Ingrese una fecha Desde válida')]")).isEmpty() ||
+                            !driver.findElements(By.xpath(".//div[contains(text(),'Ingrese una fecha Hasta válida')]")).isEmpty()) {
+                        throw new BadDateException("Alguna de las fechas ingresadas no es válida");
+                    }
 
                     Thread.sleep(20000);
 

@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
+import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class WalMartScrapper extends AbstractScrapper {
         cadena = "WalMart";
         holding = "Nutrisa";
         url = "https://retaillink.login.wal-mart.com/?ServerType=IIS1&CTAuthMode=BASIC&language=en&utm_source=retaillink&utm_medium=redirect&utm_campaign=FalconRelease&CT_ORIG_URL=/&ct_orig_uri=/ ";
+        logo = "walmart.jpg";
         fileExt = ".xlsx";
         onlyDiary = true;
     }
@@ -34,7 +36,7 @@ public class WalMartScrapper extends AbstractScrapper {
             driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys("Nutrisa20.21");
             Thread.sleep(2000);
             driver.findElement(By.className("spin-button-children")).click();
-            Thread.sleep(20000);
+            Thread.sleep(30000);
     }
 
     void doScrap(String since, String until) throws Exception {
@@ -53,6 +55,7 @@ public class WalMartScrapper extends AbstractScrapper {
             submitNewReport();
             queryReport();
         }
+
 
     }
 
@@ -141,8 +144,8 @@ public class WalMartScrapper extends AbstractScrapper {
                 }
 
                 for (int i = 0; i < nutrisaCTLReports; ++i) {
-                    status = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(0).findElement(By.xpath("parent::td/preceding-sibling::td/following-sibling::td/following-sibling::td")).findElement(By.xpath("span")).getAttribute("innerHTML");
-                    date = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(0).findElement(By.xpath("parent::td/preceding-sibling::td/following-sibling::td/following-sibling::td/following-sibling::td/following-sibling::td")).findElement(By.xpath("span")).getAttribute("innerHTML");
+                    status = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(i).findElement(By.xpath("parent::td/preceding-sibling::td/following-sibling::td/following-sibling::td")).findElement(By.xpath("span")).getAttribute("innerHTML");
+                    date = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(i).findElement(By.xpath("parent::td/preceding-sibling::td/following-sibling::td/following-sibling::td/following-sibling::td/following-sibling::td")).findElement(By.xpath("span")).getAttribute("innerHTML");
 
                     switch(status) {
                         case "Hecho":
@@ -155,9 +158,30 @@ public class WalMartScrapper extends AbstractScrapper {
                             break;
                         case "Activo":
                             Thread.sleep(10000);
+                            driver.switchTo().parentFrame();
+                            driver.switchTo().parentFrame();
+                            driver.findElements(By.className("homepage_toplink")).get(1).click();
+                            driver.switchTo().frame("ifrContent");
+                            driver.switchTo().frame("JobTable");
+                            break;
+                        case "Formateando":
+                            Thread.sleep(20000);
+                            driver.switchTo().parentFrame();
+                            driver.switchTo().parentFrame();
+                            driver.findElements(By.className("homepage_toplink")).get(1).click();
+                            driver.switchTo().frame("ifrContent");
+                            driver.switchTo().frame("JobTable");
+                            break;
                         case "Esperando":
-                            flag = false;
-                            throw new Exception("Este reporte ha sido encolado para ser generado en la próxima ventana Operativa. Intentar nuevamente la descarga más tarde");
+                            Thread.sleep(30000);
+                            driver.switchTo().parentFrame();
+                            driver.switchTo().parentFrame();
+                            driver.findElements(By.className("homepage_toplink")).get(1).click();
+                            driver.switchTo().frame("ifrContent");
+                            driver.switchTo().frame("JobTable");
+                            break;
+                            //flag = false;
+                            //throw new Exception("Este reporte ha sido encolado para ser generado en la próxima ventana Operativa. Intentar nuevamente la descarga más tarde");
                         default:
                             flag = false;
                             throw new Exception("Status de Reporte '" + status + "' no soportado! Contacte al Administrador");
@@ -174,6 +198,5 @@ public class WalMartScrapper extends AbstractScrapper {
 
         return false;
     }
-
 
 }

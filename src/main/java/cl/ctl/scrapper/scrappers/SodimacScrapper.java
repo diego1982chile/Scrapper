@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
+import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
@@ -21,6 +22,7 @@ public class SodimacScrapper extends AbstractScrapper {
         holding = "Legrand";
         cadena = "Sodimac";
         url = "https://b2b.sodimac.com/b2bsocopr/grafica/html/index.html";
+        logo = "sodimac.jpg";
         onlyDiary = true;
         fileExt = ".txt";
     }

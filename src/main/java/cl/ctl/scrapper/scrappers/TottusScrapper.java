@@ -9,6 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
+import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
@@ -23,6 +24,7 @@ public class TottusScrapper extends AbstractScrapper {
         cadena = "Tottus";
         holding = "Nutrisa";
         url = "https://b2b.tottus.com/b2btoclpr/grafica/html/index.html";
+        logo = "tottus.jpg";
     }
 
     void login() throws InterruptedException {

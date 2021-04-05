@@ -301,7 +301,10 @@ public class FilesHelper {
         fileControl.setScrapper(scrapper);
 
         LogHelper.getInstance().registerFileControl(fileControl);
-        scrapper.getFileControlList().add(fileControl);
+
+        if(!scrapper.getFileControlList().contains(fileControl)) {
+            scrapper.getFileControlList().add(fileControl);
+        }
 
         if(scrapper.isOnlyDiary()) {
             return true;
@@ -324,8 +327,13 @@ public class FilesHelper {
             return false;
         }
 
-        LogHelper.getInstance().registerFileControl(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), "Mes", scrapper.getHolding(), cadena, fileNameShort, status));
-        scrapper.getFileControlList().add(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), "Mes", scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status));
+        fileControl = new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), "Mes", scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status);
+
+        LogHelper.getInstance().registerFileControl(fileControl);
+
+        if(!scrapper.getFileControlList().contains(fileControl)) {
+            scrapper.getFileControlList().add(fileControl);
+        }
 
         // Si el proceso es del Domingo, Comprobar que exista el archivo semanal de la cadena, de lo contrario retornar false
         if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
@@ -345,8 +353,13 @@ public class FilesHelper {
                 return false;
             }
 
-            LogHelper.getInstance().registerFileControl(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), "Dom", scrapper.getHolding(), cadena, fileNameShort, status));
-            scrapper.getFileControlList().add(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), "Dom", scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status));
+            fileControl = new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), "Dom", scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status);
+
+            LogHelper.getInstance().registerFileControl(fileControl);
+
+            if(!scrapper.getFileControlList().contains(fileControl)) {
+                scrapper.getFileControlList().add(fileControl);
+            }
         }
 
         return true;
@@ -396,8 +409,13 @@ public class FilesHelper {
         String fileNameShort = file.getName().split(Pattern.quote(SEPARATOR))[file.getName().split(Pattern.quote(SEPARATOR)).length - 1];
         String status = "OK";
 
-        LogHelper.getInstance().registerFileControl(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), frequency, scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status));
-        scrapper.getFileControlList().add(new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), frequency, scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status));
+        FileControl fileControl = new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), frequency, scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status);
+
+        LogHelper.getInstance().registerFileControl(fileControl);
+
+        if(!scrapper.getFileControlList().contains(fileControl)) {
+            scrapper.getFileControlList().add(fileControl);
+        }
 
         return true;
     }

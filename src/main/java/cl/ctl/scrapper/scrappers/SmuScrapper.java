@@ -1,6 +1,7 @@
 package cl.ctl.scrapper.scrappers;
 
 import cl.ctl.scrapper.helpers.CaptchaHelper;
+import cl.ctl.scrapper.model.BadDateException;
 import cl.ctl.scrapper.model.DateOutOfRangeException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -10,6 +11,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.util.logging.Level;
 
@@ -18,11 +20,15 @@ import java.util.logging.Level;
  */
 public class SmuScrapper extends AbstractScrapper {
 
+    boolean flag = false;
+    boolean dateOutOfRangeFlag = false;
+
     public SmuScrapper() throws IOException {
         super();
         holding = "Nutrisa";
         cadena = "SMU";
         url = "https://sso.bbr.cl/auth/realms/unimarc/protocol/openid-connect/auth?response_type=code&client_id=unimarc-client-prod&redirect_uri=https%3A%2F%2Fb2b.smu.cl%2FBBRe-commerce%2Fmain&state=175f2d2f-36ee-4575-aae0-28075fd437ab&login=true&scope=openid";
+        logo = "smu.jpg";
         fileExt = ".xlsx";
     }
 
@@ -76,20 +82,22 @@ public class SmuScrapper extends AbstractScrapper {
 
             try {
 
-                // Cerrar popups!!!
+                // Cerrar popups!!! (si es la 1a vez)
+                if(!flag) {
+                    driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(2).click();
 
-                driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(2).click();
+                    Thread.sleep(2000);
 
-                Thread.sleep(2000);
+                    driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(1).click();
 
-                driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(1).click();
+                    Thread.sleep(2000);
 
-                Thread.sleep(2000);
+                    driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(0).click();
 
-                driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(0).click();
+                    Thread.sleep(2000);
 
-                Thread.sleep(2000);
-
+                    flag = true;
+                }
 
                 WebElement menuCommerce = driver.findElement(By.xpath("//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']")).findElements(By.cssSelector("span:nth-child(3)")).get(0);
                 WebDriverWait wait = new WebDriverWait(driver, 10);
@@ -160,11 +168,16 @@ public class SmuScrapper extends AbstractScrapper {
         cont = 0;
 
         // *SelectParameters
-        while(cont < 10) {
+        while(cont < 20) {
 
             cont++;
 
             try {
+
+                if(dateOutOfRangeFlag) {
+                    throw new DateOutOfRangeException(since);
+                }
+
                 String script = "document.getElementsByClassName('v-textfield v-datefield-textfield')[0].removeAttribute('disabled')";
                 JavascriptExecutor js = (JavascriptExecutor) driver;
                 js.executeScript(script);
@@ -177,6 +190,7 @@ public class SmuScrapper extends AbstractScrapper {
                 Thread.sleep(1000);
 
                 if(!driver.findElements(By.xpath("//div[@class='v-datefield v-datefield-popupcalendar v-widget v-has-width v-has-height v-datefield-error-error v-datefield-error v-datefield-day']")).isEmpty()) {
+                    dateOutOfRangeFlag = true;
                     throw new DateOutOfRangeException("La Fecha está fuera del rango permitido");
                 }
 
@@ -192,7 +206,12 @@ public class SmuScrapper extends AbstractScrapper {
                 Thread.sleep(1000);
 
                 if(!driver.findElements(By.xpath("//div[@class='v-datefield v-datefield-popupcalendar v-widget v-has-width v-has-height v-datefield-error-error v-datefield-error v-datefield-day']")).isEmpty()) {
+                    dateOutOfRangeFlag = true;
                     throw new DateOutOfRangeException("La Fecha está fuera del rango permitido");
+                }
+
+                if(sinceInput.getAttribute("value").trim().equals("") || untilInput.getAttribute("value").trim().equals("")) {
+                    throw new Exception("Alguna de las fechas está vacía!!");
                 }
 
                 break;
@@ -227,6 +246,14 @@ public class SmuScrapper extends AbstractScrapper {
                 WebElement generateReport = driver.findElement(By.xpath("//div[@class='v-button v-widget btn-filter-search v-button-btn-filter-search']"));
                 actions = new Actions(driver);
                 actions.moveToElement(generateReport).click().build().perform();
+
+                Thread.sleep(2000);
+
+                // Si se producen errores de fecha levantar excepción
+                if(!driver.findElements(By.xpath(".//div[contains(text(),'Ingrese una fecha Desde válida')]")).isEmpty() ||
+                        !driver.findElements(By.xpath(".//div[contains(text(),'Ingrese una fecha Hasta válida')]")).isEmpty()) {
+                    throw new BadDateException("Alguna de las fechas ingresadas no es válida");
+                }
 
                 Thread.sleep(20000);
 

@@ -10,6 +10,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +36,8 @@ public abstract class AbstractScrapper {
     String cadena;
 
     String url;
+
+    String logo;
 
     String fileExt = ".csv";
 
@@ -125,6 +128,15 @@ public abstract class AbstractScrapper {
         this.holding = holding;
     }
 
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
+    }
+
+
     public List<FileControl> getFileControlList() {
         return fileControlList;
     }
@@ -151,7 +163,6 @@ public abstract class AbstractScrapper {
             throw new BusinessException("Scrapper '" + cadena + "' -> Archivos ya fueron generados! se omite el proceso");
         }
     }
-
 
     private void initializeDriver() {
         WebDriverManager.chromedriver().setup();
@@ -207,16 +218,13 @@ public abstract class AbstractScrapper {
         String since = formatter.format(ProcessHelper.getInstance().getProcessDate());
         String until = since;
 
-        // Generar Scrap Diario (Si no es solo semanal)
+        // Generar Scrap Diario
 
-        if(!onlyWeekly) {
+        logger.log(Level.INFO, "Descargando Scrap Diario...");
 
-            logger.log(Level.INFO, "Descargando Scrap Diario...");
+        generateScrap(since, until, 1);
 
-            generateScrap(since, until, 1);
-
-            Thread.sleep(2000);
-        }
+        Thread.sleep(2000);
 
         // Si la cadena genera solo scraps diarios retornar en este punto
 
@@ -225,18 +233,16 @@ public abstract class AbstractScrapper {
             return;
         }
 
-        // Generar Scrap Mensual (Si no es solo semanal)
+        // Generar Scrap Mensual
 
-        if(!onlyWeekly) {
+        since = formatter.format(ProcessHelper.getInstance().getProcessDate().minusDays(ProcessHelper.getInstance().getProcessDate().getDayOfMonth()).plusDays(1));
 
-            since = formatter.format(ProcessHelper.getInstance().getProcessDate().minusDays(ProcessHelper.getInstance().getProcessDate().getDayOfMonth()).plusDays(1));
+        logger.log(Level.INFO, "Descargando Scrap Mensual...");
 
-            logger.log(Level.INFO, "Descargando Scrap Mensual...");
+        generateScrap(since, until, 2);
 
-            generateScrap(since, until, 2);
+        Thread.sleep(2000);
 
-            Thread.sleep(2000);
-        }
 
         // Si es proceso de Domingo
         // Generar Scrap Semanal
