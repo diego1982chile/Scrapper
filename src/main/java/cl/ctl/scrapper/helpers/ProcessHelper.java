@@ -34,10 +34,10 @@ public class ProcessHelper {
         try {
             processDate  = LocalDate.now().minusDays(1);
 
-            initScrappers();
-
+            if(scrappers.isEmpty()) {
+                initScrappers();
+            }
             executor = Executors.newFixedThreadPool(scrappers.size());
-
             barrier = new CyclicBarrier(scrappers.size() + 1);
 
 
@@ -115,6 +115,8 @@ public class ProcessHelper {
         TottusScrapper tottusScrapper = new TottusScrapper();
         CencosudScrapper cencosudScrapper = new CencosudScrapper();
         WalMartScrapper walMartScrapper = new WalMartScrapper();
+
+
 
         scrappers.put(construmartScrapper.toString(), construmartScrapper);
         scrappers.put(easyScrapper.toString(), easyScrapper);

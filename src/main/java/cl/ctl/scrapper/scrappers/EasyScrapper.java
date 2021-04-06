@@ -69,6 +69,7 @@ public class EasyScrapper extends AbstractScrapper {
     }
 
     private void redirectHome() {
+
         try {
             driver.get("https://www.cenconlineb2b.com/");
         }
@@ -79,6 +80,7 @@ public class EasyScrapper extends AbstractScrapper {
     }
 
     private void selectCountry() throws InterruptedException {
+
         try {
             Select pais = new Select(driver.findElement(By.id("pais")));
             Thread.sleep(3000);
