@@ -84,6 +84,10 @@ public class SmuScrapper extends AbstractScrapper {
 
                 // Cerrar popups!!! (si es la 1a vez)
                 if(!flag) {
+                    driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(3).click();
+
+                    Thread.sleep(2000);
+
                     driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(2).click();
 
                     Thread.sleep(2000);
@@ -119,7 +123,7 @@ public class SmuScrapper extends AbstractScrapper {
 
                 break;
             }
-            catch(Exception e) {
+            catch(Throwable e) {
                 if(cont >= 10) {
                     logger.log(Level.SEVERE, e.getMessage());
                     throw e;

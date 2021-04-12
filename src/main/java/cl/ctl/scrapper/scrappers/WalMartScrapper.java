@@ -34,6 +34,8 @@ public class WalMartScrapper extends AbstractScrapper {
 
         int cont = 0;
 
+        Actions actions = null;
+
         while(cont < 10) {
 
             cont++;
@@ -48,10 +50,16 @@ public class WalMartScrapper extends AbstractScrapper {
 
                 Thread.sleep(30000);
 
+                WebElement decisionSupport = driver.findElement(By.xpath(".//div[contains(text(),'Decision Support - New')]"));
+                actions = new Actions(driver);
+                actions.moveToElement(decisionSupport).click().build().perform();
+
+                Thread.sleep(10000);
+
                 break;
 
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 if (cont >= 10) {
                     logger.log(Level.SEVERE, e.getMessage());
                     throw e;
@@ -62,29 +70,6 @@ public class WalMartScrapper extends AbstractScrapper {
         // GoTo Comercial
         cont = 0;
 
-        Actions actions = null;
-
-        while(cont < 10) {
-
-            cont++;
-
-            try {
-
-                WebElement decisionSupport = driver.findElement(By.xpath(".//div[contains(text(),'Decision Support - New')]"));
-                actions = new Actions(driver);
-                actions.moveToElement(decisionSupport).click().build().perform();
-
-                Thread.sleep(10000);
-
-                break;
-            }
-            catch(Exception e) {
-                if(cont >= 10) {
-                    logger.log(Level.SEVERE, e.getMessage());
-                    throw e;
-                }
-            }
-        }
 
         cont = 0;
 
@@ -130,7 +115,7 @@ public class WalMartScrapper extends AbstractScrapper {
                 break;
 
             }
-            catch(Exception e) {
+            catch(Throwable e) {
                 if(cont >= 10) {
                     logger.log(Level.SEVERE, e.getMessage());
                     throw e;
@@ -347,7 +332,7 @@ public class WalMartScrapper extends AbstractScrapper {
             catch (TimeOutException e2) {
                 throw e2;
             }
-            catch(Exception e3) {
+            catch(Throwable e3) {
                 if(cont >= 10) {
                     logger.log(Level.SEVERE, e3.getMessage());
                     throw e3;
@@ -362,103 +347,6 @@ public class WalMartScrapper extends AbstractScrapper {
         String[] tokens = date.split("-");
 
         return tokens[1] + "-" + tokens[0] + "-" + tokens[2];
-    }
-
-
-    private boolean queryReport() throws Exception {
-        //Buscar si hay reportes disponibles para el proceso actual
-        ArrayList<String> tabs2 = new ArrayList<String>(driver.getWindowHandles());
-        driver.switchTo().window(tabs2.get(1));
-
-        Actions actions = new Actions(driver);
-
-        Thread.sleep(5000);
-
-        WebElement reports = driver.findElements(By.className("homepage_toplink")).get(1);
-        actions = new Actions(driver);
-        actions.moveToElement(reports).click().build().perform();
-
-        Thread.sleep(5000);
-
-        driver.switchTo().frame("ifrContent");
-
-        Thread.sleep(5000);
-
-        driver.switchTo().frame("JobTable");
-
-        Thread.sleep(3000);
-
-        String status = "";
-        String date = "";
-
-        boolean flag = true;
-
-        while(flag) {
-            try {
-                int nutrisaCTLReports = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).size();
-
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd");
-                String fecha = formatter.format(ProcessHelper.getInstance().getProcessDate().plusDays(1));
-
-                if(nutrisaCTLReports == 0) {
-                    logger.log(Level.WARNING, "Reporte 'Nutrisa CTL (No Modificar)' no está discponible. Se va a solicitar un nuevo reporte");
-                    return false;
-                }
-
-                for (int i = 0; i < nutrisaCTLReports; ++i) {
-                    status = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(i).findElement(By.xpath("parent::td/preceding-sibling::td/following-sibling::td/following-sibling::td")).findElement(By.xpath("span")).getAttribute("innerHTML");
-                    date = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(i).findElement(By.xpath("parent::td/preceding-sibling::td/following-sibling::td/following-sibling::td/following-sibling::td/following-sibling::td")).findElement(By.xpath("span")).getAttribute("innerHTML");
-
-                    switch(status) {
-                        case "Hecho":
-                        case "Salvados":
-                            if(date.contains(fecha)) {
-                                driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(i).click();
-                                Thread.sleep(3000);
-                                return true;
-                            }
-                            break;
-                        case "Activo":
-                            Thread.sleep(10000);
-                            driver.switchTo().parentFrame();
-                            driver.switchTo().parentFrame();
-                            driver.findElements(By.className("homepage_toplink")).get(1).click();
-                            driver.switchTo().frame("ifrContent");
-                            driver.switchTo().frame("JobTable");
-                            break;
-                        case "Formateando":
-                            Thread.sleep(20000);
-                            driver.switchTo().parentFrame();
-                            driver.switchTo().parentFrame();
-                            driver.findElements(By.className("homepage_toplink")).get(1).click();
-                            driver.switchTo().frame("ifrContent");
-                            driver.switchTo().frame("JobTable");
-                            break;
-                        case "Esperando":
-                            Thread.sleep(30000);
-                            driver.switchTo().parentFrame();
-                            driver.switchTo().parentFrame();
-                            driver.findElements(By.className("homepage_toplink")).get(1).click();
-                            driver.switchTo().frame("ifrContent");
-                            driver.switchTo().frame("JobTable");
-                            break;
-                            //flag = false;
-                            //throw new Exception("Este reporte ha sido encolado para ser generado en la próxima ventana Operativa. Intentar nuevamente la descarga más tarde");
-                        default:
-                            flag = false;
-                            throw new Exception("Status de Reporte '" + status + "' no soportado! Contacte al Administrador");
-                    }
-
-                }
-
-                return false;
-            }
-            catch (Exception e) {
-                logger.log(Level.SEVERE, e.getMessage());
-            }
-        }
-
-        return false;
     }
 
 }

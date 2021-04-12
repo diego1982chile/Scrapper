@@ -3,12 +3,14 @@ package cl.ctl.scrapper.helpers;
 import cl.ctl.scrapper.scrappers.*;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 
 /**
  * Created by des01c7 on 18-12-20.
@@ -25,6 +27,7 @@ public class ProcessHelper {
 
     private CyclicBarrier barrier;
 
+    //private Semaphore semaphore;
 
     /**
      * Constructor privado para el Singleton del Factory.
@@ -32,9 +35,12 @@ public class ProcessHelper {
     private ProcessHelper() {
 
         try {
+            //semaphore = new Semaphore(1);
+
             processDate  = LocalDate.now().minusDays(1);
 
             if(scrappers.isEmpty()) {
+                //semaphore.tryAcquire();
                 initScrappers();
             }
             executor = Executors.newFixedThreadPool(scrappers.size());
@@ -55,8 +61,11 @@ public class ProcessHelper {
     }
 
     public void setProcessDate(LocalDate processDate) throws IOException {
-        this.processDate = processDate;
-        initScrappers();
+        if(!this.processDate.equals(processDate)) {
+            this.processDate = processDate;
+            FilesHelper.getInstance().flushProcessName();
+            initScrappers();
+        }
     }
 
     public Map<String, AbstractScrapper> getScrappers() {
@@ -91,6 +100,10 @@ public class ProcessHelper {
         }
     }
 
+    public void finishProcess() {
+        //semaphore.release();
+    }
+
     static Object createObject(String className) {
         Object object = null;
         try {
@@ -116,8 +129,6 @@ public class ProcessHelper {
         CencosudScrapper cencosudScrapper = new CencosudScrapper();
         WalMartScrapper walMartScrapper = new WalMartScrapper();
 
-
-
         scrappers.put(construmartScrapper.toString(), construmartScrapper);
         scrappers.put(easyScrapper.toString(), easyScrapper);
         scrappers.put(sodimacScrapper.toString(), sodimacScrapper);
@@ -130,4 +141,6 @@ public class ProcessHelper {
 
         barrier = new CyclicBarrier(scrappers.size() + 1);
     }
+
+
 }

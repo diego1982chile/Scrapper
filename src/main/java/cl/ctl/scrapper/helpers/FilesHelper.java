@@ -48,6 +48,22 @@ public class FilesHelper {
         return instance;
     }
 
+    public void flushProcessName() {
+        String month = String.valueOf(ProcessHelper.getInstance().getProcessDate().getMonthValue());
+
+        if(ProcessHelper.getInstance().getProcessDate().getMonthValue() < 10) {
+            month = "0" + month;
+        }
+
+        String day = String.valueOf(ProcessHelper.getInstance().getProcessDate().getDayOfMonth());
+
+        if(ProcessHelper.getInstance().getProcessDate().getDayOfMonth() < 10) {
+            day = "0" + day;
+        }
+
+        PROCESS_NAME = String.valueOf(ProcessHelper.getInstance().getProcessDate().getYear()) + month + day;
+    }
+
     public FilesHelper() {
 
         String homePath = System.getProperty("user.home");;
@@ -366,7 +382,6 @@ public class FilesHelper {
     }
 
     public boolean checkFile(AbstractScrapper scrapper, String frequency) {
-
 
         switch(frequency) {
             case "DAY":

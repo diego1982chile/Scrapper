@@ -198,21 +198,25 @@ public abstract class AbstractScrapper {
         FilesHelper.getInstance().renameLastFile(this, freq);
     }
 
-    void scrap() throws Exception {
+    void scrap(boolean flag) throws Exception {
 
-        initializeDriver();
+        if(flag) {
+            initializeDriver();
+        }
 
         checkScraps();
 
-        Thread.sleep(2000);
+        if(flag) {
+            Thread.sleep(2000);
 
-        driver.get(url);
+            driver.get(url);
 
-        Thread.sleep(2000);
+            Thread.sleep(2000);
 
-        login();
+            login();
 
-        Thread.sleep(2000);
+            Thread.sleep(2000);
+        }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-YYYY");
 
@@ -220,17 +224,18 @@ public abstract class AbstractScrapper {
         String until = since;
 
         // Generar Scrap Diario
-
-        logger.log(Level.INFO, "Descargando Scrap Diario...");
-
-        generateScrap(since, until, 1);
-
-        Thread.sleep(2000);
+        if(flag) {
+            logger.log(Level.INFO, "Descargando Scrap Diario...");
+            generateScrap(since, until, 1, flag);
+            Thread.sleep(2000);
+        }
 
         // Si la cadena genera solo scraps diarios retornar en este punto
 
         if(onlyDiary) {
-            driver.quit();
+            if(flag) {
+                driver.quit();
+            }
             return;
         }
 
@@ -238,28 +243,30 @@ public abstract class AbstractScrapper {
 
         since = formatter.format(ProcessHelper.getInstance().getProcessDate().minusDays(ProcessHelper.getInstance().getProcessDate().getDayOfMonth()).plusDays(1));
 
-        logger.log(Level.INFO, "Descargando Scrap Mensual...");
-
-        generateScrap(since, until, 2);
-
-        Thread.sleep(2000);
-
+        if(flag) {
+            logger.log(Level.INFO, "Descargando Scrap Mensual...");
+            generateScrap(since, until, 2, flag);
+            Thread.sleep(2000);
+        }
 
         // Si es proceso de Domingo
         // Generar Scrap Semanal
         if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
             since = formatter.format(ProcessHelper.getInstance().getProcessDate().minusDays(6));
-            logger.log(Level.INFO, "Descargando Scrap Semanal...");
-            generateScrap(since, until, 3);
+            if(flag) {
+                logger.log(Level.INFO, "Descargando Scrap Semanal...");
+                generateScrap(since, until, 3, flag);
+            }
         }
 
-        Thread.sleep(2000);
-
-        driver.quit();
+        if(flag) {
+            Thread.sleep(2000);
+            driver.quit();
+        }
 
     }
 
-    void generateScrap(String since, String until, int count) throws Exception {
+    void generateScrap(String since, String until, int count, boolean flag) throws Exception {
 
         String freq;
 
@@ -279,8 +286,10 @@ public abstract class AbstractScrapper {
 
         try {
             checkScrap(freq);
-            doScrap(since, until);
-            FilesHelper.getInstance().registerFileControlOK(this, freq);
+            if(flag) {
+                doScrap(since, until);
+                FilesHelper.getInstance().registerFileControlOK(this, freq);
+            }
         }
         catch(BusinessException e) {
             logger.log(Level.WARNING, e.getMessage());
@@ -291,7 +300,9 @@ public abstract class AbstractScrapper {
             FilesHelper.getInstance().registerFileControlError(this, freq, e2.getMessage());
         }
         finally {
-            renameFile(cadena, count);
+            if(flag) {
+                renameFile(cadena, count);
+            }
         }
     }
 
@@ -299,15 +310,17 @@ public abstract class AbstractScrapper {
 
     abstract void login() throws Exception;
 
-    public void process() throws Exception {
+    public void process(boolean flag) throws Exception {
 
         try {
-            scrap();
+            scrap(flag);
         }
         catch(BusinessException e) {
             logger.log(Level.WARNING, e.getMessage());
             try {
-                driver.quit();
+                if(flag) {
+                    driver.quit();
+                }
             }
             catch(Exception ex) {
                 ex.printStackTrace();

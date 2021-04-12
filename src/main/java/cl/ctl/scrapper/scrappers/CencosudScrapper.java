@@ -41,7 +41,7 @@ public class CencosudScrapper extends AbstractScrapper {
             captchaHelper.solveCaptcha();
             Thread.sleep(2000);
             driver.findElement(By.id("username")).sendKeys("proyectos@nutrisa.cl");
-            driver.findElement(By.id("password")).sendKeys("nutrisa2021");
+            driver.findElement(By.id("password")).sendKeys("nutrisa.2021");
             driver.getPageSource();
             driver.findElement(By.id("kc-login")).click();
 

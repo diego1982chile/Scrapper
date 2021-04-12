@@ -29,7 +29,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        LocalDate localDate = LocalDate.of(2021, 4, 4);
+        LocalDate localDate = LocalDate.of(2021, 4, 9);
         LocalDate today = LocalDate.now();
 
         while(localDate.isBefore(today)) {
@@ -50,7 +50,7 @@ public class Main {
             logger.log(Level.INFO, "Descargando scraps -> iteración " + cont + " de " + max);
 
             for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
-                scrapper.process();
+                scrapper.process(false);
                 //ProcessHelper.getInstance().getExecutor().execute(scrapper);
             }
 
@@ -86,7 +86,7 @@ public class Main {
 
         MailHelper.getInstance().sendMail();
 
-        LogHelper.getInstance().getFileControlList().clear();
+        ProcessHelper.getInstance().finishProcess();
 
     }
     

@@ -5,6 +5,7 @@ import cl.ctl.scrapper.scrappers.AbstractScrapper;
 import com.jcraft.jsch.*;
 
 import java.io.*;
+import java.nio.file.FileSystems;
 import java.util.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -51,6 +52,21 @@ public class UploadHelper {
             e.printStackTrace();
         }
 
+    }
+
+    public void sendSignal() {
+
+        String local = FilesHelper.getInstance().getUploadPath();
+        File signal = new File(local + FileSystems.getDefault().getSeparator() + "signal.txt");
+
+        try {
+            copyLocalToRemote(local, remote, signal.getName());
+
+        } catch (JSchException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void uploadFiles() throws JSchException, IOException {

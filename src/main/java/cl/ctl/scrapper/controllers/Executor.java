@@ -57,17 +57,17 @@ public class Executor {
         logger.log(Level.INFO, "Scrapper Construmart -> Inicializando");
 
         ConstrumartScrapper construmartScrapper = new ConstrumartScrapper();
-        construmartScrapper.process();
+        construmartScrapper.process(true);
 
         logger.log(Level.INFO, "Scrapper Easy -> Inicializando");
 
         EasyScrapper easyScrapper = new EasyScrapper();
-        easyScrapper.process();
+        easyScrapper.process(true);
 
         logger.log(Level.INFO, "Scrapper Sodimac -> Inicializando");
 
         SodimacScrapper sodimacScrapper = new SodimacScrapper();
-        sodimacScrapper.process();
+        sodimacScrapper.process(true);
 
         logger.log(Level.INFO, "Descomprimiendo y renombrando archivos");
 
