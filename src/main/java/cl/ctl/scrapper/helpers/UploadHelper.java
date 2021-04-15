@@ -54,12 +54,13 @@ public class UploadHelper {
 
     }
 
-    public void sendSignal() {
+    public void sendSignal(String name) {
 
         String local = FilesHelper.getInstance().getUploadPath();
-        File signal = new File(local + FileSystems.getDefault().getSeparator() + "signal.txt");
+        File signal = new File(local + FileSystems.getDefault().getSeparator() + name + "_signal.txt");
 
         try {
+            signal.createNewFile();
             copyLocalToRemote(local, remote, signal.getName());
 
         } catch (JSchException e) {

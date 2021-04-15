@@ -286,7 +286,7 @@ public class WalMartScrapper extends AbstractScrapper {
                     throw new NoReportsException("No hay reportes para 'Nutrisa CTL (No Modificar)'");
                 }
 
-                int numberOfTries = 30;
+                int numberOfTries = 10;
 
                 for (int i = 0; i < numberOfTries; ++i) {
 

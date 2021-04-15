@@ -29,7 +29,7 @@ public class Executor {
             e.printStackTrace();
         }
 
-        ProcessHelper.getInstance().setProcessDate(date);
+        //ProcessHelper.getInstance().setProcessDate(date);
         scrap();
 
         return;

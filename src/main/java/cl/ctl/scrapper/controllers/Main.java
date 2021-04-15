@@ -33,7 +33,7 @@ public class Main {
         LocalDate today = LocalDate.now();
 
         while(localDate.isBefore(today)) {
-            ProcessHelper.getInstance().setProcessDate(localDate);
+            //ProcessHelper.getInstance().setProcessDate(localDate);
             scrap();
             localDate = localDate.plusDays(1);
             return;
@@ -85,8 +85,6 @@ public class Main {
         logger.log(Level.INFO, "Proceso finalizado con éxito. Enviando correo");
 
         MailHelper.getInstance().sendMail();
-
-        ProcessHelper.getInstance().finishProcess();
 
     }
     
