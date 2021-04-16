@@ -3,6 +3,8 @@ package cl.ctl.scrapper.helpers;
 import cl.ctl.scrapper.model.ConcurrentAccessException;
 import cl.ctl.scrapper.model.FileControl;
 import cl.ctl.scrapper.scrappers.*;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
@@ -70,7 +72,7 @@ public class ProcessHelper {
             //if(semaphore.tryAcquire()) {
                 this.processDate = processDate;
                 FilesHelper.getInstance().flushProcessName();
-                initScrappers();
+                //initScrappers();
             //}
             //else {
                 //throw new ConcurrentAccessException("Se está intentando cambiar la fecha de proceso mientras hay un proceso en curso!!");
@@ -155,6 +157,7 @@ public class ProcessHelper {
 
     public void process(String client) throws Exception {
 
+        try {
             if(!semaphore.tryAcquire()) {
                 throw new ConcurrentAccessException("Se está intentando cambiar la fecha de proceso mientras hay un proceso en curso!!");
             }
@@ -187,24 +190,64 @@ public class ProcessHelper {
 
             }
 
-            upload(client);
+            upload();
+
+            sendSignal(client);
 
             semaphore.release();
-
+        }
+        catch (Exception e) {
+            semaphore.release();
+            throw e;
+        }
 
     }
 
     public void process(String process, List<String> chains) throws Exception {
 
+        try {
+
+            if(!semaphore.tryAcquire()) {
+                throw new ConcurrentAccessException("Se está intentando cambiar la fecha de proceso mientras hay un proceso en curso!!");
+            }
+
+            if(chains == null) {
+                return;
+            }
+
+            if(chains.isEmpty()) {
+                return;
+            }
+
+            LocalDate date = getLocalDate(process);
+
+            setProcessDate(date);
+
+            validateChains(chains);
+
+            setScrappers(chains);
+
+            scrap(true);
+
+            upload();
+
+            semaphore.release();
+
+        }
+        catch (Exception e) {
+            semaphore.release();
+            throw e;
+        }
+
+    }
+
+    public void getScraps(String process) throws Exception {
+
         if(!semaphore.tryAcquire()) {
             throw new ConcurrentAccessException("Se está intentando cambiar la fecha de proceso mientras hay un proceso en curso!!");
         }
 
-        if(chains == null) {
-            return;
-        }
-
-        if(chains.isEmpty()) {
+        if(process == null) {
             return;
         }
 
@@ -212,18 +255,11 @@ public class ProcessHelper {
 
         setProcessDate(date);
 
-        validateChains(chains);
-
-        setScrappers(chains);
-
-        scrap(true);
-
-        upload();
+        scrap(false);
 
         semaphore.release();
 
     }
-
 
     private void scrap(boolean flag) throws Exception {
 
@@ -235,7 +271,7 @@ public class ProcessHelper {
 
             logger.log(Level.INFO, "Descargando scraps -> Intento " + cont + " de " + max);
 
-            for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+            for (AbstractScrapper scrapper : getScrappers().values()) {
                 if (scrapper != null) {
                     scrapper.process(flag);
                 }
@@ -246,7 +282,7 @@ public class ProcessHelper {
 
             int errors = 0;
 
-            for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+            for (AbstractScrapper scrapper : getScrappers().values()) {
                 for (FileControl fileControl : scrapper.getFileControlList()) {
                     if (!fileControl.getErrors().isEmpty()) {
                         errors++;
@@ -279,15 +315,8 @@ public class ProcessHelper {
         MailHelper.getInstance().sendMail();
     }
 
-    private void upload(String signal) throws Exception {
 
-        logger.log(Level.INFO, "Descomprimiendo y renombrando archivos");
-
-        FilesHelper.getInstance().processFiles();
-
-        logger.log(Level.INFO, "Subiendo archivos a servidor DivePort");
-
-        UploadHelper.getInstance().uploadFiles();
+    private void sendSignal(String signal) throws Exception {
 
         logger.log(Level.INFO, "Subiendo signal a servidor DivePort");
 
@@ -297,32 +326,7 @@ public class ProcessHelper {
 
         UploadHelper.getInstance().moveFiles();
 
-        logger.log(Level.INFO, "Proceso finalizado con éxito. Enviando correo");
-
-        MailHelper.getInstance().sendMail();
     }
-
-
-    public void getScraps(String process) throws Exception {
-
-        if(!semaphore.tryAcquire()) {
-            throw new ConcurrentAccessException("Se está intentando cambiar la fecha de proceso mientras hay un proceso en curso!!");
-        }
-
-        if(process == null) {
-            return;
-        }
-
-        LocalDate date = getLocalDate(process);
-
-        setProcessDate(date);
-
-        scrap(false);
-
-        semaphore.release();
-
-    }
-
 
     private void validateChains(List<String> chains) throws Exception {
 

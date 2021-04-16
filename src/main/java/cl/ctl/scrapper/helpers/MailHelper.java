@@ -114,26 +114,31 @@ public class MailHelper {
 
         for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
-                String fileName = fileControl.getFileName();
-                String status = fileControl.getStatus();
+                // Solo archivos registrados con nombre proceso actual
+                if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) && fileControl.getFileName().contains(scrapper.getHolding())) {
 
-                String color = "#4CAF50";
+                    String fileName = fileControl.getFileName();
+                    String status = fileControl.getStatus();
 
-                if(fileControl.getStatus().equalsIgnoreCase("Error")) {
-                    color = "#F44336";
-                }
+                    String color = "#4CAF50";
 
-                html = html + "<tr>";
+                    if(fileControl.getStatus().equalsIgnoreCase("Error")) {
+                        color = "#F44336";
+                    }
 
-                html = html + "<td style='padding: 0 0 0 0;'>" + fileName + "</td>";
-                html = html + "<td style='padding: 0 0 0 0; color: " + color + "'>" + status + "</td>";
+                    html = html + "<tr>";
 
-                html = html + "</tr>";
+                    html = html + "<td style='padding: 0 0 0 0;'>" + fileName + "</td>";
+                    html = html + "<td style='padding: 0 0 0 0; color: " + color + "'>" + status + "</td>";
 
-                if(fileControl.getStatus().equalsIgnoreCase("Error")) {
-                    html = html + "<tr style='background: #e8e5e5a8;'>";
-                    html = html + "<td colspan='2'><div><label>" + fileControl.getErrors().get(0) + "</label></div></td>";
                     html = html + "</tr>";
+
+                    if(fileControl.getStatus().equalsIgnoreCase("Error")) {
+                        html = html + "<tr style='background: #e8e5e5a8;'>";
+                        html = html + "<td colspan='2'><div><label>" + fileControl.getErrors().get(0) + "</label></div></td>";
+                        html = html + "</tr>";
+                    }
+
                 }
             }
         }

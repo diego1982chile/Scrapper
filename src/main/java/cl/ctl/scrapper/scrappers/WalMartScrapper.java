@@ -42,6 +42,10 @@ public class WalMartScrapper extends AbstractScrapper {
 
             try {
 
+                driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys("");
+                Thread.sleep(2000);
+                driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys("");
+                Thread.sleep(2000);
                 driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys("sdellepiane@nutrisa.cl");
                 Thread.sleep(2000);
                 driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys("Nutrisa20.21");
@@ -286,7 +290,7 @@ public class WalMartScrapper extends AbstractScrapper {
                     throw new NoReportsException("No hay reportes para 'Nutrisa CTL (No Modificar)'");
                 }
 
-                int numberOfTries = 10;
+                int numberOfTries = 15;
 
                 for (int i = 0; i < numberOfTries; ++i) {
 

@@ -57,7 +57,7 @@ public class UploadHelper {
     public void sendSignal(String name) {
 
         String local = FilesHelper.getInstance().getUploadPath();
-        File signal = new File(local + FileSystems.getDefault().getSeparator() + name + "_signal.txt");
+        File signal = new File(local + FileSystems.getDefault().getSeparator() + name + ".txt");
 
         try {
             signal.createNewFile();
@@ -77,11 +77,19 @@ public class UploadHelper {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 if(!fileControl.getStatus().equalsIgnoreCase("Error")) {
                     try {
-                        copyLocalToRemote(local, remote, fileControl.getFileName());
+                        // Solo archivos registrados con nombre proceso actual y cliente proceso actual
+                        if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) && fileControl.getFileName().contains(scrapper.getHolding())) {
+                            copyLocalToRemote(local, remote, fileControl.getFileName());
+                        }
                     } catch (JSchException e) {
                         logger.log(Level.SEVERE, e.getMessage());
                         throw e;
-                    } catch (IOException e) {
+                    }
+                    catch (FileNotFoundException e) {
+                        // TODO: Por ahora los archivos que ya habian sido descargados en procesos anteriores, omitirlos en la excepción
+                        logger.log(Level.WARNING, e.getMessage());
+                    }
+                    catch (IOException e) {
                         logger.log(Level.SEVERE, e.getMessage());
                         throw e;
                     }
