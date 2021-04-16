@@ -317,6 +317,14 @@ public abstract class AbstractScrapper {
         }
         catch(BusinessException e) {
             logger.log(Level.WARNING, e.getMessage());
+
+            FilesHelper.getInstance().registerFileControlOK(this, "DAY");
+            FilesHelper.getInstance().registerFileControlOK(this, "MONTH");
+
+            if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+                FilesHelper.getInstance().registerFileControlOK(this, "WEEK");
+            }
+
             try {
                 if(flag) {
                     driver.quit();

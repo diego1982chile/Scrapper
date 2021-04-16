@@ -231,6 +231,9 @@ public class ProcessHelper {
 
             upload();
 
+            // Cerrar la sesión explicitamente
+            UploadHelper.getInstance().closeSession();
+
             semaphore.release();
 
         }
@@ -325,6 +328,8 @@ public class ProcessHelper {
         logger.log(Level.INFO, "Moviendo archivos en servidor DivePort");
 
         UploadHelper.getInstance().moveFiles();
+
+        UploadHelper.getInstance().closeSession();
 
     }
 

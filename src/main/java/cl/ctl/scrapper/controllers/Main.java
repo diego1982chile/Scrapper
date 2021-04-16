@@ -8,6 +8,7 @@ import cl.ctl.scrapper.scrappers.EasyScrapper;
 import cl.ctl.scrapper.scrappers.SodimacScrapper;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,10 +26,15 @@ public class Main {
         // This block configure the logger with handler and formatter
         try {
             logger.addHandler(fh);
+            LocalDate yesterday = LocalDate.now().minusDays(1);
+            logger.log(Level.INFO, "Testeando Proceso Scrap");
+            ProcessHelper.getInstance().process(yesterday.toString(), Arrays.asList("WalMart"));
         } catch (SecurityException e) {
             e.printStackTrace();
         }
 
+
+        /*
         LocalDate localDate = LocalDate.of(2021, 4, 9);
         LocalDate today = LocalDate.now();
 
@@ -38,6 +44,8 @@ public class Main {
             localDate = localDate.plusDays(1);
             return;
         }
+        */
+
 
     }
 

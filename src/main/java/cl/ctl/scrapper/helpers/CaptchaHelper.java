@@ -102,5 +102,6 @@ public class CaptchaHelper {
 
         System.out.println();
 
+
     }
 }

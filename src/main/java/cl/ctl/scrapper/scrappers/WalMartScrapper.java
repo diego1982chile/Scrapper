@@ -292,6 +292,17 @@ public class WalMartScrapper extends AbstractScrapper {
 
                 int numberOfTries = 15;
 
+                // Obtener el JobId para posteriormene realizar la busqueda por JobId
+
+                //Actualizar status reporte
+                // Ojo: Se asume que el reporte mas reciente es el que se generó por el robot
+                Thread.sleep(2000);
+                driver.switchTo().parentFrame();
+                driver.findElement(By.xpath(".//span[contains(text(),'Actualizar')]")).click();
+                Thread.sleep(2000);
+                driver.switchTo().frame("JobTable");
+                String jobId = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(0).findElement(By.xpath("parent::td/preceding-sibling::td/following-sibling::td")).findElement(By.xpath("span")).getAttribute("innerHTML");
+
                 for (int i = 0; i < numberOfTries; ++i) {
 
                     //Actualizar status reporte
@@ -301,7 +312,10 @@ public class WalMartScrapper extends AbstractScrapper {
                     Thread.sleep(2000);
                     driver.switchTo().frame("JobTable");
 
-                    String status = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(0).findElement(By.xpath("parent::td/preceding-sibling::td/following-sibling::td/following-sibling::td")).findElement(By.xpath("span")).getAttribute("innerHTML");
+                    //String status = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(0).findElement(By.xpath("parent::td/preceding-sibling::td/following-sibling::td/following-sibling::td")).findElement(By.xpath("span")).getAttribute("innerHTML");
+
+                    // Se busca por JobId
+                    String status = driver.findElement(By.xpath(".//span[contains(text(),'" + jobId + "')]")).findElement(By.xpath("parent::td/preceding-sibling::td/following-sibling::td/following-sibling::td")).findElement(By.xpath("span")).getAttribute("innerHTML");
 
                     switch(status) {
                         case "Hecho":

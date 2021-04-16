@@ -135,7 +135,7 @@ public class MailHelper {
 
                     if(fileControl.getStatus().equalsIgnoreCase("Error")) {
                         html = html + "<tr style='background: #e8e5e5a8;'>";
-                        html = html + "<td colspan='2'><div><label>" + fileControl.getErrors().get(0) + "</label></div></td>";
+                        html = html + "<td colspan='2'><textarea style='width:98%;' rows='4' disabled>" + fileControl.getErrors().get(0) + "</textarea></td>";
                         html = html + "</tr>";
                     }
 

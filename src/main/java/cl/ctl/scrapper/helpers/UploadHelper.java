@@ -57,7 +57,7 @@ public class UploadHelper {
     public void sendSignal(String name) {
 
         String local = FilesHelper.getInstance().getUploadPath();
-        File signal = new File(local + FileSystems.getDefault().getSeparator() + name + ".txt");
+        File signal = new File(local + FileSystems.getDefault().getSeparator() + name + "_signal.txt");
 
         try {
             signal.createNewFile();
@@ -98,6 +98,12 @@ public class UploadHelper {
         }
     }
 
+    public void closeSession() {
+        sftpChannel.disconnect();
+        sftp.disconnect();
+        session.disconnect();
+    }
+
     public void moveFiles() throws SftpException, IOException, JSchException {
 
         try {
@@ -112,9 +118,9 @@ public class UploadHelper {
                 }
             }
 
-            sftpChannel.disconnect();
-            sftp.disconnect();
-            session.disconnect();
+            //sftpChannel.disconnect();
+            //sftp.disconnect();
+            //session.disconnect();
 
         } catch (SftpException e) {
             logger.log(Level.SEVERE, e.getMessage());

@@ -64,7 +64,8 @@ public class SodimacScrapper extends AbstractScrapper {
             driver.findElement(By.id("usuario")).sendKeys("128088660");
             Thread.sleep(2000);
             //driver.findElement(By.id("clave")).sendKeys("diy012021");
-            driver.findElement(By.id("clave")).sendKeys("diymarzo2021");
+            //driver.findElement(By.id("clave")).sendKeys("diymarzo2021");
+            driver.findElement(By.id("clave")).sendKeys("diyabril2021");
             Thread.sleep(2000);
             driver.findElement(By.id("entrar2")).click();
     }
