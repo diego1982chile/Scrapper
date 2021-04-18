@@ -35,14 +35,28 @@ public class EasyScrapper extends AbstractScrapper {
     }
 
     void login() throws Exception {
-        try {
+
+        int cont = 0;
+
+        while(cont < 3) {
+
+            cont++;
+
+            try {
             // *SolveCaptcha
             CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
             captchaHelper.solveCaptcha();
+
+            driver.findElement(By.id("username")).sendKeys("");
             Thread.sleep(2000);
+            driver.findElement(By.id("password")).sendKeys("");
+            Thread.sleep(2000);
+
             driver.findElement(By.id("username")).sendKeys("michel.lotissier@legrand.cl");
+            Thread.sleep(2000);
             driver.findElement(By.id("password")).sendKeys("diy12easy2020");
             driver.getPageSource();
+            Thread.sleep(2000);
             driver.findElement(By.id("kc-login")).click();
 
             Thread.sleep(2000);
@@ -60,11 +74,14 @@ public class EasyScrapper extends AbstractScrapper {
             //driver.findElement(By.xpath("//div[@class='v-window-closebox']")).click();
 
             //Thread.sleep(5000);
+            break;
 
-        }
-        catch(Exception e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            throw e;
+            } catch (Throwable e) {
+                if (cont >= 10) {
+                    logger.log(Level.SEVERE, e.getMessage());
+                    throw e;
+                }
+            }
         }
     }
 

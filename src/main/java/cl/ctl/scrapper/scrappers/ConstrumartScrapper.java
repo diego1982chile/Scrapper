@@ -39,29 +39,46 @@ public class ConstrumartScrapper extends AbstractScrapper {
     }
 
      void login() throws Exception {
-        try {
-            // *SolveCaptcha
-            CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
-            captchaHelper.solveCaptcha();
-            Thread.sleep(2000);
 
-            driver.findElement(By.id("username")).sendKeys("brenda.gimenez@legrand.cl");
-            Thread.sleep(2000);
-            driver.findElement(By.id("password")).sendKeys("diy012021");
-            Thread.sleep(2000);
-            driver.getPageSource();
-            driver.findElement(By.id("kc-login")).click();
+         int cont = 0;
 
-            Thread.sleep(5000);
-            //Redirigir al home
-            // https://b2b.construmart.cl/BBRe-commerce/main
-            driver.get("https://b2b.construmart.cl/Construccion/BBRe-commerce/access/login.do");
-        }
-        catch(Exception e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
+         while(cont < 3) {
+
+             cont++;
+
+             try {
+                 // *SolveCaptcha
+                 CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
+                 captchaHelper.solveCaptcha();
+
+                 driver.findElement(By.id("username")).sendKeys("");
+                 Thread.sleep(2000);
+                 driver.findElement(By.id("password")).sendKeys("");
+                 Thread.sleep(2000);
+
+                 driver.findElement(By.id("username")).sendKeys("brenda.gimenez@legrand.cl");
+                 Thread.sleep(2000);
+                 driver.findElement(By.id("password")).sendKeys("diy012021");
+                 Thread.sleep(2000);
+
+                 driver.getPageSource();
+                 driver.findElement(By.id("kc-login")).click();
+
+                 Thread.sleep(5000);
+                 //Redirigir al home
+                 // https://b2b.construmart.cl/BBRe-commerce/main
+                 driver.get("https://b2b.construmart.cl/Construccion/BBRe-commerce/access/login.do");
+
+                 Thread.sleep(5000);
+
+                 break;
+             } catch (Throwable e) {
+                 if (cont >= 10) {
+                     logger.log(Level.SEVERE, e.getMessage());
+                     throw e;
+                 }
+             }
+         }
     }
 
     private void closeTab() throws InterruptedException {

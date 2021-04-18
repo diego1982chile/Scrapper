@@ -28,7 +28,7 @@ public class Main {
             logger.addHandler(fh);
             LocalDate yesterday = LocalDate.now().minusDays(1);
             logger.log(Level.INFO, "Testeando Proceso Scrap");
-            ProcessHelper.getInstance().process(yesterday.toString(), Arrays.asList("WalMart"));
+            ProcessHelper.getInstance().process(yesterday.toString(), Arrays.asList("Construmart","Easy","Cencosud","Smu"));
         } catch (SecurityException e) {
             e.printStackTrace();
         }

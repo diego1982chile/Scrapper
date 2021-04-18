@@ -9,6 +9,8 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -16,6 +18,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -168,11 +171,23 @@ public abstract class AbstractScrapper {
     private void initializeDriver() {
         WebDriverManager.chromedriver().setup();
 
+        HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+        chromePrefs.put("profile.default_content_settings.popups", 0);
+        chromePrefs.put("download.default_directory", FilesHelper.getInstance().getDownloadPath());
+
         ChromeOptions chrome_options = new ChromeOptions();
         chrome_options.addArguments("--start-maximized");
         //chrome_options.addArguments("--headless");
         chrome_options.addArguments("--no-sandbox");
         chrome_options.addArguments("--disable-dev-shm-usage");
+
+        //DesiredCapabilities cap = DesiredCapabilities.chrome();
+        //cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+        //cap.setCapability(ChromeOptions.CAPABILITY, chrome_options);
+
+        chrome_options.setExperimentalOption("prefs", chromePrefs);
+
+
 
         driver = new ChromeDriver(chrome_options);
     }
@@ -225,7 +240,7 @@ public abstract class AbstractScrapper {
 
         // Generar Scrap Diario
         if(flag) {
-            logger.log(Level.INFO, "Descargando Scrap Diario...");
+            logger.log(Level.INFO, "Descargando Scrap Diario " + cadena + "...");
             generateScrap(since, until, 1, flag);
             Thread.sleep(2000);
         }
@@ -244,7 +259,7 @@ public abstract class AbstractScrapper {
         since = formatter.format(ProcessHelper.getInstance().getProcessDate().minusDays(ProcessHelper.getInstance().getProcessDate().getDayOfMonth()).plusDays(1));
 
         if(flag) {
-            logger.log(Level.INFO, "Descargando Scrap Mensual...");
+            logger.log(Level.INFO, "Descargando Scrap Mensual " + cadena + "...");
             generateScrap(since, until, 2, flag);
             Thread.sleep(2000);
         }
@@ -254,7 +269,7 @@ public abstract class AbstractScrapper {
         if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
             since = formatter.format(ProcessHelper.getInstance().getProcessDate().minusDays(6));
             if(flag) {
-                logger.log(Level.INFO, "Descargando Scrap Semanal...");
+                logger.log(Level.INFO, "Descargando Scrap Semanal " + cadena + "...");
                 generateScrap(since, until, 3, flag);
             }
         }
@@ -311,6 +326,8 @@ public abstract class AbstractScrapper {
     abstract void login() throws Exception;
 
     public void process(boolean flag) throws Exception {
+
+        fileControlList.clear();
 
         try {
             scrap(flag);

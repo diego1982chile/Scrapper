@@ -173,14 +173,16 @@ public class ProcessHelper {
 
             setScrappers(chains);
 
-            // Repasar toda la última semana por si hay scraps pendientes
+            // Repasar los útltimos 3 días por si hay scraps pendientes
             LocalDate today = LocalDate.now();
 
-            LocalDate date = today.minusDays(7);
+            LocalDate date = today.minusDays(3);
 
             while(date.isBefore(today)) {
 
                 setProcessDate(date);
+
+                logger.log(Level.INFO, "Ejecutando Scrap proceso " + FilesHelper.getInstance().PROCESS_NAME);
 
                 scrap(true);
 
@@ -266,7 +268,7 @@ public class ProcessHelper {
 
     private void scrap(boolean flag) throws Exception {
 
-        int max = 3;
+        int max = 2;
 
         for (int i = 0; i < max; i++) {
 

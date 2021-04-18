@@ -37,7 +37,7 @@ public class MailHelper {
 
     //private static final String from = "sistemas@minsal.cl";//"semantikos.minsal@gmail.com";
 
-    private static final String from = "diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
+    private static final String from = ConfigHelper.getInstance().CONFIG.get("mail.from.user"); //"diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
 
     //private static final String to = "diego.abelardo.soto@gmail.com";
 
@@ -45,9 +45,9 @@ public class MailHelper {
 
     private static final String to = ConfigHelper.getInstance().CONFIG.get("mail.to");//"diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
 
-    private static final String username = "diego.abelardo.soto@gmail.com";
+    private static final String username = ConfigHelper.getInstance().CONFIG.get("mail.from.user"); //"diego.abelardo.soto@gmail.com";
 
-    private static final String password = "1eurides9";
+    private static final String password = ConfigHelper.getInstance().CONFIG.get("mail.from.password");;
 
     private static final String subject = "CTL - Descarga Scraps";
 
@@ -81,21 +81,21 @@ public class MailHelper {
         return instance;
     }
 
-    public void sendMail() throws IOException {
+    public void sendMail() throws IOException, MessagingException {
 
         this.body = "";
         loadMailBody();
 
         List<FileControl> fileControlList = LogHelper.getInstance().getFileControlList();
 
-        String weekProcessDay = WordUtils.capitalize(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+        String weekProcessDay = WordUtils.capitalize(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES")));
         String processMonthDay = String.valueOf(ProcessHelper.getInstance().getProcessDate().getDayOfMonth());
-        String processMonth = WordUtils.capitalize(ProcessHelper.getInstance().getProcessDate().getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+        String processMonth = WordUtils.capitalize(ProcessHelper.getInstance().getProcessDate().getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES")));
         String processYear = String.valueOf(ProcessHelper.getInstance().getProcessDate().getYear());
 
-        String weekExecutionDay = WordUtils.capitalize(LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+        String weekExecutionDay = WordUtils.capitalize(LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES")));
         String executionMonthDay = String.valueOf(LocalDate.now().getDayOfMonth());
-        String executionMonth = WordUtils.capitalize(LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+        String executionMonth = WordUtils.capitalize(LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES")));
         String executionYear = String.valueOf(LocalDate.now().getYear());
 
         this.body = this.body.replace("[Process]", FilesHelper.getInstance().PROCESS_NAME);
@@ -134,8 +134,10 @@ public class MailHelper {
                     html = html + "</tr>";
 
                     if(fileControl.getStatus().equalsIgnoreCase("Error")) {
-                        html = html + "<tr style='background: #e8e5e5a8;'>";
-                        html = html + "<td colspan='2'><textarea style='width:98%;' rows='4' disabled>" + fileControl.getErrors().get(0) + "</textarea></td>";
+                        int rows = (int) Math.round(fileControl.getErrors().get(0).toString().length()*0.03);
+
+                        html = html + "<tr>";
+                        html = html + "<td colspan='2'><textarea style='width:98%;resize:none;font-size:12px' rows='" + rows + "' disabled>" + fileControl.getErrors().get(0) + "</textarea></td>";
                         html = html + "</tr>";
                     }
 
@@ -146,7 +148,7 @@ public class MailHelper {
         this.body = this.body.replace("[rows]", html);
     }
 
-    private void send() {
+    private void send() throws MessagingException {
 
         logger.info("Enviando correo a destinatario: " + to);
 
@@ -194,12 +196,9 @@ public class MailHelper {
             } catch (Exception e) {
                 // handle exception
                 logger.info((count+1)+"° intento enviando correo a destinatario: " + to + " - " + e.getMessage());
-                if (++count == maxTries) try {
+                if (++count >= maxTries) {
                     logger.error("Error al enviar correo a destinatario: " + to + " - " + e.getMessage());
                     throw e;
-                } catch (MessagingException e1) {
-                    logger.error("Error: "+e1.getMessage());
-                    e1.printStackTrace();
                 }
             }
         }

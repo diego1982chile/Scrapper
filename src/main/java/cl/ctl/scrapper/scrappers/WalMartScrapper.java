@@ -338,7 +338,7 @@ public class WalMartScrapper extends AbstractScrapper {
                 }
 
                 // Si se llega a este punto es porque se superó el límite de tiempo de espera, levantar excepción de timeout
-                throw new TimeOutException("Se superó el tiempo de espera para el reporte ''Nutrisa CTL (No Modificar)'");
+                throw new TimeOutException("Se superó el tiempo de espera para el reporte ''Nutrisa CTL (No Modificar)' con JobId = " + jobId);
 
                 //break;
 

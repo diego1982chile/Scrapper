@@ -31,6 +31,7 @@ public class CencosudScrapper extends AbstractScrapper {
     }
 
     void login() throws Exception {
+
         try {
 
             // Select country

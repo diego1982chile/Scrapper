@@ -33,7 +33,7 @@ public class ErrorHelper {
 
     //private static final String from = "sistemas@minsal.cl";//"semantikos.minsal@gmail.com";
 
-    private static final String from = "diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
+    private static final String from = ConfigHelper.getInstance().CONFIG.get("mail.from.user"); //"diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
 
     //private static final String to = "diego.abelardo.soto@gmail.com";
 
@@ -41,9 +41,9 @@ public class ErrorHelper {
 
     private static final String to = ConfigHelper.getInstance().CONFIG.get("error.to");//"diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
 
-    private static final String username = "diego.abelardo.soto@gmail.com";
+    private static final String username = ConfigHelper.getInstance().CONFIG.get("mail.from.user"); //"diego.abelardo.soto@gmail.com";
 
-    private static final String password = "1eurides9";
+    private static final String password = ConfigHelper.getInstance().CONFIG.get("mail.from.password");
 
     private static final String subject = "CTL - Descarga Scraps";
 
@@ -152,7 +152,7 @@ public class ErrorHelper {
         this.body = this.body.replace("[rows]", html);
     }
 
-    private void send() {
+    private void send() throws MessagingException {
 
         logger.info("Enviando correo a destinatario: " + to);
 
@@ -206,12 +206,9 @@ public class ErrorHelper {
             } catch (Exception e) {
                 // handle exception
                 logger.info((count+1)+"° intento enviando correo a destinatario: " + to + " - " + e.getMessage());
-                if (++count == maxTries) try {
+                if (++count >= maxTries) {
                     logger.error("Error al enviar correo a destinatario: " + to + " - " + e.getMessage());
                     throw e;
-                } catch (MessagingException e1) {
-                    logger.error("Error: "+e1.getMessage());
-                    e1.printStackTrace();
                 }
             }
         }
