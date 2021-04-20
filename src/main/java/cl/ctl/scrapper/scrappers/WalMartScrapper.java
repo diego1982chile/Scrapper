@@ -30,7 +30,7 @@ public class WalMartScrapper extends AbstractScrapper {
         fileExt = ".xlsx";
     }
 
-    void login() throws InterruptedException {
+    void login() throws Exception {
 
         int cont = 0;
 

@@ -196,6 +196,9 @@ public class ProcessHelper {
 
             sendSignal(client);
 
+            // Cerrar la sesión explicitamente
+            //UploadHelper.getInstance().closeSession();
+
             semaphore.release();
         }
         catch (Exception e) {
@@ -234,7 +237,7 @@ public class ProcessHelper {
             upload();
 
             // Cerrar la sesión explicitamente
-            UploadHelper.getInstance().closeSession();
+            //UploadHelper.getInstance().closeSession();
 
             semaphore.release();
 
@@ -301,7 +304,7 @@ public class ProcessHelper {
         }
     }
 
-    private void upload() throws Exception {
+    public void upload() throws Exception {
 
         logger.log(Level.INFO, "Descomprimiendo y renombrando archivos");
 
@@ -321,7 +324,7 @@ public class ProcessHelper {
     }
 
 
-    private void sendSignal(String signal) throws Exception {
+    public void sendSignal(String signal) throws Exception {
 
         logger.log(Level.INFO, "Subiendo signal a servidor DivePort");
 

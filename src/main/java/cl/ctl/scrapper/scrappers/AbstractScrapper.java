@@ -6,6 +6,7 @@ import cl.ctl.scrapper.helpers.ProcessHelper;
 import cl.ctl.scrapper.model.BusinessException;
 import cl.ctl.scrapper.model.FileControl;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -20,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -169,6 +171,7 @@ public abstract class AbstractScrapper {
     }
 
     private void initializeDriver() {
+
         WebDriverManager.chromedriver().setup();
 
         HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
@@ -187,12 +190,12 @@ public abstract class AbstractScrapper {
 
         chrome_options.setExperimentalOption("prefs", chromePrefs);
 
-
-
         driver = new ChromeDriver(chrome_options);
+
+        driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
     }
 
-    void renameFile(String cadena, int count) {
+    private void renameFile(String cadena, int count) {
 
         String freq;
 
@@ -213,7 +216,7 @@ public abstract class AbstractScrapper {
         FilesHelper.getInstance().renameLastFile(this, freq);
     }
 
-    void scrap(boolean flag) throws Exception {
+    private void scrap(boolean flag) throws Exception {
 
         if(flag) {
             initializeDriver();
@@ -222,15 +225,23 @@ public abstract class AbstractScrapper {
         checkScraps();
 
         if(flag) {
-            Thread.sleep(2000);
 
-            driver.get(url);
+            try {
+                Thread.sleep(2000);
 
-            Thread.sleep(2000);
+                driver.get(url);
 
-            login();
+                Thread.sleep(2000);
 
-            Thread.sleep(2000);
+                login();
+
+                Thread.sleep(2000);
+            }
+            catch (TimeoutException e) {
+                logger.log(Level.WARNING, e.getMessage());
+                throw e;
+            }
+
         }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-YYYY");
@@ -281,7 +292,7 @@ public abstract class AbstractScrapper {
 
     }
 
-    void generateScrap(String since, String until, int count, boolean flag) throws Exception {
+    private void generateScrap(String since, String until, int count, boolean flag) throws Exception {
 
         String freq;
 
@@ -349,6 +360,7 @@ public abstract class AbstractScrapper {
             }
             catch(Exception ex) {
                 ex.printStackTrace();
+                throw ex;
             }
         }
     }
