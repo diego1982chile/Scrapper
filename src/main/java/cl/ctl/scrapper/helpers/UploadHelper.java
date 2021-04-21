@@ -6,6 +6,7 @@ import com.jcraft.jsch.*;
 
 import java.io.*;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -54,21 +55,38 @@ public class UploadHelper {
 
     }
 
-    public void sendSignal(String name) {
+    public void sendSignal(String name) throws JSchException, IOException, SftpException {
 
         String local = FilesHelper.getInstance().getUploadPath();
         File signal = new File(local + FileSystems.getDefault().getSeparator() + name + "_signal.txt");
 
         try {
+            logger.log(Level.INFO, "Subiendo signal cliente '" + name + "' a servidor DivePort");
             signal.createNewFile();
+            logger.log(Level.INFO, "Moviendo archivos en servidor DivePort");
             copyLocalToRemote(local, remote, signal.getName());
+            moveFiles();
 
         } catch (JSchException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage());
+            throw e;
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage());
+            throw e;
+        } catch (SftpException e) {
+            logger.log(Level.SEVERE, e.getMessage());
+            throw e;
         }
     }
+
+    public boolean signalExists(String client) {
+
+        File signal = new File(FilesHelper.getInstance().getUploadPath() + FileSystems.getDefault().getSeparator() + client + "_signal.txt");
+
+        return signal.exists();
+
+    }
+
 
     public void uploadFiles() throws JSchException, IOException {
         String local = FilesHelper.getInstance().getUploadPath();
@@ -96,6 +114,25 @@ public class UploadHelper {
                 }
             }
         }
+    }
+
+    public void upload() throws Exception {
+
+        logger.log(Level.INFO, "Descomprimiendo y renombrando archivos");
+
+        FilesHelper.getInstance().processFiles();
+
+        logger.log(Level.INFO, "Subiendo archivos a servidor DivePort");
+
+        uploadFiles();
+
+        logger.log(Level.INFO, "Moviendo archivos en servidor DivePort");
+
+        moveFiles();
+
+        logger.log(Level.INFO, "Proceso finalizado con éxito. Enviando correo");
+
+        MailHelper.getInstance().sendMail();
     }
 
     public void closeSession() {

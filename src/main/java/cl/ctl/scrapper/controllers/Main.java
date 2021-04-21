@@ -26,10 +26,26 @@ public class Main {
         // This block configure the logger with handler and formatter
         try {
             logger.addHandler(fh);
-            LocalDate yesterday = LocalDate.now().minusDays(1);
-            logger.log(Level.INFO, "Testeando Proceso Scrap");
-            ProcessHelper.getInstance().process(yesterday.toString(), Arrays.asList("Construmart","Easy","Cencosud","Smu"));
+
+            if(args.length != 2) {
+                logger.log(Level.SEVERE, "Número de argumentos no válido. Este programa recibe solo 1 argumento");
+                throw new Exception("Número de argumentos no válido. Este programa recibe solo 1 argumento");
+            }
+            else {
+                if(!args[0].equalsIgnoreCase("-client")) {
+                    logger.log(Level.SEVERE, "Argumento '" + args[0] + "' no válido. Argumentos válidos: -client");
+                    throw new Exception("Argumento '" + args[0] + "' no válido. Argumentos válidos: '-client0");
+                }
+
+                String client = args[1];
+
+                logger.log(Level.INFO, "Invocando Scrapper con cliente '" + client + "'");
+
+                ProcessHelper.getInstance().process(client);
+            }
+
         } catch (SecurityException e) {
+            logger.log(Level.SEVERE, e.getMessage());
             e.printStackTrace();
         }
 
@@ -46,54 +62,7 @@ public class Main {
         }
         */
 
-
     }
 
-    public static void scrap() throws Exception {
-
-        int max = 3;
-
-        for (int i = 0; i < max; i++) {
-            int cont = i + 1;
-            logger.log(Level.INFO, "Descargando scraps -> iteración " + cont + " de " + max);
-
-            for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
-                scrapper.process(false);
-                //ProcessHelper.getInstance().getExecutor().execute(scrapper);
-            }
-
-            int errors = 0;
-
-            for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
-                for (FileControl fileControl : scrapper.getFileControlList()) {
-                    if(!fileControl.getErrors().isEmpty()) {
-                       errors++;
-                    }
-                }
-            }
-
-            if(errors == 0) {
-                break;
-            }
-        }
-
-
-        logger.log(Level.INFO, "Descomprimiendo y renombrando archivos");
-
-        FilesHelper.getInstance().processFiles();
-
-        logger.log(Level.INFO, "Subiendo archivos a servidor DivePort");
-
-        UploadHelper.getInstance().uploadFiles();
-
-        logger.log(Level.INFO, "Moviendo archivos en servidor DivePort");
-
-        UploadHelper.getInstance().moveFiles();
-
-        logger.log(Level.INFO, "Proceso finalizado con éxito. Enviando correo");
-
-        MailHelper.getInstance().sendMail();
-
-    }
     
 }

@@ -189,12 +189,13 @@ public class ProcessHelper {
                 date = date.plusDays(1);
 
                 //semaphore.release();
-
             }
 
-            upload();
-
-            sendSignal(client);
+            // Si no se ha generado el signal, subir archivos y enviar correo
+            if(!UploadHelper.getInstance().signalExists(client)) {
+                UploadHelper.getInstance().upload();
+                UploadHelper.getInstance().sendSignal(client);
+            }
 
             // Cerrar la sesión explicitamente
             //UploadHelper.getInstance().closeSession();
@@ -234,7 +235,7 @@ public class ProcessHelper {
 
             scrap(true);
 
-            upload();
+            UploadHelper.getInstance().upload();
 
             // Cerrar la sesión explicitamente
             //UploadHelper.getInstance().closeSession();
@@ -304,39 +305,6 @@ public class ProcessHelper {
         }
     }
 
-    public void upload() throws Exception {
-
-        logger.log(Level.INFO, "Descomprimiendo y renombrando archivos");
-
-        FilesHelper.getInstance().processFiles();
-
-        logger.log(Level.INFO, "Subiendo archivos a servidor DivePort");
-
-        UploadHelper.getInstance().uploadFiles();
-
-        logger.log(Level.INFO, "Moviendo archivos en servidor DivePort");
-
-        UploadHelper.getInstance().moveFiles();
-
-        logger.log(Level.INFO, "Proceso finalizado con éxito. Enviando correo");
-
-        MailHelper.getInstance().sendMail();
-    }
-
-
-    public void sendSignal(String signal) throws Exception {
-
-        logger.log(Level.INFO, "Subiendo signal a servidor DivePort");
-
-        UploadHelper.getInstance().sendSignal(signal);
-
-        logger.log(Level.INFO, "Moviendo archivos en servidor DivePort");
-
-        UploadHelper.getInstance().moveFiles();
-
-        UploadHelper.getInstance().closeSession();
-
-    }
 
     private void validateChains(List<String> chains) throws Exception {
 

@@ -10,6 +10,8 @@ import org.apache.commons.lang.WordUtils;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
@@ -507,20 +509,5 @@ public class FilesHelper {
         }
     }
 
-    public boolean checkEquivalentScrap(AbstractScrapper scrapper) {
-
-        boolean flag = false;
-
-        for (FileControl fileControl :LogHelper.getInstance().getFileControlList()) {
-            if(fileControl.getFileName().contains(scrapper.getCadena())) {
-                //TODO: Duplicar archivo con cliente actual
-                String frequency = fileControl.getFrequency();
-                File file = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + scrapper.getHolding() + "_" + scrapper.getCadena() + "_" + frequency + "_" + PROCESS_NAME + scrapper.getFileExt());
-                flag = true;
-            }
-        }
-
-        return flag;
-    }
 
 }

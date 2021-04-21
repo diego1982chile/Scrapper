@@ -226,20 +226,33 @@ public abstract class AbstractScrapper {
 
         if(flag) {
 
-            try {
-                Thread.sleep(2000);
+            int cont = 0;
 
-                driver.get(url);
+            while(cont < 3) {
 
-                Thread.sleep(2000);
+                cont++;
 
-                login();
+                try {
+                    Thread.sleep(2000);
 
-                Thread.sleep(2000);
-            }
-            catch (TimeoutException e) {
-                logger.log(Level.WARNING, e.getMessage());
-                throw e;
+                    driver.get(url);
+
+                    Thread.sleep(2000);
+
+                    login();
+
+                    Thread.sleep(2000);
+
+                    break;
+                }
+                catch (TimeoutException e) {
+                    logger.log(Level.WARNING, e.getMessage());
+                    if(cont >= 3) {
+                        logger.log(Level.SEVERE, e.getMessage());
+                        //throw e;
+                    }
+                }
+
             }
 
         }

@@ -42,9 +42,9 @@ public class WalMartScrapper extends AbstractScrapper {
 
             try {
 
-                driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys("");
+                driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys(Keys.chord(Keys.CONTROL,"a", Keys.DELETE));
                 Thread.sleep(2000);
-                driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys("");
+                driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys(Keys.chord(Keys.CONTROL,"a", Keys.DELETE));
                 Thread.sleep(2000);
                 driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys("sdellepiane@nutrisa.cl");
                 Thread.sleep(2000);

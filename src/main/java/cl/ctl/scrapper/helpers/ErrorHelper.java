@@ -2,6 +2,7 @@ package cl.ctl.scrapper.helpers;
 
 import cl.ctl.scrapper.model.FileControl;
 import cl.ctl.scrapper.model.Log;
+import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +18,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -93,13 +97,21 @@ public class ErrorHelper {
 
         List<FileControl> fileControlList = LogHelper.getInstance().getFileControlList();
 
-        if(!fileControlList.isEmpty()) {
-            this.body = this.body.replace("[Process]", fileControlList.get(0).getProcess());
-            this.body = this.body.replace("[ProcessDay]", fileControlList.get(0).getProcessDay());
-            this.body = this.body.replace("[ProcessWeekDay]", fileControlList.get(0).getDayOfWeekProcess());
-            this.body = this.body.replace("[ExecutionDay]", fileControlList.get(0).getDayOfWeek());
-            this.body = this.body.replace("%email%", to);
-        }
+        String weekProcessDay = WordUtils.capitalize(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES")));
+        String processMonthDay = String.valueOf(ProcessHelper.getInstance().getProcessDate().getDayOfMonth());
+        String processMonth = WordUtils.capitalize(ProcessHelper.getInstance().getProcessDate().getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES")));
+        String processYear = String.valueOf(ProcessHelper.getInstance().getProcessDate().getYear());
+
+        String weekExecutionDay = WordUtils.capitalize(LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES")));
+        String executionMonthDay = String.valueOf(LocalDate.now().getDayOfMonth());
+        String executionMonth = WordUtils.capitalize(LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES")));
+        String executionYear = String.valueOf(LocalDate.now().getYear());
+
+        this.body = this.body.replace("[Process]", FilesHelper.getInstance().PROCESS_NAME);
+        this.body = this.body.replace("[ProcessDay]", weekProcessDay + " " + processMonthDay + " de " + processMonth + " del " + processYear);
+        this.body = this.body.replace("[ExecutionDay]", weekExecutionDay + " " + executionMonthDay + " de " + executionMonth + " del " + executionYear);
+        this.body = this.body.replace("%email%", to);
+
 
         addRecords();
 
