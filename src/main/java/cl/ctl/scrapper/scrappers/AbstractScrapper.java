@@ -164,12 +164,6 @@ public abstract class AbstractScrapper {
         }
     }
 
-    void checkEquivalentScraps() throws BusinessException {
-        if(FilesHelper.getInstance().checkEquivalentScrap(this)) {
-            throw new BusinessException("Scrapper '" + cadena + "' -> Archivos ya fueron generados! se omite el proceso");
-        }
-    }
-
     private void initializeDriver() {
 
         WebDriverManager.chromedriver().setup();
