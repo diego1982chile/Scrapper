@@ -173,10 +173,10 @@ public abstract class AbstractScrapper {
         chromePrefs.put("download.default_directory", FilesHelper.getInstance().getDownloadPath());
 
         ChromeOptions chrome_options = new ChromeOptions();
-        chrome_options.addArguments("--start-maximized");
-        //chrome_options.addArguments("--headless");
         chrome_options.addArguments("--no-sandbox");
         chrome_options.addArguments("--disable-dev-shm-usage");
+        //chrome_options.addArguments("--headless");
+        chrome_options.addArguments("--start-maximized");
 
         //DesiredCapabilities cap = DesiredCapabilities.chrome();
         //cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
@@ -239,7 +239,7 @@ public abstract class AbstractScrapper {
 
                     break;
                 }
-                catch (TimeoutException e) {
+                catch (Exception e) {
                     logger.log(Level.WARNING, e.getMessage());
                     if(cont >= 3) {
                         logger.log(Level.SEVERE, e.getMessage());

@@ -3,6 +3,7 @@ package cl.ctl.scrapper.helpers;
 import cl.ctl.scrapper.model.FileControl;
 import cl.ctl.scrapper.scrappers.AbstractScrapper;
 import com.jcraft.jsch.*;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
 import java.nio.file.FileSystems;
@@ -58,7 +59,7 @@ public class UploadHelper {
     public void sendSignal(String name) throws JSchException, IOException, SftpException {
 
         String local = FilesHelper.getInstance().getUploadPath();
-        File signal = new File(local + FileSystems.getDefault().getSeparator() + name + "_signal.txt");
+        File signal = new File(local + FileSystems.getDefault().getSeparator() + StringUtils.capitalize(name.toLowerCase()) + "_signal.txt");
 
         try {
             logger.log(Level.INFO, "Subiendo signal cliente '" + name + "' a servidor DivePort");
@@ -81,7 +82,7 @@ public class UploadHelper {
 
     public boolean signalExists(String client) {
 
-        File signal = new File(FilesHelper.getInstance().getUploadPath() + FileSystems.getDefault().getSeparator() + client + "_signal.txt");
+        File signal = new File(FilesHelper.getInstance().getUploadPath() + FileSystems.getDefault().getSeparator() + StringUtils.capitalize(client.toLowerCase()) + "_signal.txt");
 
         return signal.exists();
 

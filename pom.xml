@@ -112,7 +112,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>cl.ctl.scrapper.Main</mainClass>
+                            <mainClass>cl.ctl.scrapper.controllers.Main</mainClass>
                         </manifest>
                     </archive>
                     <finalName>Scrapper</finalName>

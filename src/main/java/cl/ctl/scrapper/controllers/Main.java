@@ -2,13 +2,19 @@ package cl.ctl.scrapper.controllers;
 
 import cl.ctl.scrapper.helpers.*;
 import cl.ctl.scrapper.model.FileControl;
+import cl.ctl.scrapper.model.Schedule;
 import cl.ctl.scrapper.scrappers.AbstractScrapper;
 import cl.ctl.scrapper.scrappers.ConstrumartScrapper;
 import cl.ctl.scrapper.scrappers.EasyScrapper;
 import cl.ctl.scrapper.scrappers.SodimacScrapper;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,28 +27,14 @@ public class Main {
 
     static LogHelper fh = LogHelper.getInstance();
 
+
     public static void main(String... args) throws Exception {
 
         // This block configure the logger with handler and formatter
         try {
             logger.addHandler(fh);
 
-            if(args.length != 2) {
-                logger.log(Level.SEVERE, "Número de argumentos no válido. Este programa recibe solo 1 argumento");
-                throw new Exception("Número de argumentos no válido. Este programa recibe solo 1 argumento");
-            }
-            else {
-                if(!args[0].equalsIgnoreCase("-client")) {
-                    logger.log(Level.SEVERE, "Argumento '" + args[0] + "' no válido. Argumentos válidos: -client");
-                    throw new Exception("Argumento '" + args[0] + "' no válido. Argumentos válidos: '-client0");
-                }
-
-                String client = args[1];
-
-                logger.log(Level.INFO, "Invocando Scrapper con cliente '" + client + "'");
-
-                ProcessHelper.getInstance().process(client);
-            }
+            SchedulerHelper.getInstance().schedule();
 
         } catch (SecurityException e) {
             logger.log(Level.SEVERE, e.getMessage());
@@ -64,5 +56,7 @@ public class Main {
 
     }
 
-    
+
+
+
 }

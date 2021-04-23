@@ -28,6 +28,8 @@ public class ProcessHelper {
 
     private LocalDate processDate  = LocalDate.now().minusDays(1);
 
+    private String client;
+
     private Map<String, AbstractScrapper> scrappers = new TreeMap<>();
 
     private ExecutorService executor;
@@ -78,6 +80,10 @@ public class ProcessHelper {
                 //throw new ConcurrentAccessException("Se está intentando cambiar la fecha de proceso mientras hay un proceso en curso!!");
             //}
         }
+    }
+
+    public void setClient(String client) {
+        this.client = client;
     }
 
     public Map<String, AbstractScrapper> getScrappers() {
@@ -162,7 +168,11 @@ public class ProcessHelper {
                 throw new ConcurrentAccessException("Se está intentando cambiar la fecha de proceso mientras hay un proceso en curso!!");
             }
 
+            setClient(client);
+
             List<String> chains = new ArrayList<>();
+
+            initScrappers();
 
             // Setear los scrappers de las cadenas correspondientes al cliente
             for (AbstractScrapper scrapper : scrappers.values()) {
@@ -182,20 +192,24 @@ public class ProcessHelper {
 
                 setProcessDate(date);
 
-                logger.log(Level.INFO, "Ejecutando Scrap proceso " + FilesHelper.getInstance().PROCESS_NAME);
+                logger.log(Level.INFO, "Ejecutando Scrap proceso " + FilesHelper.getInstance().PROCESS_NAME + " para cliente " + client);
 
                 scrap(true);
+
+                logger.log(Level.INFO, "Fin del proceso " + FilesHelper.getInstance().PROCESS_NAME + " para cliente " + client);
 
                 date = date.plusDays(1);
 
                 //semaphore.release();
             }
 
+            logger.log(Level.INFO, "Fin del proceso general " + FilesHelper.getInstance().PROCESS_NAME + ", Se procede a subir los scraps");
+
             // Si no se ha generado el signal, subir archivos y enviar correo
-            if(!UploadHelper.getInstance().signalExists(client)) {
+            //if(!UploadHelper.getInstance().signalExists(client)) {
                 UploadHelper.getInstance().upload();
                 UploadHelper.getInstance().sendSignal(client);
-            }
+            //}
 
             // Cerrar la sesión explicitamente
             //UploadHelper.getInstance().closeSession();
