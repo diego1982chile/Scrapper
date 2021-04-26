@@ -34,6 +34,7 @@ public class Main {
         try {
             logger.addHandler(fh);
 
+            logger.log(Level.INFO, "Leyendo archivo de parámetros 'schedule.json'...");
             SchedulerHelper.getInstance().schedule();
 
         } catch (SecurityException e) {

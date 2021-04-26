@@ -30,6 +30,7 @@ public class ScrapTask extends TimerTask {
         logger.addHandler(fh);
     }
 
+
     @Override
     public void run() {
         try {
@@ -48,11 +49,14 @@ public class ScrapTask extends TimerTask {
                 ProcessHelper.getInstance().process(client);
             }
             else {
-                logger.log(Level.WARNING, "Se está ejecutando un proceso para cliente '" + client + "' en un horario no programado!, Se omite ejecución");
+                logger.log(Level.WARNING, "Se está intentando ejecutar proceso para cliente '" + client + "' en un horario no programado!, Se omite ejecución");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            logger.log(Level.SEVERE, e.getMessage());
+            cancel();
         }
     }
+
 }

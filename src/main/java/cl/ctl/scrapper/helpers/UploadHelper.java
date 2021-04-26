@@ -58,7 +58,7 @@ public class UploadHelper {
 
     public void sendSignal(String name) throws JSchException, IOException, SftpException {
 
-        String local = FilesHelper.getInstance().getUploadPath();
+         String local = FilesHelper.getInstance().getUploadPath();
         File signal = new File(local + FileSystems.getDefault().getSeparator() + StringUtils.capitalize(name.toLowerCase()) + "_signal.txt");
 
         try {

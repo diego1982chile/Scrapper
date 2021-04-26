@@ -301,7 +301,7 @@ public abstract class AbstractScrapper {
 
     private void generateScrap(String since, String until, int count, boolean flag) throws Exception {
 
-        String freq;
+        String freq = "DAY";
 
         switch (count) {
             case 1:
@@ -325,8 +325,16 @@ public abstract class AbstractScrapper {
             }
         }
         catch(BusinessException e) {
-            logger.log(Level.WARNING, e.getMessage());
-            FilesHelper.getInstance().registerFileControlOK(this, freq);
+            if(onlyDiary) {
+                if(freq.equals("DAY")) {
+                    logger.log(Level.WARNING, e.getMessage());
+                    FilesHelper.getInstance().registerFileControlOK(this, freq);
+                }
+            }
+            else {
+                logger.log(Level.WARNING, e.getMessage());
+                FilesHelper.getInstance().registerFileControlOK(this, freq);
+            }
         }
         catch(Exception e2) {
             logger.log(Level.SEVERE, e2.getMessage());

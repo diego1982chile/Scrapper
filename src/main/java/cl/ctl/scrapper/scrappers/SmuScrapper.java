@@ -84,21 +84,11 @@ public class SmuScrapper extends AbstractScrapper {
 
                 // Cerrar popups!!! (si es la 1a vez)
                 if(!flag) {
-                    driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(3).click();
 
-                    Thread.sleep(2000);
-
-                    driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(2).click();
-
-                    Thread.sleep(2000);
-
-                    driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(1).click();
-
-                    Thread.sleep(2000);
-
-                    driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(0).click();
-
-                    Thread.sleep(2000);
+                    for(int i = driver.findElements(By.xpath("//div[@class='v-window-closebox']")).size(); i > 0; --i ) {
+                        driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(i-1).click();
+                        Thread.sleep(2000);
+                    }
 
                     flag = true;
                 }

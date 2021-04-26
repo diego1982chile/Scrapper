@@ -4,6 +4,13 @@ import cl.ctl.scrapper.helpers.ProcessHelper;
 import cl.ctl.scrapper.model.DateOutOfRangeException;
 import cl.ctl.scrapper.model.NoReportsException;
 import cl.ctl.scrapper.model.TimeOutException;
+import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
+import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
+import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
+import org.apache.commons.math3.exception.*;
+import org.apache.commons.math3.util.Pair;
+import org.joda.primitives.list.DoubleList;
+import org.joda.primitives.list.impl.ArrayDoubleList;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -11,15 +18,24 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.event.InputEvent;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 
 /**
  * Created by des01c7 on 16-12-20.
  */
 public class WalMartScrapper extends AbstractScrapper {
+
+    Robot robot;
+
+    float m;
+    int x0;
+    int y0;
 
     public WalMartScrapper() throws IOException {
         super();
@@ -52,10 +68,15 @@ public class WalMartScrapper extends AbstractScrapper {
                 Thread.sleep(2000);
                 driver.findElement(By.className("spin-button-children")).click();
 
-                Thread.sleep(30000);
+                Thread.sleep(5000);
 
-                WebElement decisionSupport = driver.findElement(By.xpath(".//div[contains(text(),'Decision Support - New')]"));
+                if(true) {
+                    solveCustomChallenge();
+                    Thread.sleep(10000);
+                }
+
                 actions = new Actions(driver);
+                WebElement decisionSupport = driver.findElement(By.xpath(".//div[contains(text(),'Decision Support - New')]"));
                 actions.moveToElement(decisionSupport).click().build().perform();
 
                 Thread.sleep(10000);
@@ -366,5 +387,76 @@ public class WalMartScrapper extends AbstractScrapper {
 
         return tokens[1] + "-" + tokens[0] + "-" + tokens[2];
     }
+
+
+    private void solveCustomChallenge() throws InterruptedException, AWTException {
+
+        robot = new Robot();
+
+        int xMin = 350;
+        int yMin = 420;
+
+        int x = ThreadLocalRandom.current().nextInt(0, 80);
+        int y = ThreadLocalRandom.current().nextInt(0, 80);
+
+        PointerInfo a = MouseInfo.getPointerInfo();
+        Point b = a.getLocation();
+
+        int x0 = (int) b.getX();
+        int y0 = (int) b.getY();
+
+        int xn = xMin + x;
+        int yn = yMin + y;
+
+        createLinearParameters(new int[]{x0,xn}, new int[]{y0,yn});
+
+        int rate = 1;
+
+        if(xn < x0) {
+            rate = -1;
+        }
+
+        int[] X = new int[Math.abs(xn-x0)];
+        int[] Y = new int[Math.abs(xn-x0)];
+
+        int cont = 0;
+
+        while(x0 != xn) {
+            x0 = x0 + rate;
+            X[cont] = x0;
+            Y[cont] = getLinearValue(x0);
+            cont++;
+        }
+
+        for(int i = 0; i < X.length; ++i) {
+            robot.mouseMove(X[i], Y[i]);
+            int k = ThreadLocalRandom.current().nextInt(10, 200);
+            Thread.sleep(k);
+        }
+
+        a = MouseInfo.getPointerInfo();
+        b = a.getLocation();
+
+        //robot.mouseMove(xMin + x, yMin + y);
+        robot.mousePress(InputEvent.BUTTON1_MASK);
+
+        int t = ThreadLocalRandom.current().nextInt(3000, 5000);
+
+        Thread.sleep(t);
+        robot.mouseRelease(InputEvent.BUTTON1_MASK);
+    }
+
+    private void createLinearParameters(int[] x, int[] y) {
+        m =  (float) (y[1] - y[0])/(x[1] - x[0]);
+        x0 = x[0];
+        y0 = y[0];
+    }
+
+    private int getLinearValue(int x) {
+        return  (int)((float)m*x - (float)m*x0 + y0);
+    }
+
+
+
 
 }

@@ -70,6 +70,21 @@
             <version>0.1.55</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.6.1</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.joda/joda-primitives -->
+        <dependency>
+            <groupId>org.joda</groupId>
+            <artifactId>joda-primitives</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+
+
     </dependencies>
 
     <build>
