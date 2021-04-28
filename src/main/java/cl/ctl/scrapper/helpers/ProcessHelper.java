@@ -211,7 +211,7 @@ public class ProcessHelper {
 
             // Si no se ha generado el signal, subir archivos y enviar correo
             //if(!UploadHelper.getInstance().signalExists(client)) {
-                UploadHelper.getInstance().upload();
+                //UploadHelper.getInstance().upload();
                 UploadHelper.getInstance().sendSignal(client);
             //}
 
@@ -292,6 +292,8 @@ public class ProcessHelper {
 
         int max = 2;
 
+        int downloads = 0;
+
         for (int i = 0; i < max; i++) {
 
             int cont = i + 1;
@@ -320,6 +322,15 @@ public class ProcessHelper {
             if (errors == 0) {
                 break;
             }
+        }
+
+        for (AbstractScrapper scrapper : getScrappers().values()) {
+            downloads = downloads + scrapper.getDownloads();
+        }
+
+        //Si hubo alguna descarga de algún scrapper subir los scraps para proceso actual
+        if(downloads > 0) {
+            UploadHelper.getInstance().upload();
         }
     }
 

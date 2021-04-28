@@ -44,7 +44,7 @@ public class ScrapTask extends TimerTask {
             int sched_minute = this.date.getMinutes();
             int sched_second = this.date.getSeconds();
 
-            if(hour == sched_hour && minute == sched_minute && second == sched_second) {
+            if(hour == sched_hour && minute == sched_minute /*&& second == sched_second*/) {
                 logger.log(Level.INFO, "Ejecutando proceso para cliente '" + client + "' en horario programado '" + date + "'");
                 ProcessHelper.getInstance().process(client);
             }

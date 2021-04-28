@@ -58,9 +58,9 @@ public class WalMartScrapper extends AbstractScrapper {
 
             try {
 
-                driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys("sdellepiane@nutrisa.cl");
+                driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys("scrappers.walmart.user");
                 Thread.sleep(2000);
-                driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys("Nutrisa20.21");
+                driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys("scrappers.walmart.password");
                 Thread.sleep(2000);
                 driver.findElement(By.className("spin-button-children")).click();
 

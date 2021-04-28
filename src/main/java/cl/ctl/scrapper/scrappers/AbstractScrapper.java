@@ -51,6 +51,8 @@ public abstract class AbstractScrapper {
 
     boolean onlyWeekly = false;
 
+    int downloads = 0;
+
     List<FileControl> fileControlList = new ArrayList<>();
 
 
@@ -140,6 +142,10 @@ public abstract class AbstractScrapper {
 
     public void setLogo(String logo) {
         this.logo = logo;
+    }
+
+    public int getDownloads() {
+        return downloads;
     }
 
 
@@ -299,6 +305,7 @@ public abstract class AbstractScrapper {
 
     }
 
+
     private void generateScrap(String since, String until, int count, boolean flag) throws Exception {
 
         String freq = "DAY";
@@ -322,6 +329,8 @@ public abstract class AbstractScrapper {
             if(flag) {
                 doScrap(since, until);
                 FilesHelper.getInstance().registerFileControlOK(this, freq);
+                downloads++;
+
             }
         }
         catch(BusinessException e) {
