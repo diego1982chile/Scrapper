@@ -1,6 +1,7 @@
 package cl.ctl.scrapper.scrappers;
 
 import cl.ctl.scrapper.helpers.CaptchaHelper;
+import cl.ctl.scrapper.helpers.ConfigHelper;
 import cl.ctl.scrapper.model.BadDateException;
 import cl.ctl.scrapper.model.DateOutOfRangeException;
 import org.openqa.selenium.By;
@@ -39,8 +40,8 @@ public class SmuScrapper extends AbstractScrapper {
             CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
             captchaHelper.solveCaptcha();
             Thread.sleep(2000);
-            driver.findElement(By.id("username")).sendKeys("proyectos@nutrisa.cl");
-            driver.findElement(By.id("password")).sendKeys("Nutrisa.2021");
+            driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.smu.user"));
+            driver.findElement(By.id("password")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.smu.password"));
             driver.getPageSource();
             driver.findElement(By.id("kc-login")).click();
 

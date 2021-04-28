@@ -1,6 +1,7 @@
 package cl.ctl.scrapper.scrappers;
 
 import cl.ctl.scrapper.helpers.CaptchaHelper;
+import cl.ctl.scrapper.helpers.ConfigHelper;
 import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
 import cl.ctl.scrapper.model.BadDateException;
@@ -47,14 +48,9 @@ public class EasyScrapper extends AbstractScrapper {
             CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
             captchaHelper.solveCaptcha();
 
-            driver.findElement(By.id("username")).sendKeys("");
+            driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.easy.user"));
             Thread.sleep(2000);
-            driver.findElement(By.id("password")).sendKeys("");
-            Thread.sleep(2000);
-
-            driver.findElement(By.id("username")).sendKeys("michel.lotissier@legrand.cl");
-            Thread.sleep(2000);
-            driver.findElement(By.id("password")).sendKeys("diy12easy2020");
+            driver.findElement(By.id("password")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.easy.password"));
             driver.getPageSource();
             Thread.sleep(2000);
             driver.findElement(By.id("kc-login")).click();

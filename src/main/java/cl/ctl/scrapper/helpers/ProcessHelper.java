@@ -82,6 +82,10 @@ public class ProcessHelper {
         }
     }
 
+    public String getClient() {
+        return client;
+    }
+
     public void setClient(String client) {
         this.client = client;
     }

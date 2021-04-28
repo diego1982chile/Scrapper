@@ -1,5 +1,6 @@
 package cl.ctl.scrapper.scrappers;
 
+import cl.ctl.scrapper.helpers.ConfigHelper;
 import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
 import cl.ctl.scrapper.model.BusinessException;
@@ -59,13 +60,13 @@ public class SodimacScrapper extends AbstractScrapper {
             b2b.selectByValue("6");
             Thread.sleep(2000);
 
-            driver.findElement(By.id("empresa")).sendKeys("796027304");
+            driver.findElement(By.id("empresa")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.sodimac.company"));
             Thread.sleep(2000);
-            driver.findElement(By.id("usuario")).sendKeys("128088660");
+            driver.findElement(By.id("usuario")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.sodimac.user"));
             Thread.sleep(2000);
             //driver.findElement(By.id("clave")).sendKeys("diy012021");
             //driver.findElement(By.id("clave")).sendKeys("diymarzo2021");
-            driver.findElement(By.id("clave")).sendKeys("diyabril2021");
+            driver.findElement(By.id("clave")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.sodimac.password"));
             Thread.sleep(2000);
             driver.findElement(By.id("entrar2")).click();
     }

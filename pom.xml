@@ -84,10 +84,12 @@
         </dependency>
 
 
-
     </dependencies>
 
     <build>
+
+        <finalName>Scrapper</finalName>
+
         <plugins>
             <plugin>
                 <!-- Build an executable JAR -->
@@ -130,7 +132,6 @@
                             <mainClass>cl.ctl.scrapper.controllers.Main</mainClass>
                         </manifest>
                     </archive>
-                    <finalName>Scrapper</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>

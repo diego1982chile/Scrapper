@@ -99,6 +99,7 @@ public class MailHelper {
         String executionYear = String.valueOf(LocalDate.now().getYear());
 
         this.body = this.body.replace("[Process]", FilesHelper.getInstance().PROCESS_NAME);
+        this.body = this.body.replace("[Client]", ProcessHelper.getInstance().getClient());
         this.body = this.body.replace("[ProcessDay]", weekProcessDay + " " + processMonthDay + " de " + processMonth + " del " + processYear);
         this.body = this.body.replace("[ExecutionDay]", weekExecutionDay + " " + executionMonthDay + " de " + executionMonth + " del " + executionYear);
         this.body = this.body.replace("%email%", to);

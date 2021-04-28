@@ -58,10 +58,6 @@ public class WalMartScrapper extends AbstractScrapper {
 
             try {
 
-                driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys(Keys.chord(Keys.CONTROL,"a", Keys.DELETE));
-                Thread.sleep(2000);
-                driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys(Keys.chord(Keys.CONTROL,"a", Keys.DELETE));
-                Thread.sleep(2000);
                 driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys("sdellepiane@nutrisa.cl");
                 Thread.sleep(2000);
                 driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys("Nutrisa20.21");
@@ -85,6 +81,17 @@ public class WalMartScrapper extends AbstractScrapper {
 
 
             } catch (Throwable e) {
+                try {
+                    driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys(Keys.chord(Keys.CONTROL,"a", Keys.DELETE));
+                    Thread.sleep(2000);
+                    driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys(Keys.chord(Keys.CONTROL,"a", Keys.DELETE));
+                    Thread.sleep(2000);
+                }
+                catch (Throwable e2) {
+                    logger.log(Level.SEVERE, e2.getMessage());
+                    throw e;
+                }
+
                 if (cont >= 10) {
                     logger.log(Level.SEVERE, e.getMessage());
                     throw e;
@@ -388,26 +395,34 @@ public class WalMartScrapper extends AbstractScrapper {
         return tokens[1] + "-" + tokens[0] + "-" + tokens[2];
     }
 
-
+    //Desafio consistente en mantener boton del mouse presionado sobre una región específica de la pantalla durante una cantidad de tiempo
+    //Se emula movimiento del mouse mediante puntos que siguen la trayectoria de la recta que pasa por los puntos:
+    //P0 = posicion actual del mouse y Pn = posicion dentro de la región (determinada empiricamente)
+    //Se utiliza la libreria Robot, por lo que la pantalla debe estar visible durante la ejecución de esta función
     private void solveCustomChallenge() throws InterruptedException, AWTException {
 
         robot = new Robot();
 
+        //Límites inferiores región captcha (determinados empiricamente => puede variar en otras resoluciones)
         int xMin = 350;
         int yMin = 420;
 
+        //Delta que se sumará a límites inferiores para agregar aleatoriedad a la posicion
         int x = ThreadLocalRandom.current().nextInt(0, 80);
         int y = ThreadLocalRandom.current().nextInt(0, 80);
 
+        //P0 = posición actual mouse
         PointerInfo a = MouseInfo.getPointerInfo();
         Point b = a.getLocation();
 
         int x0 = (int) b.getX();
         int y0 = (int) b.getY();
 
+        //Pn = posición final mouse
         int xn = xMin + x;
         int yn = yMin + y;
 
+        //Crear parámetros de la recta que pasa por los puntos P0 y Pn
         createLinearParameters(new int[]{x0,xn}, new int[]{y0,yn});
 
         int rate = 1;
@@ -421,6 +436,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
         int cont = 0;
 
+        //Generar puntos de la recta
         while(x0 != xn) {
             x0 = x0 + rate;
             X[cont] = x0;
@@ -428,6 +444,7 @@ public class WalMartScrapper extends AbstractScrapper {
             cont++;
         }
 
+        //Mover mouse siguiendo los puntos de la recta previamente calculada
         for(int i = 0; i < X.length; ++i) {
             robot.mouseMove(X[i], Y[i]);
             int k = ThreadLocalRandom.current().nextInt(10, 200);

@@ -1,5 +1,6 @@
 package cl.ctl.scrapper.scrappers;
 
+import cl.ctl.scrapper.helpers.ConfigHelper;
 import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
 import cl.ctl.scrapper.model.DateOutOfRangeException;
@@ -59,12 +60,12 @@ public class TottusScrapper extends AbstractScrapper {
             b2b.selectByValue("8");
             Thread.sleep(2000);
 
-            driver.findElement(By.id("empresa")).sendKeys("952140000 ");
+            driver.findElement(By.id("empresa")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.tottus.company"));
             Thread.sleep(2000);
-            driver.findElement(By.id("usuario")).sendKeys("100777517");
+            driver.findElement(By.id("usuario")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.tottus.user"));
             Thread.sleep(2000);
             //driver.findElement(By.id("clave")).sendKeys("diy012021");
-            driver.findElement(By.id("clave")).sendKeys("Nutrisa21.21 ");
+            driver.findElement(By.id("clave")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.tottus.password"));
             Thread.sleep(2000);
             driver.findElement(By.id("entrar2")).click();
     }
