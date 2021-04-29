@@ -1,5 +1,6 @@
 package cl.ctl.scrapper.scrappers;
 
+import cl.ctl.scrapper.helpers.ConfigHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
 import cl.ctl.scrapper.model.DateOutOfRangeException;
 import cl.ctl.scrapper.model.NoReportsException;
@@ -37,6 +38,8 @@ public class WalMartScrapper extends AbstractScrapper {
     int x0;
     int y0;
 
+    Map<String, String> locales = new HashMap<>();
+
     public WalMartScrapper() throws IOException {
         super();
         cadena = "WalMart";
@@ -44,6 +47,29 @@ public class WalMartScrapper extends AbstractScrapper {
         url = "https://retaillink.login.wal-mart.com/?ServerType=IIS1&CTAuthMode=BASIC&language=en&utm_source=retaillink&utm_medium=redirect&utm_campaign=FalconRelease&CT_ORIG_URL=/&ct_orig_uri=/ ";
         logo = "walmart.jpg";
         fileExt = ".xlsx";
+    }
+
+    private void localize(String locale) {
+
+        switch (locale) {
+            case "english":
+                locales.put("modify","Modify");
+                locales.put("times","Times");
+                locales.put("range","Time Range 1");
+                locales.put("condition","Time Range 1 Is Between");
+                locales.put("submit","Submit");
+                locales.put("refresh","Refresh");
+                break;
+            case "spanish":
+                locales.put("modify","Modificar");
+                locales.put("times","Selección de Tiempo");
+                locales.put("range","Rango 1");
+                locales.put("condition","Rango 1 Está Entre");
+                locales.put("submit","Submitir");
+                locales.put("refresh","Actualizar");
+                break;
+        }
+
     }
 
     void login() throws Exception {
@@ -58,9 +84,9 @@ public class WalMartScrapper extends AbstractScrapper {
 
             try {
 
-                driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys("scrappers.walmart.user");
+                driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.walmart.user"));
                 Thread.sleep(2000);
-                driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys("scrappers.walmart.password");
+                driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.walmart.password"));
                 Thread.sleep(2000);
                 driver.findElement(By.className("spin-button-children")).click();
 
@@ -117,6 +143,15 @@ public class WalMartScrapper extends AbstractScrapper {
 
                 Thread.sleep(5000);
 
+                //Si el idioma está seteado en inglés localizar a inglés, caso contrario localizar a español
+                if(!driver.findElements(By.xpath(".//a[contains(text(),'English')]")).isEmpty()) {
+                    localize("english");
+                }
+                else {
+                    localize("spanish");
+                }
+
+                //Continuar...
                 WebElement reports = driver.findElements(By.className("homepage_toplink")).get(2);
                 actions = new Actions(driver);
                 actions.moveToElement(reports).click().build().perform();
@@ -140,7 +175,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
                 Thread.sleep(3000);
 
-                driver.findElement(By.xpath(".//*[contains(text(),'Modificar')]")).click();
+                driver.findElement(By.xpath(".//*[contains(text(),'" + locales.get("modify") + "')]")).click();
 
                 Thread.sleep(20000);
 
@@ -186,7 +221,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
                 Thread.sleep(3000);
 
-                driver.findElement(By.xpath(".//a[contains(text(),'Selección de Tiempo')]")).click();
+                driver.findElement(By.xpath(".//a[contains(text(),'" + locales.get("times") + "')]")).click();
 
                 Thread.sleep(3000);
 
@@ -204,7 +239,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
                 driver.switchTo().frame("left");
 
-                driver.findElement(By.xpath(".//*[contains(text(),'Rango 1')]")).click();
+                driver.findElement(By.xpath(".//*[contains(text(),'" + locales.get("range") + "')]")).click();
 
                 Thread.sleep(3000);
 
@@ -225,7 +260,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
                 Thread.sleep(3000);
 
-                driver.findElement(By.xpath(".//*[contains(text(),'Rango 1 Está Entre')]")).click();
+                driver.findElement(By.xpath(".//*[contains(text(),'" + locales.get("condition") + "')]")).click();
 
                 Thread.sleep(3000);
 
@@ -289,7 +324,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
                 Thread.sleep(2000);
 
-                driver.findElement(By.xpath(".//a[contains(text(),'Submitir')]")).click();
+                driver.findElement(By.xpath(".//a[contains(text(),'" + locales.get("submit") + "')]")).click();
 
                 Thread.sleep(2000);
 
@@ -323,10 +358,10 @@ public class WalMartScrapper extends AbstractScrapper {
                 // Obtener el JobId para posteriormene realizar la busqueda por JobId
 
                 //Actualizar status reporte
-                // Ojo: Se asume que el reporte mas reciente es el que se generó por el robot
+                // Ojo: Se asume que el reporte mas reciente (1a coincidencia) es el que se generó por el robot
                 Thread.sleep(2000);
                 driver.switchTo().parentFrame();
-                driver.findElement(By.xpath(".//span[contains(text(),'Actualizar')]")).click();
+                driver.findElement(By.xpath(".//span[contains(text(),'" + locales.get("refresh") + "')]")).click();
                 Thread.sleep(2000);
                 driver.switchTo().frame("JobTable");
                 String jobId = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(0).findElement(By.xpath("parent::td/preceding-sibling::td/following-sibling::td")).findElement(By.xpath("span")).getAttribute("innerHTML");
@@ -336,7 +371,7 @@ public class WalMartScrapper extends AbstractScrapper {
                     //Actualizar status reporte
                     Thread.sleep(2000);
                     driver.switchTo().parentFrame();
-                    driver.findElement(By.xpath(".//span[contains(text(),'Actualizar')]")).click();
+                    driver.findElement(By.xpath(".//span[contains(text(),'" + locales.get("refresh") + "')]")).click();
                     Thread.sleep(2000);
                     driver.switchTo().frame("JobTable");
 
@@ -347,13 +382,18 @@ public class WalMartScrapper extends AbstractScrapper {
 
                     switch(status) {
                         case "Hecho":
+                        case "Done":
                         case "Salvados":
+                        case "Retrieved":
                             driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(0).click();
                             Thread.sleep(5000);
                             return;
                         case "Activo":
+                        case "Active":
                         case "Formateando":
+                        case "Formatting":
                         case "Esperando":
+                        case "Waiting":
                             logger.log(Level.INFO, "Reporte en estado '" + status + "', se esperará 1 min antes de la próxima consulta");
                             Thread.sleep(60000);
                             break;
@@ -472,8 +512,6 @@ public class WalMartScrapper extends AbstractScrapper {
     private int getLinearValue(int x) {
         return  (int)((float)m*x - (float)m*x0 + y0);
     }
-
-
 
 
 }

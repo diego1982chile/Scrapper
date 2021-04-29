@@ -148,6 +148,9 @@ public abstract class AbstractScrapper {
         return downloads;
     }
 
+    public void setDownloads(int downloads) {
+        this.downloads = downloads;
+    }
 
     public List<FileControl> getFileControlList() {
         return fileControlList;
@@ -216,6 +219,7 @@ public abstract class AbstractScrapper {
         FilesHelper.getInstance().renameLastFile(this, freq);
     }
 
+
     private void scrap(boolean flag) throws Exception {
 
         if(flag) {
@@ -265,6 +269,7 @@ public abstract class AbstractScrapper {
         // Generar Scrap Diario
         if(flag) {
             logger.log(Level.INFO, "Descargando Scrap Diario " + cadena + "...");
+
             generateScrap(since, until, 1, flag);
             Thread.sleep(2000);
         }

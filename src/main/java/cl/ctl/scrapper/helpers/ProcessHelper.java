@@ -6,6 +6,7 @@ import cl.ctl.scrapper.scrappers.*;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -172,7 +173,7 @@ public class ProcessHelper {
                 throw new ConcurrentAccessException("Se está intentando cambiar la fecha de proceso mientras hay un proceso en curso!!");
             }
 
-            setClient(client);
+            setClient(WordUtils.capitalize(client));
 
             List<String> chains = new ArrayList<>();
 
@@ -302,6 +303,7 @@ public class ProcessHelper {
 
             for (AbstractScrapper scrapper : getScrappers().values()) {
                 if (scrapper != null) {
+                    scrapper.setDownloads(0);
                     scrapper.process(flag);
                 }
                 //ProcessHelper.getInstance().getExecutor().execute(scrapper);
