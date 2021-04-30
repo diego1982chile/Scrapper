@@ -64,7 +64,7 @@ public class UploadHelper {
         try {
             logger.log(Level.INFO, "Subiendo signal cliente '" + name + "' a servidor DivePort");
             signal.createNewFile();
-            logger.log(Level.INFO, "Moviendo archivos en servidor DivePort");
+            logger.log(Level.INFO, "Moviendo signal en servidor DivePort");
             copyLocalToRemote(local, remote, signal.getName());
             moveFiles();
 
@@ -119,15 +119,15 @@ public class UploadHelper {
 
     public void upload() throws Exception {
 
-        logger.log(Level.INFO, "Descomprimiendo y renombrando archivos");
+        logger.log(Level.INFO, "Descomprimiendo y renombrando scraps");
 
         FilesHelper.getInstance().processFiles();
 
-        logger.log(Level.INFO, "Subiendo archivos a servidor DivePort");
+        logger.log(Level.INFO, "Subiendo scraps a servidor DivePort");
 
         uploadFiles();
 
-        logger.log(Level.INFO, "Moviendo archivos en servidor DivePort");
+        logger.log(Level.INFO, "Moviendo scraps en servidor DivePort");
 
         moveFiles();
 

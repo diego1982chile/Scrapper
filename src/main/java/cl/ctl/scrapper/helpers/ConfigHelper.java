@@ -42,11 +42,14 @@ public class ConfigHelper {
             ex.printStackTrace();
         }
 
-
     }
 
     public static ConfigHelper getInstance() {
         return instance;
+    }
+
+    public void setParameter(String name, String value) {
+        CONFIG.put(name, value);
     }
 
 }

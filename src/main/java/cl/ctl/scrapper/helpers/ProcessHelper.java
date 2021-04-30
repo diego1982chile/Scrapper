@@ -191,7 +191,7 @@ public class ProcessHelper {
             // Repasar los útltimos 3 días por si hay scraps pendientes
             LocalDate today = LocalDate.now();
 
-            LocalDate date = today.minusDays(3);
+            LocalDate date = today.minusDays(1);
 
             while(date.isBefore(today)) {
 
@@ -208,12 +208,12 @@ public class ProcessHelper {
                 //semaphore.release();
             }
 
-            logger.log(Level.INFO, "Fin del proceso general " + FilesHelper.getInstance().PROCESS_NAME + ", Se procede a subir los scraps");
+            //logger.log(Level.INFO, "Fin del proceso general " + FilesHelper.getInstance().PROCESS_NAME + ", Se procede a subir los scraps");
 
             // Si no se ha generado el signal, subir archivos y enviar correo
             //if(!UploadHelper.getInstance().signalExists(client)) {
                 //UploadHelper.getInstance().upload();
-                UploadHelper.getInstance().sendSignal(client);
+                //UploadHelper.getInstance().sendSignal(client);
             //}
 
             // Cerrar la sesión explicitamente
@@ -303,7 +303,7 @@ public class ProcessHelper {
 
             for (AbstractScrapper scrapper : getScrappers().values()) {
                 if (scrapper != null) {
-                    scrapper.setDownloads(0);
+                    //scrapper.setDownloads(0);
                     scrapper.process(flag);
                 }
                 //ProcessHelper.getInstance().getExecutor().execute(scrapper);
@@ -331,9 +331,11 @@ public class ProcessHelper {
         }
 
         //Si hubo alguna descarga de algún scrapper subir los scraps para proceso actual
-        if(downloads > 0) {
+        //if(downloads > 0) {
+            //logger.log(Level.INFO, downloads + " nuevas descargas para proceso " + FilesHelper.getInstance().PROCESS_NAME + " " + client + "... ");
             UploadHelper.getInstance().upload();
-        }
+            UploadHelper.getInstance().sendSignal(client);
+        //}
     }
 
 

@@ -59,69 +59,23 @@ public class SchedulerHelper {
 
     }
 
-    public void schedule() {
-        //JSON parser object to parse read file
-        JSONParser jsonParser = new JSONParser();
+    public void schedule(List<Schedule> schedules) {
 
-        try (FileReader reader = new FileReader("schedule.json")) {
-            //Read JSON file
-            Object obj = jsonParser.parse(reader);
+        int period = 1000 * 60 * 60 * 24;
 
-            JSONArray schedules = (JSONArray) obj;
-            System.out.println(schedules);
-
-            List<Schedule> scheduleList = new ArrayList<>();
-
-            //Iterate over employee array
-            for (int i=0; i < schedules.size(); i++) {
-                Schedule schedule = parseScheduleObject( (JSONObject) schedules.get(i) );
-                scheduleList.add(schedule);
-            }
-
-            int period = 1000 * 60 * 60 * 24;
-
-            for (Schedule schedule : scheduleList) {
-                String client = schedule.getClient();
-                Date time = schedule.getSchedule();
-                timer.scheduleAtFixedRate(new ScrapTask(client, time), time, period );
-            }
-
-        } catch (FileNotFoundException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            e.printStackTrace();
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            e.printStackTrace();
-        } catch (ParseException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            e.printStackTrace();
+        for (Schedule schedule : schedules) {
+            String client = schedule.getClient();
+            Date time = schedule.getSchedule();
+            timer.scheduleAtFixedRate(new ScrapTask(client, time), time, period );
         }
+
     }
 
     public static SchedulerHelper getInstance() {
         return instance;
     }
 
-    private Schedule parseScheduleObject(JSONObject scheduleJson)
-    {
-        //Get employee object within list
-        String client = scheduleJson.get("client").toString();
 
-        String schedule = scheduleJson.get("schedule").toString();
-
-        int hour = Integer.parseInt(schedule.split(":")[0]);
-        int minute = Integer.parseInt(schedule.split(":")[1]);
-
-        Calendar date = GregorianCalendar.getInstance(Locale.forLanguageTag("es-ES"));
-
-        date.set(Calendar.HOUR_OF_DAY, hour);
-        date.set(Calendar.MINUTE, minute );
-        date.set(Calendar.SECOND, 0);
-        date.set(Calendar.MILLISECOND, 0);
-
-        return new Schedule(client, date.getTime());
-
-    }
 
 }
 

@@ -376,10 +376,13 @@ public abstract class AbstractScrapper {
             logger.log(Level.WARNING, e.getMessage());
 
             FilesHelper.getInstance().registerFileControlOK(this, "DAY");
-            FilesHelper.getInstance().registerFileControlOK(this, "MONTH");
 
-            if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-                FilesHelper.getInstance().registerFileControlOK(this, "WEEK");
+            if(!onlyDiary) {
+                FilesHelper.getInstance().registerFileControlOK(this, "MONTH");
+
+                if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+                    FilesHelper.getInstance().registerFileControlOK(this, "WEEK");
+                }
             }
 
             try {
