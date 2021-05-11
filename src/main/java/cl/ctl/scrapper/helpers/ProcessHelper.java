@@ -332,7 +332,8 @@ public class ProcessHelper {
 
         //Si hubo alguna descarga de algún scrapper subir los scraps para proceso actual
         //if(downloads > 0) {
-            //logger.log(Level.INFO, downloads + " nuevas descargas para proceso " + FilesHelper.getInstance().PROCESS_NAME + " " + client + "... ");
+            logger.log(Level.INFO, downloads + " nuevas descargas para proceso " + FilesHelper.getInstance().PROCESS_NAME + " " + client + "... ");
+            logger.log(Level.INFO, "Se procede a subir los Scraps...");
             UploadHelper.getInstance().upload();
             UploadHelper.getInstance().sendSignal(client);
         //}

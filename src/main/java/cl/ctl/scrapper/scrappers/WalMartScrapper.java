@@ -3,6 +3,7 @@ package cl.ctl.scrapper.scrappers;
 import cl.ctl.scrapper.helpers.ConfigHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
 import cl.ctl.scrapper.model.DateOutOfRangeException;
+import cl.ctl.scrapper.model.MultipleSubmitsSameRequestException;
 import cl.ctl.scrapper.model.NoReportsException;
 import cl.ctl.scrapper.model.TimeOutException;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
@@ -39,6 +40,8 @@ public class WalMartScrapper extends AbstractScrapper {
     int y0;
 
     Map<String, String> locales = new HashMap<>();
+
+    Map<String, String> jobIds = new HashMap<>();
 
     public WalMartScrapper() throws IOException {
         super();
@@ -212,159 +215,213 @@ public class WalMartScrapper extends AbstractScrapper {
 
                 Thread.sleep(10000);
                 */
-                
+
+                int numberOfTries = 60;
+                String jobId = "0";
+
                 driver.get("https://retaillink.wal-mart.com/decision_support/Report_Builder.aspx?reopen=true&AppId=300&jobid=39040995&getSavedRequests=1&isShared=N&isScheduled=N&country_cd=K2&divid=1");
 
                 Thread.sleep(5000);
 
-                driver.switchTo().frame("menu");
+                if(!jobIds.containsKey(since)) {
 
-                Thread.sleep(3000);
+                    driver.switchTo().frame("menu");
 
-                driver.findElement(By.xpath(".//a[contains(text(),'" + locales.get("times") + "')]")).click();
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    driver.findElement(By.xpath(".//a[contains(text(),'" + locales.get("times") + "')]")).click();
 
-                driver.switchTo().parentFrame();
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    driver.switchTo().parentFrame();
 
-                driver.switchTo().frame("content_4");
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    driver.switchTo().frame("content_4");
 
-                //driver.switchTo().frame("data_frame");
+                    Thread.sleep(3000);
 
-                //Thread.sleep(5000);
+                    //driver.switchTo().frame("data_frame");
 
-                driver.switchTo().frame("left");
+                    //Thread.sleep(5000);
 
-                driver.findElement(By.xpath(".//*[contains(text(),'" + locales.get("range") + "')]")).click();
+                    driver.switchTo().frame("left");
 
-                Thread.sleep(3000);
+                    driver.findElement(By.xpath(".//*[contains(text(),'" + locales.get("range") + "')]")).click();
 
-                driver.switchTo().parentFrame();
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    driver.switchTo().parentFrame();
 
-                driver.switchTo().frame("mid");
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    driver.switchTo().frame("mid");
 
-                driver.switchTo().frame("F1000010_frame");
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    driver.switchTo().frame("F1000010_frame");
 
-                WebElement fechaPOS = driver.findElement(By.name("204F1000010Tree"));
-                fechaPOS.click();
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    WebElement fechaPOS = driver.findElement(By.name("204F1000010Tree"));
+                    fechaPOS.click();
 
-                driver.findElement(By.xpath(".//*[contains(text(),'" + locales.get("condition") + "')]")).click();
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    driver.findElement(By.xpath(".//*[contains(text(),'" + locales.get("condition") + "')]")).click();
 
-                driver.switchTo().parentFrame();
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    driver.switchTo().parentFrame();
 
-                driver.switchTo().parentFrame();
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    driver.switchTo().parentFrame();
 
-                driver.switchTo().frame("right");
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    driver.switchTo().frame("right");
 
-                driver.switchTo().frame("filter_values");
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    driver.switchTo().frame("filter_values");
 
-                Select dateCondition = new Select(driver.findElement(By.id("filllist")));
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    Select dateCondition = new Select(driver.findElement(By.id("filllist")));
 
-                dateCondition.selectByIndex(0);
+                    Thread.sleep(3000);
 
-                Thread.sleep(2000);
+                    dateCondition.selectByIndex(0);
 
-                driver.switchTo().parentFrame();
+                    Thread.sleep(2000);
 
-                Thread.sleep(2000);
+                    driver.switchTo().parentFrame();
 
-                driver.findElement(By.id("Delete")).click();
+                    Thread.sleep(2000);
 
-                Thread.sleep(3000);
+                    driver.findElement(By.id("Delete")).click();
 
-                WebElement sinceInput = driver.findElement(By.xpath("//input[@id='firstValue']"));
-                sinceInput.clear();
-                sinceInput.sendKeys(convertDate(since));
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    WebElement sinceInput = driver.findElement(By.xpath("//input[@id='firstValue']"));
+                    sinceInput.clear();
+                    sinceInput.sendKeys(convertDate(since));
 
-                WebElement untilInput = driver.findElement(By.xpath("//input[@id='lastValue']"));
-                untilInput.clear();
-                untilInput.sendKeys(convertDate(until));
+                    Thread.sleep(3000);
 
-                Thread.sleep(3000);
+                    WebElement untilInput = driver.findElement(By.xpath("//input[@id='lastValue']"));
+                    untilInput.clear();
+                    untilInput.sendKeys(convertDate(until));
 
-                driver.findElement(By.xpath(".//input[@id='btnAnd']")).click();
+                    Thread.sleep(3000);
 
-                Thread.sleep(2000);
+                    driver.findElement(By.xpath(".//input[@id='btnAnd']")).click();
 
-                driver.switchTo().parentFrame();
+                    Thread.sleep(2000);
 
-                Thread.sleep(2000);
+                    driver.switchTo().parentFrame();
 
-                driver.switchTo().parentFrame();
+                    Thread.sleep(2000);
 
-                Thread.sleep(2000);
+                    driver.switchTo().parentFrame();
 
-                driver.switchTo().frame("menu");
+                    Thread.sleep(2000);
 
-                Thread.sleep(2000);
+                    driver.switchTo().frame("menu");
 
-                driver.findElement(By.xpath(".//a[contains(text(),'" + locales.get("submit") + "')]")).click();
+                    Thread.sleep(2000);
 
-                Thread.sleep(2000);
+                    driver.findElement(By.xpath(".//a[contains(text(),'" + locales.get("submit") + "')]")).click();
 
-                driver.switchTo().parentFrame();
+                    Thread.sleep(2000);
 
-                Thread.sleep(2000);
+                    driver.switchTo().parentFrame();
 
-                driver.switchTo().frame("submit");
+                    Thread.sleep(2000);
 
-                Thread.sleep(2000);
+                    driver.switchTo().frame("submit");
 
-                driver.findElement(By.xpath(".//input[@id='subnow']")).click();
+                    Thread.sleep(2000);
 
-                Thread.sleep(2000);
+                    driver.findElement(By.xpath(".//input[@id='subnow']")).click();
 
-                driver.findElement(By.xpath(".//input[@id='viewStatus']")).click();
+                    Thread.sleep(2000);
 
-                Thread.sleep(2000);
+                    driver.switchTo().frame("SubmitWindow");
 
-                driver.switchTo().frame("JobTable");
+                    Thread.sleep(2000);
 
-                int nutrisaCTLReports = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).size();
+                    int multipleSubmitsSameRequestError = driver.findElements(By.xpath(".//*[contains(text(),'Multiple submits of this request are not allowed.')]")).size();
 
-                //Si no existe la solicitud del reporte lanzar excepción
-                if(nutrisaCTLReports == 0) {
-                    throw new NoReportsException("No hay reportes para 'Nutrisa CTL (No Modificar)'");
+                    int jobIdNum = driver.findElements(By.xpath(".//*[contains(text(),'Query Submitted')]")).size();
+
+
+                    //int jobId =
+
+                    if(multipleSubmitsSameRequestError > 0) {
+                        throw new MultipleSubmitsSameRequestException("Multiples submits de la misma solicitud no son permitidos");
+                    }
+
+                    if(jobIdNum > 0) {
+                        jobId = driver.findElement(By.xpath(".//*[contains(text(),'Query Submitted')]")).getAttribute("innerHTML").split("&nbsp;")[2];
+                        jobIds.put(since, jobId);
+                    }
+
+                    Thread.sleep(2000);
+
+                    driver.switchTo().parentFrame();
+
+                    driver.findElement(By.xpath(".//input[@id='viewStatus']")).click();
+
+                    Thread.sleep(2000);
+
+                    driver.switchTo().frame("JobTable");
+
+                    int nutrisaCTLReports = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).size();
+
+                    //Si no existe la solicitud del reporte lanzar excepción
+                    if(nutrisaCTLReports == 0) {
+                        throw new NoReportsException("No hay reportes para 'Nutrisa CTL (No Modificar)'");
+                    }
+
+                    // Obtener el JobId para posteriormene realizar la busqueda por JobId
+
+                    //Actualizar status reporte
+                    // Ojo: Se asume que el reporte mas reciente (1a coincidencia) es el que se generó por el robot
+                    Thread.sleep(2000);
+                    driver.switchTo().parentFrame();
+                    driver.findElement(By.xpath(".//span[contains(text(),'" + locales.get("refresh") + "')]")).click();
+                    Thread.sleep(2000);
+                    driver.switchTo().frame("JobTable");
+                    //jobId = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(0).findElement(By.xpath("parent::td/preceding-sibling::td/following-sibling::td")).findElement(By.xpath("span")).getAttribute("innerHTML");
+                    //jobIds.put(since, jobId);
                 }
+                else {
 
-                int numberOfTries = 15;
+                    driver.switchTo().frame("submit");
 
-                // Obtener el JobId para posteriormene realizar la busqueda por JobId
+                    Thread.sleep(2000);
 
-                //Actualizar status reporte
-                // Ojo: Se asume que el reporte mas reciente (1a coincidencia) es el que se generó por el robot
-                Thread.sleep(2000);
-                driver.switchTo().parentFrame();
-                driver.findElement(By.xpath(".//span[contains(text(),'" + locales.get("refresh") + "')]")).click();
-                Thread.sleep(2000);
-                driver.switchTo().frame("JobTable");
-                String jobId = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(0).findElement(By.xpath("parent::td/preceding-sibling::td/following-sibling::td")).findElement(By.xpath("span")).getAttribute("innerHTML");
+                    driver.findElement(By.xpath(".//input[@id='viewStatus']")).click();
+
+                    Thread.sleep(2000);
+
+                    driver.switchTo().frame("JobTable");
+
+                    int nutrisaCTLReports = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).size();
+
+                    //Si no existe la solicitud del reporte lanzar excepción
+                    if(nutrisaCTLReports == 0) {
+                        throw new NoReportsException("No hay reportes para 'Nutrisa CTL (No Modificar)'");
+                    }
+
+                    // Obtener el JobId para posteriormene realizar la busqueda por JobId
+
+                    //Actualizar status reporte
+                    // Ojo: Se asume que el reporte mas reciente (1a coincidencia) es el que se generó por el robot
+                    jobId = jobIds.get(since);
+                }
 
                 for (int i = 0; i < numberOfTries; ++i) {
 
@@ -385,7 +442,8 @@ public class WalMartScrapper extends AbstractScrapper {
                         case "Done":
                         case "Salvados":
                         case "Retrieved":
-                            driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(0).click();
+                            //driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).get(0).click();
+                            driver.findElement(By.xpath(".//span[contains(text(),'" + jobId + "')]")).click();
                             Thread.sleep(5000);
                             return;
                         case "Activo":
@@ -397,6 +455,9 @@ public class WalMartScrapper extends AbstractScrapper {
                             logger.log(Level.INFO, "Reporte en estado '" + status + "', se esperará 1 min antes de la próxima consulta");
                             Thread.sleep(60000);
                             break;
+                        case "System Error":
+                            jobIds.remove(since);
+                            throw new Exception("Status de Reporte '" + status + "' se descarta el reporte solicitado y se levanta excepción");
                         //flag = false;
                         //throw new Exception("Este reporte ha sido encolado para ser generado en la próxima ventana Operativa. Intentar nuevamente la descarga más tarde");
                         default:
@@ -413,12 +474,15 @@ public class WalMartScrapper extends AbstractScrapper {
                 //filllist
             }
             catch(NoReportsException e) {
+                e.printStackTrace();
+                logger.log(Level.SEVERE, e.getMessage());
                 throw e;
             }
             catch (TimeOutException e2) {
                 throw e2;
             }
             catch(Throwable e3) {
+                logger.log(Level.WARNING, e3.getMessage());
                 if(cont >= 10) {
                     logger.log(Level.SEVERE, e3.getMessage());
                     throw e3;
@@ -510,7 +574,7 @@ public class WalMartScrapper extends AbstractScrapper {
     }
 
     private int getLinearValue(int x) {
-        return  (int)((float)m*x - (float)m*x0 + y0);
+        return  (int)((float) m*x - (float) m*x0 + y0);
     }
 
 

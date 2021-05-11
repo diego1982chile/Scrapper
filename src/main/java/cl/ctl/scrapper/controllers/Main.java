@@ -34,8 +34,14 @@ public class Main {
         try {
             logger.addHandler(fh);
 
-            logger.log(Level.INFO, "Leyendo archivo de parámetros 'parameters.json'...");
-            ParamsHelper.getInstance().loadParameters();
+            if(args.length != 1) {
+                logger.log(Level.SEVERE, "Falta el nombre del archivo json de parámetros!!");
+            }
+
+            String parametersFile = args[0];
+
+            logger.log(Level.INFO, "Leyendo archivo de parámetros " + parametersFile + "...");
+            ParamsHelper.getInstance().loadParameters(parametersFile);
 
         } catch (SecurityException e) {
             logger.log(Level.SEVERE, e.getMessage());

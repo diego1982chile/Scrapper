@@ -33,4 +33,9 @@ public class Schedule {
     public void setSchedule(Date schedule) {
         this.schedule = schedule;
     }
+
+    @Override
+    public String toString() {
+        return "{" + client + "," + schedule + "}";
+    }
 }

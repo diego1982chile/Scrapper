@@ -92,6 +92,7 @@ public class LogHelper extends Handler {
 
     @Override
     public void publish(LogRecord record) {
+
         Instant instance = java.time.Instant.ofEpochMilli(record.getMillis());
         LocalDateTime localDateTime = java.time.LocalDateTime.ofInstant(instance, ZoneId.systemDefault());
 
@@ -114,6 +115,7 @@ public class LogHelper extends Handler {
         Log log = new Log(string, record.getSourceClassName(), record.getSourceMethodName(), record.getMessage(), level);
 
         if(!logs.contains(log)) {
+            System.out.println(record.getMessage());
             logs.add(log);
         }
 

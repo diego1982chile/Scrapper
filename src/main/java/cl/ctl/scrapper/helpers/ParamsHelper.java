@@ -41,12 +41,15 @@ public class ParamsHelper {
 
     }
 
-    public void loadParameters() {
+    public void loadParameters(String parametersFile) {
 
         //JSON parser object to parse read file
         JSONParser jsonParser = new JSONParser();
 
-        try (FileReader reader = new FileReader("parameters.json")) {
+        try (FileReader reader = new FileReader(parametersFile)) {
+
+            logger.log(Level.INFO, "Obteniendo parámetro 'downloads'...");
+
             //Read JSON file
             Object obj = jsonParser.parse(reader);
 
@@ -55,6 +58,8 @@ public class ParamsHelper {
             String downloadPath = params.get("downloads").toString();
 
             ConfigHelper.getInstance().setParameter("file.download_path",downloadPath);
+
+            logger.log(Level.INFO, "Obteniendo parámetro 'schedules'...");
 
             JSONArray schedules = (JSONArray) params.get("schedules");
 

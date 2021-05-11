@@ -63,6 +63,8 @@ public class SchedulerHelper {
 
         int period = 1000 * 60 * 60 * 24;
 
+        logger.log(Level.INFO, "Programando Scrapper de acuerdo a programación: " + schedules.toString());
+
         for (Schedule schedule : schedules) {
             String client = schedule.getClient();
             Date time = schedule.getSchedule();
