@@ -116,7 +116,8 @@ public class MailHelper {
         for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 // Solo archivos registrados con nombre proceso actual
-                if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) && fileControl.getFileName().contains(scrapper.getHolding())) {
+                if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
+                        fileControl.getFileName().toLowerCase().contains(scrapper.getHolding().toLowerCase())) {
 
                     String fileName = fileControl.getFileName();
                     String status = fileControl.getStatus();

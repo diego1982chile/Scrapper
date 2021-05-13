@@ -222,6 +222,7 @@ public class ProcessHelper {
             semaphore.release();
         }
         catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
             semaphore.release();
             throw e;
         }
@@ -263,6 +264,7 @@ public class ProcessHelper {
 
         }
         catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
             semaphore.release();
             throw e;
         }

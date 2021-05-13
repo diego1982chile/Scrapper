@@ -97,7 +97,8 @@ public class UploadHelper {
                 if(!fileControl.getStatus().equalsIgnoreCase("Error")) {
                     try {
                         // Solo archivos registrados con nombre proceso actual y cliente proceso actual
-                        if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) && fileControl.getFileName().contains(scrapper.getHolding())) {
+                        if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
+                                fileControl.getFileName().toLowerCase().contains(scrapper.getHolding().toLowerCase())) {
                             copyLocalToRemote(local, remote, fileControl.getFileName());
                         }
                     } catch (JSchException e) {
@@ -145,6 +146,8 @@ public class UploadHelper {
     public void moveFiles() throws SftpException, IOException, JSchException {
 
         try {
+            session = createSession(user, host, keyPassword);
+
             sftpChannel.ls(remote);
 
             for (Object o : sftpChannel.ls(remote)) {
@@ -156,9 +159,9 @@ public class UploadHelper {
                 }
             }
 
-            //sftpChannel.disconnect();
-            //sftp.disconnect();
-            //session.disconnect();
+            sftpChannel.disconnect();
+            sftp.disconnect();
+            session.disconnect();
 
         } catch (SftpException e) {
             logger.log(Level.SEVERE, e.getMessage());
