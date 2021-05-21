@@ -2,17 +2,15 @@ package cl.ctl.scrapper.scrappers;
 
 import cl.ctl.scrapper.helpers.CaptchaHelper;
 import cl.ctl.scrapper.helpers.ConfigHelper;
-import cl.ctl.scrapper.model.BadDateException;
-import cl.ctl.scrapper.model.DateOutOfRangeException;
+import cl.ctl.scrapper.model.exceptions.BadDateException;
+import cl.ctl.scrapper.model.exceptions.DateOutOfRangeException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.util.logging.Level;
 
@@ -84,7 +82,7 @@ public class SmuScrapper extends AbstractScrapper {
             try {
 
                 // Cerrar popups!!! (si es la 1a vez)
-                if(!flag) {
+                if(!driver.findElements(By.xpath("//div[@class='v-window-closebox']")).isEmpty()) {
 
                     for(int i = driver.findElements(By.xpath("//div[@class='v-window-closebox']")).size(); i > 0; --i ) {
                         driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(i-1).click();
@@ -250,7 +248,7 @@ public class SmuScrapper extends AbstractScrapper {
                     throw new BadDateException("Alguna de las fechas ingresadas no es válida");
                 }
 
-                Thread.sleep(20000);
+                Thread.sleep(40000);
 
                 WebElement downloadReportMenu = driver.findElement(By.xpath("//div[@class='v-button v-widget toolbar-button v-button-toolbar-button bbr-popupbutton']"));
                 actions = new Actions(driver);
@@ -276,7 +274,7 @@ public class SmuScrapper extends AbstractScrapper {
                 actions = new Actions(driver);
                 actions.moveToElement(downloadReportButton).click().build().perform();
 
-                Thread.sleep(60000);
+                Thread.sleep(90000);
 
                 WebElement downloadReportLink = driver.findElement(By.xpath("//div[@class='v-horizontallayout v-layout v-horizontal v-widget']")).findElements(By.xpath("//div[@class='v-slot']")).get(0).findElements(By.xpath("//div[@class='v-link v-widget']")).get(0);
                 actions = new Actions(driver);

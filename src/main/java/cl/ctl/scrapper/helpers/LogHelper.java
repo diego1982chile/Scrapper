@@ -1,10 +1,8 @@
 package cl.ctl.scrapper.helpers;
 
-import cl.ctl.scrapper.model.BusinessException;
 import cl.ctl.scrapper.model.FileControl;
 import cl.ctl.scrapper.model.Log;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

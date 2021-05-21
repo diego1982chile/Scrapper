@@ -6,8 +6,7 @@ import com.jcraft.jsch.*;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
+import java.nio.file.*;
 import java.util.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -26,6 +25,8 @@ public class UploadHelper {
 
     private static String destiny = "/di/projects/Legrand/_Scraps_Hoy/";
     private static String remote = ConfigHelper.getInstance().CONFIG.get("upload.path");//"/home/dsoto/temp/";
+
+    private static String target = ConfigHelper.getInstance().CONFIG.get("upload.target");;
 
     private static String user =  ConfigHelper.getInstance().CONFIG.get("upload.user");//"dsoto";
     private static String host = ConfigHelper.getInstance().CONFIG.get("upload.host");//"cfiedler.dyndns.org";
@@ -58,7 +59,7 @@ public class UploadHelper {
 
     public void sendSignal(String name) throws JSchException, IOException, SftpException {
 
-         String local = FilesHelper.getInstance().getUploadPath();
+        String local = FilesHelper.getInstance().getUploadPath();
         File signal = new File(local + FileSystems.getDefault().getSeparator() + StringUtils.capitalize(name.toLowerCase()) + "_signal.txt");
 
         try {
@@ -75,6 +76,23 @@ public class UploadHelper {
             logger.log(Level.SEVERE, e.getMessage());
             throw e;
         } catch (SftpException e) {
+            logger.log(Level.SEVERE, e.getMessage());
+            throw e;
+        }
+    }
+
+    public void generateSignal(String name) throws JSchException, IOException, SftpException {
+
+        String local = FilesHelper.getInstance().getUploadPath();
+        File signal = new File(local + FileSystems.getDefault().getSeparator() + StringUtils.capitalize(name.toLowerCase()) + "_signal.txt");
+
+        try {
+            logger.log(Level.INFO, "Generando signal cliente '" + name + "");
+            signal.createNewFile();
+            File dest = new File(target + File.separator + signal.getName());
+            Files.copy(Paths.get(local + File.separator + signal.getName()), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+        } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage());
             throw e;
         }
@@ -118,6 +136,34 @@ public class UploadHelper {
         }
     }
 
+    public void copyFiles() throws JSchException, IOException {
+        String local = FilesHelper.getInstance().getUploadPath();
+
+        for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+            for (FileControl fileControl : scrapper.getFileControlList()) {
+                if(!fileControl.getStatus().equalsIgnoreCase("Error")) {
+                    try {
+                        // Solo archivos registrados con nombre proceso actual y cliente proceso actual
+                        if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
+                                fileControl.getFileName().toLowerCase().contains(scrapper.getHolding().toLowerCase())) {
+                            //copyLocalToRemote(local, remote, fileControl.getFileName());
+                            File dest = new File(target + File.separator + fileControl.getFileName());
+                            Files.copy(Paths.get(local + File.separator + fileControl.getFileName()), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        }
+                    }
+                    catch (FileNotFoundException e) {
+                        // TODO: Por ahora los archivos que ya habian sido descargados en procesos anteriores, omitirlos en la excepción
+                        logger.log(Level.WARNING, e.getMessage());
+                    }
+                    catch (IOException e) {
+                        logger.log(Level.SEVERE, e.getMessage());
+                        throw e;
+                    }
+                }
+            }
+        }
+    }
+
     public void upload() throws Exception {
 
         logger.log(Level.INFO, "Descomprimiendo y renombrando scraps");
@@ -131,6 +177,21 @@ public class UploadHelper {
         logger.log(Level.INFO, "Moviendo scraps en servidor DivePort");
 
         moveFiles();
+
+        logger.log(Level.INFO, "Proceso finalizado con éxito. Enviando correo");
+
+        MailHelper.getInstance().sendMail();
+    }
+
+    public void copy() throws Exception {
+
+        logger.log(Level.INFO, "Descomprimiendo y renombrando scraps");
+
+        FilesHelper.getInstance().processFiles();
+
+        logger.log(Level.INFO, "Copiando scraps a destino: " + target);
+
+        copyFiles();
 
         logger.log(Level.INFO, "Proceso finalizado con éxito. Enviando correo");
 

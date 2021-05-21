@@ -1,29 +1,18 @@
 package cl.ctl.scrapper.scrappers;
 
 import cl.ctl.scrapper.helpers.ConfigHelper;
-import cl.ctl.scrapper.helpers.ProcessHelper;
-import cl.ctl.scrapper.model.DateOutOfRangeException;
-import cl.ctl.scrapper.model.MultipleSubmitsSameRequestException;
-import cl.ctl.scrapper.model.NoReportsException;
-import cl.ctl.scrapper.model.TimeOutException;
-import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
-import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
-import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
-import org.apache.commons.math3.exception.*;
-import org.apache.commons.math3.util.Pair;
-import org.joda.primitives.list.DoubleList;
-import org.joda.primitives.list.impl.ArrayDoubleList;
+import cl.ctl.scrapper.model.exceptions.MultipleSubmitsSameRequestException;
+import cl.ctl.scrapper.model.exceptions.NoReportsException;
+import cl.ctl.scrapper.model.exceptions.TimeOutException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
@@ -378,12 +367,14 @@ public class WalMartScrapper extends AbstractScrapper {
 
                     driver.switchTo().frame("JobTable");
 
+                    /*
                     int nutrisaCTLReports = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).size();
 
                     //Si no existe la solicitud del reporte lanzar excepción
                     if(nutrisaCTLReports == 0) {
                         throw new NoReportsException("No hay reportes para 'Nutrisa CTL (No Modificar)'");
                     }
+                    */
 
                     // Obtener el JobId para posteriormene realizar la busqueda por JobId
 
@@ -456,6 +447,7 @@ public class WalMartScrapper extends AbstractScrapper {
                             Thread.sleep(60000);
                             break;
                         case "System Error":
+                        case "Formatter Error":
                             jobIds.remove(since);
                             throw new Exception("Status de Reporte '" + status + "' se descarta el reporte solicitado y se levanta excepción");
                         //flag = false;

@@ -1,14 +1,12 @@
 package cl.ctl.scrapper.helpers;
 
-import cl.ctl.scrapper.model.ConcurrentAccessException;
+import cl.ctl.scrapper.model.exceptions.ConcurrentAccessException;
 import cl.ctl.scrapper.model.FileControl;
+import cl.ctl.scrapper.model.exceptions.SignalExistsException;
 import cl.ctl.scrapper.scrappers.*;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -175,6 +173,10 @@ public class ProcessHelper {
 
             setClient(WordUtils.capitalize(client));
 
+            if(UploadHelper.getInstance().signalExists(client)) {
+                throw new SignalExistsException("Ya se generó el signal para el proceso " + FilesHelper.getInstance().PROCESS_NAME + " " + this.client + ". Se omite el proceso");
+            }
+
             List<String> chains = new ArrayList<>();
 
             initScrappers();
@@ -215,6 +217,10 @@ public class ProcessHelper {
                 //UploadHelper.getInstance().upload();
                 //UploadHelper.getInstance().sendSignal(client);
             //}
+
+            //UploadHelper.getInstance().sendSignal(client);
+
+            UploadHelper.getInstance().generateSignal(client);
 
             // Cerrar la sesión explicitamente
             //UploadHelper.getInstance().closeSession();
@@ -336,8 +342,9 @@ public class ProcessHelper {
         //if(downloads > 0) {
             logger.log(Level.INFO, downloads + " nuevas descargas para proceso " + FilesHelper.getInstance().PROCESS_NAME + " " + client + "... ");
             logger.log(Level.INFO, "Se procede a subir los Scraps...");
-            UploadHelper.getInstance().upload();
-            UploadHelper.getInstance().sendSignal(client);
+            //UploadHelper.getInstance().upload();
+            UploadHelper.getInstance().copy();
+            //UploadHelper.getInstance().sendSignal(client);
         //}
     }
 

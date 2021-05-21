@@ -3,12 +3,10 @@ package cl.ctl.scrapper.scrappers;
 import cl.ctl.scrapper.helpers.ConfigHelper;
 import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
-import cl.ctl.scrapper.model.BusinessException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
-import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;

@@ -1,4 +1,4 @@
-package cl.ctl.scrapper.model;
+package cl.ctl.scrapper.model.exceptions;
 
 public class MultipleSubmitsSameRequestException extends Exception {
 
