@@ -3,8 +3,9 @@ package cl.ctl.scrapper.scrappers;
 import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.LogHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
-import cl.ctl.scrapper.model.exceptions.BusinessException;
+import cl.ctl.scrapper.model.exceptions.ScrapAlreadyExistsException;
 import cl.ctl.scrapper.model.FileControl;
+import cl.ctl.scrapper.model.exceptions.ScrapUnavailableException;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -12,6 +13,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,6 +50,8 @@ public abstract class AbstractScrapper {
     boolean onlyWeekly = false;
 
     int downloads = 0;
+
+    boolean readyOnMorning = true;
 
     List<FileControl> fileControlList = new ArrayList<>();
 
@@ -155,16 +160,16 @@ public abstract class AbstractScrapper {
         this.fileControlList = fileControlList;
     }
 
-    void checkScraps() throws BusinessException {
+    void checkScraps() throws ScrapAlreadyExistsException {
         if(FilesHelper.getInstance().checkFiles(this)) {
-            throw new BusinessException("Scrapper '" + cadena + "' -> Archivos ya fueron generados! se omite el proceso");
+            throw new ScrapAlreadyExistsException("Scrapper '" + cadena + "' -> Archivos ya fueron generados! se omite el proceso");
         }
     }
 
-    void checkScrap(String freq) throws BusinessException {
+    void checkScrap(String freq) throws ScrapAlreadyExistsException {
 
         if(FilesHelper.getInstance().checkFile(this, freq)) {
-            throw new BusinessException("Scrapper " + this.getCadena() + " -> Archivo de frecuencia '" + freq + "' ya fue generado! se omite el proceso diario");
+            throw new ScrapAlreadyExistsException("Scrapper " + this.getCadena() + " -> Archivo de frecuencia '" + freq + "' ya fue generado! se omite el proceso diario");
         }
     }
 
@@ -326,14 +331,21 @@ public abstract class AbstractScrapper {
 
         try {
             checkScrap(freq);
+
             if(flag) {
+                if(!readyOnMorning) {
+                    //TODO: Si son antes de las 14:00 omitir el scrapping
+                    if(LocalDateTime.now().getHour() <= 14) {
+                        throw new ScrapUnavailableException("Scrap " + freq + " para cliente " + ProcessHelper.getInstance().getClient() + " aún no se encuentra disponible");
+                    }
+                }
                 doScrap(since, until);
-                FilesHelper.getInstance().registerFileControlOK(this, freq);
+                FilesHelper.getInstance().registerFileControlNew(this, freq);
                 downloads++;
 
             }
         }
-        catch(BusinessException e) {
+        catch(ScrapAlreadyExistsException e) {
             if(onlyDiary) {
                 if(freq.equals("DAY")) {
                     logger.log(Level.WARNING, e.getMessage());
@@ -367,7 +379,7 @@ public abstract class AbstractScrapper {
         try {
             scrap(flag);
         }
-        catch(BusinessException e) {
+        catch(ScrapAlreadyExistsException e) {
             logger.log(Level.WARNING, e.getMessage());
 
             FilesHelper.getInstance().registerFileControlOK(this, "DAY");

@@ -220,11 +220,28 @@ public class ProcessHelper {
 
             //UploadHelper.getInstance().sendSignal(client);
 
-            UploadHelper.getInstance().generateSignal(client);
+            int contNew = 0;
+
+            for (AbstractScrapper scrapper : getScrappers().values()) {
+                for (FileControl fileControl : scrapper.getFileControlList()) {
+                    if (fileControl.isNew()) {
+                        contNew++;
+                    }
+                }
+            }
+
+            // Se envia signal solo si se descargaron nuevos scraps (al menos 1)
+            if(contNew > 0) {
+                UploadHelper.getInstance().generateSignal(client);
+            }
 
             // Cerrar la sesión explicitamente
             //UploadHelper.getInstance().closeSession();
 
+            semaphore.release();
+        }
+        catch(SignalExistsException ex) {
+            logger.log(Level.WARNING, ex.getMessage());
             semaphore.release();
         }
         catch (Exception e) {

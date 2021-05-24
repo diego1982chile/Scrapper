@@ -21,6 +21,8 @@ public class FileControl {
     String fileName;
     String status;
 
+    boolean NEW = false;
+
     List<String> errors = new ArrayList<String>();
 
     AbstractScrapper scrapper;
@@ -124,6 +126,14 @@ public class FileControl {
 
     public void setErrors(List<String> errors) {
         this.errors = errors;
+    }
+
+    public boolean isNew() {
+        return NEW;
+    }
+
+    public void setNew(boolean NEW) {
+        this.NEW = NEW;
     }
 
     @Override

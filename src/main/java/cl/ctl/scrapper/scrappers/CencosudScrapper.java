@@ -28,6 +28,8 @@ public class CencosudScrapper extends AbstractScrapper {
         cadena = "Cencosud";
         url = "https://www.cenconlineb2b.com/";
         logo = "cencosud.png";
+
+        readyOnMorning = false;
     }
 
     void login() throws Exception {

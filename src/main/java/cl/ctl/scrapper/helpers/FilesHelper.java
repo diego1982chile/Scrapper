@@ -471,6 +471,41 @@ public class FilesHelper {
 
     }
 
+    public void registerFileControlNew(AbstractScrapper scrapper, String frequency) {
+
+        switch(frequency) {
+            case "DAY":
+                frequency = "Dia";
+                break;
+            case "MONTH":
+                frequency = "Mes";
+                break;
+            case "WEEK":
+                frequency = "Dom";
+                break;
+        }
+
+        // Comprobar que exista el archivo con la frecuencia de la cadena, de lo contrario retornar false
+        File file = new File(DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + scrapper.getHolding() + "_" + scrapper.getCadena() + "_" + frequency + "_" + PROCESS_NAME + scrapper.getFileExt());
+
+        String processDay = ProcessHelper.getInstance().getProcessDate().toString();
+        String dayOfWeekProcess = WordUtils.capitalize(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES")));
+        String dayOfWeek = WordUtils.capitalize(LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES")));
+        String fileNameShort = file.getName().split(Pattern.quote(SEPARATOR))[file.getName().split(Pattern.quote(SEPARATOR)).length - 1];
+        String status = "OK";
+
+        FileControl fileControl = new FileControl(PROCESS_NAME, processDay, dayOfWeekProcess, dayOfWeek, ProcessHelper.getInstance().getProcessDate().toString(), frequency, scrapper.getHolding(), scrapper.getCadena(), fileNameShort, status);
+
+        fileControl.setNew(true);
+
+        LogHelper.getInstance().registerFileControl(fileControl);
+
+        if(!scrapper.getFileControlList().contains(fileControl)) {
+            scrapper.getFileControlList().add(fileControl);
+        }
+
+    }
+
     public void registerFileControlError(AbstractScrapper scrapper, String frequency, String errorMsg) {
 
         switch(frequency) {
