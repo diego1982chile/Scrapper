@@ -3,6 +3,7 @@ package cl.ctl.scrapper.helpers;
 import cl.ctl.scrapper.model.FileControl;
 import cl.ctl.scrapper.scrappers.AbstractScrapper;
 import com.jcraft.jsch.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
@@ -22,6 +23,8 @@ public class UploadHelper {
     private static JSch jsch;
     private static Channel sftp;
     private static ChannelSftp sftpChannel;
+
+    private static String server = ConfigHelper.getInstance().CONFIG.get("upload.server");
 
     private static String destiny = "/di/projects/Legrand/_Scraps_Hoy/";
     private static String remote = ConfigHelper.getInstance().CONFIG.get("upload.path");//"/home/dsoto/temp/";
@@ -57,6 +60,15 @@ public class UploadHelper {
 
     }
 
+    public String getServer() {
+        return server;
+    }
+
+    public void setServer(String server) {
+        UploadHelper.server = server;
+    }
+
+
     public void sendSignal(String name) throws JSchException, IOException, SftpException {
 
         String local = FilesHelper.getInstance().getUploadPath();
@@ -89,8 +101,12 @@ public class UploadHelper {
         try {
             logger.log(Level.INFO, "Generando signal cliente '" + name + "");
             signal.createNewFile();
-            File dest = new File(target + File.separator + signal.getName());
-            Files.copy(Paths.get(local + File.separator + signal.getName()), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            //File dest = new File(target + File.separator + signal.getName());
+            File source = new File(local + File.separator + signal.getName());
+            File dest = new File(ConfigHelper.getInstance().CONFIG.get("upload.target") + File.separator + signal.getName());
+            logger.log(Level.INFO, "Copiando signal a destino '" + dest.getPath() + "'");
+            //Files.copy(Paths.get(local + File.separator + signal.getName()), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            FileUtils.copyFile(source, dest);
 
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage());
@@ -147,8 +163,12 @@ public class UploadHelper {
                         if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
                                 fileControl.getFileName().toLowerCase().contains(scrapper.getHolding().toLowerCase())) {
                             //copyLocalToRemote(local, remote, fileControl.getFileName());
-                            File dest = new File(target + File.separator + fileControl.getFileName());
-                            Files.copy(Paths.get(local + File.separator + fileControl.getFileName()), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                            //File dest = new File(target + File.separator + fileControl.getFileName());
+                            File source = new File(local + File.separator + fileControl.getFileName());
+                            File dest = new File(ConfigHelper.getInstance().CONFIG.get("upload.target") + File.separator + fileControl.getFileName());
+                            logger.log(Level.INFO, "Copiando scrap a destino '" + dest.getPath() + "'");
+                            //Files.copy(Paths.get(local + File.separator + fileControl.getFileName()), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                            FileUtils.copyFile(source, dest);
                         }
                     }
                     catch (FileNotFoundException e) {
@@ -189,7 +209,9 @@ public class UploadHelper {
 
         FilesHelper.getInstance().processFiles();
 
-        logger.log(Level.INFO, "Copiando scraps a destino: " + target);
+        //logger.log(Level.INFO, "Copiando scraps a destino: " + target);
+
+        logger.log(Level.INFO, "Copiando scraps a destino: " + ConfigHelper.getInstance().CONFIG.get("upload.target"));
 
         copyFiles();
 
@@ -216,6 +238,7 @@ public class UploadHelper {
                 if(!entry.getFilename().equals(".") && !entry.getFilename().equals("..")) {
                     //sftpChannel.rename(remote + entry.getFilename(), destiny + entry.getFilename());
                     String command = "mv " + remote + entry.getFilename() + " " + destiny + entry.getFilename();
+
                     runSudoCommand(user, keyPassword, host, command);
                 }
             }

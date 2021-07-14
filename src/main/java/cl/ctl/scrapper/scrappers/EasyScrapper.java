@@ -30,6 +30,11 @@ public class EasyScrapper extends AbstractScrapper {
         logo = "easy.jpg";
     }
 
+    public EasyScrapper(String holding) throws IOException {
+        this();
+        this.holding = holding;
+    }
+
     void login() throws Exception {
 
         int cont = 0;
@@ -43,9 +48,10 @@ public class EasyScrapper extends AbstractScrapper {
             CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
             captchaHelper.solveCaptcha();
 
-            driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.easy.user"));
+            String holding = getHolding().toLowerCase();
+            driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".easy.user"));
             Thread.sleep(2000);
-            driver.findElement(By.id("password")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.easy.password"));
+            driver.findElement(By.id("password")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".easy.password"));
             driver.getPageSource();
             Thread.sleep(2000);
             driver.findElement(By.id("kc-login")).click();

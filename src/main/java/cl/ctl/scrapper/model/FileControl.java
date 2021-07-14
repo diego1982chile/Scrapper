@@ -21,7 +21,7 @@ public class FileControl {
     String fileName;
     String status;
 
-    boolean NEW = false;
+    boolean NEW;// = false;
 
     List<String> errors = new ArrayList<String>();
 
@@ -38,6 +38,7 @@ public class FileControl {
         this.chain = chain;
         this.fileName = fileName;
         this.status = status;
+        NEW = false;
     }
 
     public AbstractScrapper getScrapper() {

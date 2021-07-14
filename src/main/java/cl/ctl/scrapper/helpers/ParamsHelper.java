@@ -41,7 +41,7 @@ public class ParamsHelper {
 
     }
 
-    public void loadParameters(String parametersFile) {
+    public void loadParameters(String parametersFile) throws Exception {
 
         //JSON parser object to parse read file
         JSONParser jsonParser = new JSONParser();
@@ -53,25 +53,64 @@ public class ParamsHelper {
             //Read JSON file
             Object obj = jsonParser.parse(reader);
 
+            // Leyendo downloads
             JSONObject params = (JSONObject) obj;
 
-            String downloadPath = params.get("downloads").toString();
-
-            ConfigHelper.getInstance().setParameter("file.download_path",downloadPath);
-
-            logger.log(Level.INFO, "Obteniendo parámetro 'schedules'...");
-
-            JSONArray schedules = (JSONArray) params.get("schedules");
-
-            List<Schedule> scheduleList = new ArrayList<>();
-
-            //Iterate over employee array
-            for (int i=0; i < schedules.size(); i++) {
-                Schedule schedule = parseScheduleObject( (JSONObject) schedules.get(i) );
-                scheduleList.add(schedule);
+            if(params.containsKey("downloads")) {
+                String downloadPath = params.get("downloads").toString();
+                ConfigHelper.getInstance().setParameter("file.download_path",downloadPath);
+            }
+            else {
+                logger.log(Level.WARNING, "No se ha especificado el parámetro 'downloads' se utilizará el del archivo de propiedades");
             }
 
-            SchedulerHelper.getInstance().schedule(scheduleList);
+            // Leyendo uploads
+            logger.log(Level.INFO, "Obteniendo parámetro 'uploads'...");
+
+            if(params.containsKey("uploads")) {
+                JSONObject uploads = (JSONObject) params.get("uploads");
+
+                UploadHelper.getInstance().setServer(uploads.get("server").toString());
+
+                switch(uploads.get("server").toString().toUpperCase()) {
+                    case "LOCAL":
+                        ConfigHelper.getInstance().setParameter("upload.target",uploads.get("target").toString());
+                        break;
+                    case "REMOTE":
+                        ConfigHelper.getInstance().setParameter("upload.host",uploads.get("host").toString());
+                        ConfigHelper.getInstance().setParameter("upload.path",uploads.get("path").toString());
+                        ConfigHelper.getInstance().setParameter("upload.user",uploads.get("user").toString());
+                        ConfigHelper.getInstance().setParameter("upload.password",uploads.get("password").toString());
+                        ConfigHelper.getInstance().setParameter("upload.target",uploads.get("target").toString());
+                        break;
+                    default:
+                        throw new Exception("Parámetro 'uploads' tipo de servidor no válido " + uploads.get("server").toString());
+                }
+            }
+            else {
+                logger.log(Level.WARNING, "No se ha especificado el parámetro 'uploads' se utilizará el del archivo de propiedades");
+            }
+
+            // Leyendo schedules
+            if(params.containsKey("schedules")) {
+                logger.log(Level.INFO, "Obteniendo parámetro 'schedules'...");
+
+                JSONArray schedules = (JSONArray) params.get("schedules");
+
+                List<Schedule> scheduleList = new ArrayList<>();
+
+                //Iterate over employee array
+                for (int i=0; i < schedules.size(); i++) {
+                    Schedule schedule = parseScheduleObject( (JSONObject) schedules.get(i) );
+                    scheduleList.add(schedule);
+                }
+
+                SchedulerHelper.getInstance().schedule(scheduleList);
+            }
+            else {
+                logger.log(Level.WARNING, "No se ha especificado el parámetro 'schedules'!");
+                throw new Exception("No se ha especificado el parámetro 'schedules'!");
+            }
 
 
         } catch (FileNotFoundException e) {

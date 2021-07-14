@@ -234,6 +234,15 @@ public abstract class AbstractScrapper {
 
             while(cont < 3) {
 
+                if(!readyOnMorning) {
+                    //TODO: Si son antes de las 14:00 omitir el login
+                    if(LocalDateTime.now().getHour() <= 14) {
+                        //throw new ScrapUnavailableException("Scrap para cliente " + ProcessHelper.getInstance().getClient() + " aún no se encuentra disponible!");
+                        logger.log(Level.WARNING, "Scrap para cliente " + ProcessHelper.getInstance().getClient() + " aún no se encuentra disponible!");
+                        break;
+                    }
+                }
+
                 cont++;
 
                 try {

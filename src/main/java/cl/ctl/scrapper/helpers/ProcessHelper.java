@@ -120,7 +120,9 @@ public class ProcessHelper {
                 className = scrapper + "Scrapper";
                 abstractScrapper = (AbstractScrapper) createObject(packageName + "." + className);
             }
-            this.scrappers.put(abstractScrapper.toString(), (AbstractScrapper) createObject(packageName + "." + className));
+            //Setear el holding
+            abstractScrapper.setHolding(client);
+            this.scrappers.put(abstractScrapper.toString(), abstractScrapper);
         }
     }
 
@@ -146,18 +148,26 @@ public class ProcessHelper {
         ConstrumartScrapper construmartScrapper = new ConstrumartScrapper();
         EasyScrapper easyScrapper = new EasyScrapper();
         SodimacScrapper sodimacScrapper = new SodimacScrapper();
+        CencosudScrapper cencosudScrapperLegrand = new CencosudScrapper("Legrand");
         SmuScrapper smuScrapper = new SmuScrapper();
         TottusScrapper tottusScrapper = new TottusScrapper();
         CencosudScrapper cencosudScrapper = new CencosudScrapper();
         WalMartScrapper walMartScrapper = new WalMartScrapper();
 
+        CencosudScrapper cencosudScrapperBless = new CencosudScrapper("Bless");
+        TottusScrapper tottusScrapperBless = new TottusScrapper("Bless");
+
+
         scrappers.put(construmartScrapper.toString(), construmartScrapper);
         scrappers.put(easyScrapper.toString(), easyScrapper);
         scrappers.put(sodimacScrapper.toString(), sodimacScrapper);
+        scrappers.put(cencosudScrapperLegrand.toString(), cencosudScrapperLegrand);
         scrappers.put(smuScrapper.toString(), smuScrapper);
         scrappers.put(cencosudScrapper.toString(), cencosudScrapper);
         scrappers.put(tottusScrapper.toString(), tottusScrapper);
         scrappers.put(walMartScrapper.toString(), walMartScrapper);
+        scrappers.put(cencosudScrapperBless.toString(), cencosudScrapperBless);
+        scrappers.put(tottusScrapperBless.toString(), tottusScrapperBless);
 
         executor = Executors.newFixedThreadPool(scrappers.size());
 
@@ -173,9 +183,11 @@ public class ProcessHelper {
 
             setClient(WordUtils.capitalize(client));
 
+            /*
             if(UploadHelper.getInstance().signalExists(client)) {
                 throw new SignalExistsException("Ya se generó el signal para el proceso " + FilesHelper.getInstance().PROCESS_NAME + " " + this.client + ". Se omite el proceso");
             }
+            */
 
             List<String> chains = new ArrayList<>();
 
@@ -225,15 +237,24 @@ public class ProcessHelper {
             for (AbstractScrapper scrapper : getScrappers().values()) {
                 for (FileControl fileControl : scrapper.getFileControlList()) {
                     if (fileControl.isNew()) {
+                        logger.log(Level.INFO, "Nuevo scrap -> " + fileControl.getFileName());
                         contNew++;
                     }
                 }
             }
 
             // Se envia signal solo si se descargaron nuevos scraps (al menos 1)
-            if(contNew > 0) {
+            //if(contNew > 0) {
+
+            if(UploadHelper.getInstance().getServer().equalsIgnoreCase("LOCAL")) {
                 UploadHelper.getInstance().generateSignal(client);
             }
+            else {
+                UploadHelper.getInstance().sendSignal(client);
+            }
+
+                //UploadHelper.getInstance().generateSignal(client);
+            //}
 
             // Cerrar la sesión explicitamente
             //UploadHelper.getInstance().closeSession();
@@ -359,8 +380,15 @@ public class ProcessHelper {
         //if(downloads > 0) {
             logger.log(Level.INFO, downloads + " nuevas descargas para proceso " + FilesHelper.getInstance().PROCESS_NAME + " " + client + "... ");
             logger.log(Level.INFO, "Se procede a subir los Scraps...");
-            //UploadHelper.getInstance().upload();
-            UploadHelper.getInstance().copy();
+
+            if(UploadHelper.getInstance().getServer().equalsIgnoreCase("LOCAL")) {
+                UploadHelper.getInstance().copy();
+            }
+            else {
+                UploadHelper.getInstance().upload();
+            }
+
+            //UploadHelper.getInstance().copy();
             //UploadHelper.getInstance().sendSignal(client);
         //}
     }

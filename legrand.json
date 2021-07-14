@@ -1,0 +1,6 @@
+{
+"downloads":"/home/des01c7/CTL/Downloads",
+"schedules":[{"client":"legrand","schedule":"15:17"},{"client":"legrand","schedule":"18:55"}],
+"uploads":{"server":"local","target":"/home/des01c7/CTL/_Scraps_Hoy"},
+"scrappers":[{"legrand":[{"construmart":{"user":"","password":""}},{"easy":{"user":"","password":""}},{"sodimac":{"user":"","password":""}},{"cencosud":}]}]
+}

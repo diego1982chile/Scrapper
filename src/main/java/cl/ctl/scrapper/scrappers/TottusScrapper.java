@@ -23,6 +23,11 @@ public class TottusScrapper extends AbstractScrapper {
         logo = "tottus.jpg";
     }
 
+    public TottusScrapper(String holding) throws IOException {
+        this();
+        this.holding = holding;
+    }
+
     void login() throws InterruptedException {
 
         Select b2b;
@@ -55,12 +60,14 @@ public class TottusScrapper extends AbstractScrapper {
             b2b.selectByValue("8");
             Thread.sleep(2000);
 
-            driver.findElement(By.id("empresa")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.tottus.company"));
+            String holding = getHolding().toLowerCase();
+
+            driver.findElement(By.id("empresa")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".tottus.company"));
             Thread.sleep(2000);
-            driver.findElement(By.id("usuario")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.tottus.user"));
+            driver.findElement(By.id("usuario")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".tottus.user"));
             Thread.sleep(2000);
             //driver.findElement(By.id("clave")).sendKeys("diy012021");
-            driver.findElement(By.id("clave")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.tottus.password"));
+            driver.findElement(By.id("clave")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".tottus.password"));
             Thread.sleep(2000);
             driver.findElement(By.id("entrar2")).click();
     }

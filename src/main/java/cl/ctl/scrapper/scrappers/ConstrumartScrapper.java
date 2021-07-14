@@ -32,8 +32,9 @@ public class ConstrumartScrapper extends AbstractScrapper {
         readyOnMorning = false;
     }
 
-    public ConstrumartScrapper(LocalDate processDate) throws IOException {
-        super();
+    public ConstrumartScrapper(String holding) throws IOException {
+        this();
+        this.holding = holding;
     }
 
      void login() throws Exception {
@@ -49,9 +50,10 @@ public class ConstrumartScrapper extends AbstractScrapper {
                  CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
                  captchaHelper.solveCaptcha();
 
-                 driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.construmart.user"));
+                 String holding = getHolding().toLowerCase();
+                 driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".construmart.user"));
                  Thread.sleep(2000);
-                 driver.findElement(By.id("password")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.construmart.password"));
+                 driver.findElement(By.id("password")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".construmart.password"));
                  Thread.sleep(2000);
 
                  driver.getPageSource();

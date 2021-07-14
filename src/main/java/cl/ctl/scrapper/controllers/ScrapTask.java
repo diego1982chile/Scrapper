@@ -55,7 +55,7 @@ public class ScrapTask extends TimerTask {
         } catch (Exception e) {
             e.printStackTrace();
             logger.log(Level.SEVERE, e.getMessage());
-            cancel();
+            //cancel();
         }
     }
 

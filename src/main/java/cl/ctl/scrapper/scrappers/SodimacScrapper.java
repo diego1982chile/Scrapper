@@ -26,6 +26,11 @@ public class SodimacScrapper extends AbstractScrapper {
         fileExt = ".txt";
     }
 
+    public SodimacScrapper(String holding) throws IOException {
+        this();
+        this.holding = holding;
+    }
+
     void login() throws InterruptedException {
 
         Select b2b;
@@ -58,13 +63,15 @@ public class SodimacScrapper extends AbstractScrapper {
             b2b.selectByValue("6");
             Thread.sleep(2000);
 
-            driver.findElement(By.id("empresa")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.sodimac.company"));
+            String holding = getHolding().toLowerCase();
+
+            driver.findElement(By.id("empresa")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".sodimac.company"));
             Thread.sleep(2000);
-            driver.findElement(By.id("usuario")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.sodimac.user"));
+            driver.findElement(By.id("usuario")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".sodimac.user"));
             Thread.sleep(2000);
             //driver.findElement(By.id("clave")).sendKeys("diy012021");
             //driver.findElement(By.id("clave")).sendKeys("diymarzo2021");
-            driver.findElement(By.id("clave")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.sodimac.password"));
+            driver.findElement(By.id("clave")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".sodimac.password"));
             Thread.sleep(2000);
             driver.findElement(By.id("entrar2")).click();
     }

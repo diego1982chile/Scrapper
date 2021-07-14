@@ -32,6 +32,11 @@ public class CencosudScrapper extends AbstractScrapper {
         readyOnMorning = false;
     }
 
+    public CencosudScrapper(String holding) throws IOException {
+        this();
+        this.holding = holding;
+    }
+
     void login() throws Exception {
 
         try {
@@ -43,8 +48,9 @@ public class CencosudScrapper extends AbstractScrapper {
             CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
             captchaHelper.solveCaptcha();
             Thread.sleep(2000);
-            driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.cencosud.user"));
-            driver.findElement(By.id("password")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.cencosud.password"));
+            String holding = getHolding().toLowerCase();
+            driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".cencosud.user"));
+            driver.findElement(By.id("password")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".cencosud.password"));
             driver.getPageSource();
             driver.findElement(By.id("kc-login")).click();
 
@@ -115,6 +121,17 @@ public class CencosudScrapper extends AbstractScrapper {
             cont++;
 
             try {
+
+                // Cerrar popups!!! (si es la 1a vez)
+                if(!driver.findElements(By.xpath("//div[@class='v-window-closebox']")).isEmpty()) {
+
+                    for(int i = driver.findElements(By.xpath("//div[@class='v-window-closebox']")).size(); i > 0; --i ) {
+                        driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(i-1).click();
+                        Thread.sleep(2000);
+                    }
+
+                }
+
                 WebElement menuCommerce = driver.findElement(By.xpath("//div[@class='v-menubar v-widget mainMenuBar v-menubar-mainMenuBar v-has-width']")).findElements(By.cssSelector("span:nth-child(3)")).get(0);
                 WebDriverWait wait = new WebDriverWait(driver, 10);
                 wait.until(ExpectedConditions.elementToBeClickable(menuCommerce));

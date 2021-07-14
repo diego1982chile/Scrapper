@@ -39,7 +39,20 @@ public class WalMartScrapper extends AbstractScrapper {
         url = "https://retaillink.login.wal-mart.com/?ServerType=IIS1&CTAuthMode=BASIC&language=en&utm_source=retaillink&utm_medium=redirect&utm_campaign=FalconRelease&CT_ORIG_URL=/&ct_orig_uri=/ ";
         logo = "walmart.jpg";
         fileExt = ".xlsx";
+
+        locales.put("modify","Modify");
+        locales.put("times","Times");
+        locales.put("range","Time Range 1");
+        locales.put("condition","Time Range 1 Is Between");
+        locales.put("submit","Submit");
+        locales.put("refresh","Refresh");
     }
+
+    public WalMartScrapper(String holding) throws IOException {
+        this();
+        this.holding = holding;
+    }
+
 
     private void localize(String locale) {
 
@@ -70,24 +83,27 @@ public class WalMartScrapper extends AbstractScrapper {
 
         Actions actions = null;
 
-        while(cont < 10) {
+        while(cont < 3) {
 
             cont++;
 
             try {
+                String holding = getHolding().toLowerCase();
 
-                driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.walmart.user"));
+                driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".walmart.user"));
                 Thread.sleep(2000);
-                driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.walmart.password"));
+                driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".walmart.password"));
                 Thread.sleep(2000);
                 driver.findElement(By.className("spin-button-children")).click();
 
                 Thread.sleep(5000);
 
+                /*
                 if(true) {
                     solveCustomChallenge();
                     Thread.sleep(10000);
                 }
+                */
 
                 actions = new Actions(driver);
                 WebElement decisionSupport = driver.findElement(By.xpath(".//div[contains(text(),'Decision Support - New')]"));
@@ -110,7 +126,7 @@ public class WalMartScrapper extends AbstractScrapper {
                     throw e;
                 }
 
-                if (cont >= 10) {
+                if (cont >= 3) {
                     logger.log(Level.SEVERE, e.getMessage());
                     throw e;
                 }
@@ -477,6 +493,7 @@ public class WalMartScrapper extends AbstractScrapper {
                 logger.log(Level.WARNING, e3.getMessage());
                 if(cont >= 10) {
                     logger.log(Level.SEVERE, e3.getMessage());
+                    e3.printStackTrace();
                     throw e3;
                 }
             }

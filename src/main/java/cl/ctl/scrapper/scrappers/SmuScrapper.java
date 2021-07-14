@@ -31,6 +31,11 @@ public class SmuScrapper extends AbstractScrapper {
         fileExt = ".xlsx";
     }
 
+    public SmuScrapper(String holding) throws IOException {
+        this();
+        this.holding = holding;
+    }
+
     void login() throws Exception {
 
         try {
@@ -38,8 +43,10 @@ public class SmuScrapper extends AbstractScrapper {
             CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
             captchaHelper.solveCaptcha();
             Thread.sleep(2000);
-            driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.smu.user"));
-            driver.findElement(By.id("password")).sendKeys(ConfigHelper.getInstance().CONFIG.get("scrappers.smu.password"));
+
+            String holding = getHolding().toLowerCase();
+            driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".smu.user"));
+            driver.findElement(By.id("password")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".smu.password"));
             driver.getPageSource();
             driver.findElement(By.id("kc-login")).click();
 
