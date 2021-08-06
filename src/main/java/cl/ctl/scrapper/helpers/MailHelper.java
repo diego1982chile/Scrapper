@@ -106,7 +106,24 @@ public class MailHelper {
 
         addRecords();
 
-        send();
+        if(newFileExists()) {
+            send();
+        }
+    }
+
+    private boolean newFileExists() {
+
+        for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+            for (FileControl fileControl : scrapper.getFileControlList()) {
+                // Solo archivos registrados con nombre proceso actual
+                if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
+                        fileControl.getFileName().toLowerCase().contains(scrapper.getHolding().toLowerCase())
+                        && fileControl.isNew()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void addRecords() {

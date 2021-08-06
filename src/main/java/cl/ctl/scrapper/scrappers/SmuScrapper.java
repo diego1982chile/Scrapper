@@ -214,6 +214,20 @@ public class SmuScrapper extends AbstractScrapper {
                     throw new Exception("Alguna de las fechas está vacía!!");
                 }
 
+                WebElement generateReport = driver.findElement(By.xpath("//div[@class='v-button v-widget btn-filter-search v-button-btn-filter-search']"));
+                actions = new Actions(driver);
+                actions.moveToElement(generateReport).click().build().perform();
+
+                Thread.sleep(2000);
+
+                // Si se producen errores de fecha levantar excepción
+                if(!driver.findElements(By.xpath(".//div[contains(text(),'Ingrese una fecha Desde válida')]")).isEmpty() ||
+                        !driver.findElements(By.xpath(".//div[contains(text(),'Ingrese una fecha Hasta válida')]")).isEmpty()) {
+                    throw new BadDateException("Alguna de las fechas ingresadas no es válida");
+                }
+
+                Thread.sleep(40000);
+
                 break;
             }
             catch (Throwable e) {
@@ -243,21 +257,8 @@ public class SmuScrapper extends AbstractScrapper {
             cont++;
 
             try {
-                WebElement generateReport = driver.findElement(By.xpath("//div[@class='v-button v-widget btn-filter-search v-button-btn-filter-search']"));
-                actions = new Actions(driver);
-                actions.moveToElement(generateReport).click().build().perform();
 
-                Thread.sleep(2000);
-
-                // Si se producen errores de fecha levantar excepción
-                if(!driver.findElements(By.xpath(".//div[contains(text(),'Ingrese una fecha Desde válida')]")).isEmpty() ||
-                        !driver.findElements(By.xpath(".//div[contains(text(),'Ingrese una fecha Hasta válida')]")).isEmpty()) {
-                    throw new BadDateException("Alguna de las fechas ingresadas no es válida");
-                }
-
-                Thread.sleep(40000);
-
-                WebElement downloadReportMenu = driver.findElement(By.xpath("//div[@class='v-button v-widget toolbar-button v-button-toolbar-button bbr-popupbutton']"));
+                WebElement downloadReportMenu = driver.findElements(By.xpath("//div[@class='v-button v-widget toolbar-button v-button-toolbar-button bbr-popupbutton']")).get(0);
                 actions = new Actions(driver);
                 actions.moveToElement(downloadReportMenu).click().build().perform();
 
@@ -292,6 +293,15 @@ public class SmuScrapper extends AbstractScrapper {
             catch (Throwable e) {
                 e.printStackTrace();
                 logger.log(Level.WARNING, e.getMessage());
+
+                // Si hubo un error al generar el archivo, cerrar mensaje de error y reintentar
+                if(!driver.findElements(By.xpath(".//div[contains(text(),'Error generando el archivo.')]")).isEmpty()) {
+                    for(int i = driver.findElements(By.xpath("//div[@class='v-window-closebox']")).size(); i > 0; --i ) {
+                        driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(i-1).click();
+                        Thread.sleep(2000);
+                    }
+                }
+
                 if(cont >= 10) {
                     logger.log(Level.SEVERE, e.getMessage());
                     throw e;

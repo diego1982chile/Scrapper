@@ -1,9 +1,11 @@
 package cl.ctl.scrapper.scrappers;
 
 import cl.ctl.scrapper.helpers.ConfigHelper;
+import cl.ctl.scrapper.helpers.ProcessHelper;
 import cl.ctl.scrapper.model.exceptions.MultipleSubmitsSameRequestException;
 import cl.ctl.scrapper.model.exceptions.NoReportsException;
 import cl.ctl.scrapper.model.exceptions.TimeOutException;
+import org.apache.commons.lang.WordUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -46,6 +48,7 @@ public class WalMartScrapper extends AbstractScrapper {
         locales.put("condition","Time Range 1 Is Between");
         locales.put("submit","Submit");
         locales.put("refresh","Refresh");
+        locales.put("querySubmitted","Query Submitted");
     }
 
     public WalMartScrapper(String holding) throws IOException {
@@ -64,6 +67,7 @@ public class WalMartScrapper extends AbstractScrapper {
                 locales.put("condition","Time Range 1 Is Between");
                 locales.put("submit","Submit");
                 locales.put("refresh","Refresh");
+                locales.put("querySubmitted","Query Submitted");
                 break;
             case "spanish":
                 locales.put("modify","Modificar");
@@ -72,6 +76,7 @@ public class WalMartScrapper extends AbstractScrapper {
                 locales.put("condition","Rango 1 Está Entre");
                 locales.put("submit","Submitir");
                 locales.put("refresh","Actualizar");
+                locales.put("querySubmitted","Solicitud Submitida");
                 break;
         }
 
@@ -83,7 +88,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
         Actions actions = null;
 
-        while(cont < 3) {
+        while(cont < 1) {
 
             cont++;
 
@@ -96,7 +101,7 @@ public class WalMartScrapper extends AbstractScrapper {
                 Thread.sleep(2000);
                 driver.findElement(By.className("spin-button-children")).click();
 
-                Thread.sleep(5000);
+                Thread.sleep(20000);
 
                 /*
                 if(true) {
@@ -126,7 +131,7 @@ public class WalMartScrapper extends AbstractScrapper {
                     throw e;
                 }
 
-                if (cont >= 3) {
+                if (cont >= 1) {
                     logger.log(Level.SEVERE, e.getMessage());
                     throw e;
                 }
@@ -139,7 +144,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
         cont = 0;
 
-        while(cont < 10) {
+        while(cont < 3) {
 
             cont++;
 
@@ -152,7 +157,7 @@ public class WalMartScrapper extends AbstractScrapper {
                 Thread.sleep(5000);
 
                 //Si el idioma está seteado en inglés localizar a inglés, caso contrario localizar a español
-                if(!driver.findElements(By.xpath(".//a[contains(text(),'English')]")).isEmpty()) {
+                if(!driver.findElements(By.xpath(".//a[contains(text(),'Logout')]")).isEmpty()) {
                     localize("english");
                 }
                 else {
@@ -170,11 +175,37 @@ public class WalMartScrapper extends AbstractScrapper {
 
                 Thread.sleep(5000);
 
-                actions.moveToElement(driver.findElement(By.id("IMG27305673"))).click().build().perform();
+                switch(holding) {
+                    case "Nutrisa":
+                        actions.moveToElement(driver.findElement(By.id("IMG27305673"))).click().build().perform();
+                        break;
+                    case "Bless":
+                        actions.moveToElement(driver.findElement(By.xpath(".//span[contains(text(),'Reporte CTL')]/parent::span/child::img[2]"))).click().build().perform();
+                        break;
+                    default:
+                        actions.moveToElement(driver.findElement(By.xpath(".//span[contains(text(),'Reportes CTL')]/parent::span/child::img[2]"))).click().build().perform();
+                        break;
+                }
 
                 Thread.sleep(3000);
 
-                WebElement nutrisaCTL = driver.findElement(By.id("CD39040995"));
+                WebElement nutrisaCTL;
+
+                switch(holding) {
+                    case "Nutrisa":
+                        nutrisaCTL = driver.findElement(By.id("CD39040995"));
+                        break;
+                    case "Bless":
+                        nutrisaCTL = driver.findElement(By.xpath(".//span[contains(text(),'Bless CTL')]"));
+                        break;
+                    case "Soho":
+                        nutrisaCTL = driver.findElement(By.id("CD42727978"));
+                        break;
+                    default:
+                        nutrisaCTL = driver.findElement(By.xpath(".//span[contains(text(),'MODELO CTL')]"));
+                        break;
+                }
+
                 actions.contextClick(nutrisaCTL).perform();
 
                 Thread.sleep(3000);
@@ -191,7 +222,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
             }
             catch(Throwable e) {
-                if(cont >= 10) {
+                if(cont >= 3) {
                     logger.log(Level.SEVERE, e.getMessage());
                     throw e;
                 }
@@ -206,7 +237,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
         int cont = 0;
 
-        while(cont < 10) {
+        while(cont < 1) {
 
             cont++;
 
@@ -349,6 +380,14 @@ public class WalMartScrapper extends AbstractScrapper {
 
                     Thread.sleep(2000);
 
+                    // Setear el titulo del reporte
+                    WebElement titleInput = driver.findElement(By.xpath("//input[@id='title']"));
+                    titleInput.clear();
+                    String title = WordUtils.capitalize(holding.toLowerCase()) + "_" + WordUtils.capitalize(cadena.toLowerCase()) + "_" + calculateFrequency(since, until) + "_" + ProcessHelper.getInstance().getProcessDate().toString().replace("-","");
+                    titleInput.sendKeys(title);
+
+                    Thread.sleep(3000);
+
                     driver.findElement(By.xpath(".//input[@id='subnow']")).click();
 
                     Thread.sleep(2000);
@@ -359,8 +398,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
                     int multipleSubmitsSameRequestError = driver.findElements(By.xpath(".//*[contains(text(),'Multiple submits of this request are not allowed.')]")).size();
 
-                    int jobIdNum = driver.findElements(By.xpath(".//*[contains(text(),'Query Submitted')]")).size();
-
+                    int jobIdNum = driver.findElements(By.xpath(".//*[contains(text(),'" + locales.get("querySubmitted") + "')]")).size();
 
                     //int jobId =
 
@@ -369,7 +407,7 @@ public class WalMartScrapper extends AbstractScrapper {
                     }
 
                     if(jobIdNum > 0) {
-                        jobId = driver.findElement(By.xpath(".//*[contains(text(),'Query Submitted')]")).getAttribute("innerHTML").split("&nbsp;")[2];
+                        jobId = driver.findElement(By.xpath(".//*[contains(text(),'" + locales.get("querySubmitted") + "')]")).getAttribute("innerHTML").split("&nbsp;")[2];
                         jobIds.put(since, jobId);
                     }
 
@@ -416,7 +454,9 @@ public class WalMartScrapper extends AbstractScrapper {
 
                     driver.switchTo().frame("JobTable");
 
-                    int nutrisaCTLReports = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).size();
+                    //int nutrisaCTLReports = driver.findElements(By.xpath(".//span[contains(text(),'Nutrisa CTL (No Modificar)')]")).size();
+
+                    int nutrisaCTLReports = driver.findElements(By.xpath(".//span[contains(text(),'" + jobIds.get(since) + "')]")).size();
 
                     //Si no existe la solicitud del reporte lanzar excepción
                     if(nutrisaCTLReports == 0) {
@@ -491,7 +531,7 @@ public class WalMartScrapper extends AbstractScrapper {
             }
             catch(Throwable e3) {
                 logger.log(Level.WARNING, e3.getMessage());
-                if(cont >= 10) {
+                if(cont >= 1) {
                     logger.log(Level.SEVERE, e3.getMessage());
                     e3.printStackTrace();
                     throw e3;

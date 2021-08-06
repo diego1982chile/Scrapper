@@ -149,6 +149,7 @@ public class ProcessHelper {
         EasyScrapper easyScrapper = new EasyScrapper();
         SodimacScrapper sodimacScrapper = new SodimacScrapper();
         CencosudScrapper cencosudScrapperLegrand = new CencosudScrapper("Legrand");
+
         SmuScrapper smuScrapper = new SmuScrapper();
         TottusScrapper tottusScrapper = new TottusScrapper();
         CencosudScrapper cencosudScrapper = new CencosudScrapper();
@@ -157,17 +158,32 @@ public class ProcessHelper {
         CencosudScrapper cencosudScrapperBless = new CencosudScrapper("Bless");
         TottusScrapper tottusScrapperBless = new TottusScrapper("Bless");
 
+        SmuScrapper smuScrapperBless = new SmuScrapper("Bless");
+        WalMartScrapper walMartScrapperBless = new WalMartScrapper("Bless");
+
+        CencosudScrapper cencosudScrapperSoho = new CencosudScrapper("Soho");
+        SmuScrapper smuScrapperSoho = new SmuScrapper("Soho");
+        WalMartScrapper walMartScrapperSoho = new WalMartScrapper("Soho");
+
 
         scrappers.put(construmartScrapper.toString(), construmartScrapper);
         scrappers.put(easyScrapper.toString(), easyScrapper);
         scrappers.put(sodimacScrapper.toString(), sodimacScrapper);
         scrappers.put(cencosudScrapperLegrand.toString(), cencosudScrapperLegrand);
+
         scrappers.put(smuScrapper.toString(), smuScrapper);
         scrappers.put(cencosudScrapper.toString(), cencosudScrapper);
         scrappers.put(tottusScrapper.toString(), tottusScrapper);
         scrappers.put(walMartScrapper.toString(), walMartScrapper);
+
         scrappers.put(cencosudScrapperBless.toString(), cencosudScrapperBless);
         scrappers.put(tottusScrapperBless.toString(), tottusScrapperBless);
+        scrappers.put(smuScrapperBless.toString(), smuScrapperBless);
+        scrappers.put(walMartScrapperBless.toString(), walMartScrapperBless);
+
+        scrappers.put(cencosudScrapperSoho.toString(), cencosudScrapperSoho);
+        scrappers.put(smuScrapperSoho.toString(), smuScrapperSoho);
+        scrappers.put(walMartScrapperSoho.toString(), walMartScrapperSoho);
 
         executor = Executors.newFixedThreadPool(scrappers.size());
 
@@ -205,7 +221,9 @@ public class ProcessHelper {
             // Repasar los útltimos 3 días por si hay scraps pendientes
             LocalDate today = LocalDate.now();
 
-            LocalDate date = today.minusDays(1);
+            //LocalDate date = today.minusDays(1);
+
+            LocalDate date = today.minusDays(4);
 
             while(date.isBefore(today)) {
 

@@ -232,7 +232,7 @@ public abstract class AbstractScrapper {
 
             int cont = 0;
 
-            while(cont < 3) {
+            while(cont < 1) {
 
                 if(!readyOnMorning) {
                     //TODO: Si son antes de las 14:00 omitir el login
@@ -260,7 +260,7 @@ public abstract class AbstractScrapper {
                 }
                 catch (Exception e) {
                     logger.log(Level.WARNING, e.getMessage());
-                    if(cont >= 3) {
+                    if(cont >= 1) {
                         logger.log(Level.SEVERE, e.getMessage());
                         //throw e;
                     }
@@ -416,6 +416,21 @@ public abstract class AbstractScrapper {
     @Override
     public String toString() {
         return holding + " -> " + cadena;
+    }
+
+    String calculateFrequency(String since, String until) {
+
+        String freq = "Dom";
+
+        if(since.equals(until)) {
+            freq = "Dia";
+        }
+
+        if(since.split("-")[0].equals("01")) {
+            freq = "Mes";
+        }
+
+        return freq;
     }
 
 
