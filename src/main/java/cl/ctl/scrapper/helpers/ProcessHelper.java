@@ -221,9 +221,9 @@ public class ProcessHelper {
             // Repasar los útltimos 3 días por si hay scraps pendientes
             LocalDate today = LocalDate.now();
 
-            //LocalDate date = today.minusDays(1);
+            //LocalDate date = today.minusDays(40);
 
-            LocalDate date = today.minusDays(4);
+            LocalDate date = today.minusDays(1);
 
             while(date.isBefore(today)) {
 

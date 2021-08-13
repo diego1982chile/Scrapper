@@ -498,6 +498,8 @@ public class FilesHelper {
 
         fileControl.setNew(true);
 
+        scrapper.getNewScraps().add(fileNameShort);
+
         LogHelper.getInstance().registerFileControl(fileControl);
 
         if(!scrapper.getFileControlList().contains(fileControl)) {

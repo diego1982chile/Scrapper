@@ -106,9 +106,9 @@ public class MailHelper {
 
         addRecords();
 
-        if(newFileExists()) {
+        //if(newFileExists()) {
             send();
-        }
+        //}
     }
 
     private boolean newFileExists() {

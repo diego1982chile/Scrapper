@@ -55,6 +55,8 @@ public abstract class AbstractScrapper {
 
     List<FileControl> fileControlList = new ArrayList<>();
 
+    List<String> newScraps = new ArrayList<>();
+
 
     public AbstractScrapper() throws IOException {
         // This block configure the logger with handler and formatter
@@ -158,6 +160,14 @@ public abstract class AbstractScrapper {
 
     public void setFileControlList(List<FileControl> fileControlList) {
         this.fileControlList = fileControlList;
+    }
+
+    public List<String> getNewScraps() {
+        return newScraps;
+    }
+
+    public void setNewScraps(List<String> newScraps) {
+        this.newScraps = newScraps;
     }
 
     void checkScraps() throws ScrapAlreadyExistsException {
