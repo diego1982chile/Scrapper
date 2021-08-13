@@ -291,67 +291,6 @@ public class ProcessHelper {
 
     }
 
-    public void process(String process, List<String> chains) throws Exception {
-
-        try {
-
-            if(!semaphore.tryAcquire()) {
-                throw new ConcurrentAccessException("Se está intentando cambiar la fecha de proceso mientras hay un proceso en curso!!");
-            }
-
-            if(chains == null) {
-                return;
-            }
-
-            if(chains.isEmpty()) {
-                return;
-            }
-
-            LocalDate date = getLocalDate(process);
-
-            setProcessDate(date);
-
-            validateChains(chains);
-
-            setScrappers(chains);
-
-            scrap(true);
-
-            UploadHelper.getInstance().upload();
-
-            // Cerrar la sesión explicitamente
-            //UploadHelper.getInstance().closeSession();
-
-            semaphore.release();
-
-        }
-        catch (Exception e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            semaphore.release();
-            throw e;
-        }
-
-    }
-
-    public void getScraps(String process) throws Exception {
-
-        if(!semaphore.tryAcquire()) {
-            throw new ConcurrentAccessException("Se está intentando cambiar la fecha de proceso mientras hay un proceso en curso!!");
-        }
-
-        if(process == null) {
-            return;
-        }
-
-        LocalDate date = getLocalDate(process);
-
-        setProcessDate(date);
-
-        scrap(false);
-
-        semaphore.release();
-
-    }
 
     private void scrap(boolean flag) throws Exception {
 
