@@ -27,7 +27,7 @@ import java.util.logging.SimpleFormatter;
 /**
  * Created by des01c7 on 16-12-20.
  */
-public abstract class AbstractScrapper {
+public abstract class AbstractScrapper implements Runnable {
 
     WebDriver driver;
 
@@ -390,6 +390,42 @@ public abstract class AbstractScrapper {
     abstract void doScrap(String since, String until) throws Exception;
 
     abstract void login() throws Exception;
+
+
+    @Override
+    public void run() {
+
+        fileControlList.clear();
+
+        try {
+            scrap(true);
+        }
+        catch(ScrapAlreadyExistsException e) {
+            logger.log(Level.WARNING, e.getMessage());
+
+            FilesHelper.getInstance().registerFileControlOK(this, "DAY");
+
+            if(!onlyDiary) {
+                FilesHelper.getInstance().registerFileControlOK(this, "MONTH");
+
+                if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+                    FilesHelper.getInstance().registerFileControlOK(this, "WEEK");
+                }
+            }
+
+            try {
+                driver.quit();
+            }
+            catch(Exception ex) {
+                ex.printStackTrace();
+                throw ex;
+            }
+        }
+        catch (Exception ex) {
+            logger.log(Level.SEVERE, ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
 
     public void process(boolean flag) throws Exception {
 

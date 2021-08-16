@@ -308,9 +308,12 @@ public class ProcessHelper {
                 if (scrapper != null) {
                     //scrapper.setDownloads(0);
                     scrapper.process(flag);
+                    //getExecutor().execute(scrapper);
                 }
                 //ProcessHelper.getInstance().getExecutor().execute(scrapper);
             }
+
+            //getBarrier().await();
 
             //ProcessHelper.getInstance().getBarrier().await();
 
