@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -248,7 +249,7 @@ public abstract class AbstractScrapper implements Runnable {
                     //TODO: Si son antes de las 14:00 omitir el login
                     if(LocalDateTime.now().getHour() <= 14) {
                         //throw new ScrapUnavailableException("Scrap para cliente " + ProcessHelper.getInstance().getClient() + " aún no se encuentra disponible!");
-                        logger.log(Level.WARNING, "Scrap para cliente " + ProcessHelper.getInstance().getClient() + " aún no se encuentra disponible!");
+                        logger.log(Level.WARNING, "Scrap para holding " + ProcessHelper.getInstance().getHolding() + " aún no se encuentra disponible!");
                         break;
                     }
                 }
@@ -355,7 +356,7 @@ public abstract class AbstractScrapper implements Runnable {
                 if(!readyOnMorning) {
                     //TODO: Si son antes de las 14:00 omitir el scrapping
                     if(LocalDateTime.now().getHour() <= 14) {
-                        throw new ScrapUnavailableException("Scrap " + freq + " para cliente " + ProcessHelper.getInstance().getClient() + " aún no se encuentra disponible");
+                        throw new ScrapUnavailableException("Scrap " + freq + " para holding " + ProcessHelper.getInstance().getHolding() + " aún no se encuentra disponible");
                     }
                 }
                 doScrap(since, until);
@@ -424,6 +425,15 @@ public abstract class AbstractScrapper implements Runnable {
         catch (Exception ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             ex.printStackTrace();
+        }
+        finally {
+            try {
+                ProcessHelper.getInstance().getBarrier().await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (BrokenBarrierException e) {
+                e.printStackTrace();
+            }
         }
     }
 

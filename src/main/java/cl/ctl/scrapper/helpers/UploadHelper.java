@@ -133,7 +133,7 @@ public class UploadHelper {
                         // Solo archivos registrados con nombre proceso actual y cliente proceso actual
                         if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
                                 fileControl.getFileName().toLowerCase().contains(scrapper.getHolding().toLowerCase())
-                                //&& scrapper.getNewScraps().contains(fileControl.getFileName())
+                                && scrapper.getNewScraps().contains(fileControl.getFileName())
                                 //&& fileControl.isNew()
                                 ) {
                             copyLocalToRemote(local, remote, fileControl.getFileName());
@@ -165,7 +165,7 @@ public class UploadHelper {
                         // Solo archivos registrados con nombre proceso actual y cliente proceso actual
                         if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
                                 fileControl.getFileName().toLowerCase().contains(scrapper.getHolding().toLowerCase())
-                                //&& scrapper.getNewScraps().contains(fileControl.getFileName())
+                                && scrapper.getNewScraps().contains(fileControl.getFileName())
                                 //&& fileControl.isNew()
                             ) {
                             //copyLocalToRemote(local, remote, fileControl.getFileName());
