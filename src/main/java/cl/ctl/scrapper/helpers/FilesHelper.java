@@ -1,27 +1,23 @@
 package cl.ctl.scrapper.helpers;
 
 import cl.ctl.scrapper.model.FileControl;
+import cl.ctl.scrapper.model.exceptions.ScrapEmptyException;
 import cl.ctl.scrapper.scrappers.AbstractScrapper;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.WordUtils;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
 
 /**
@@ -266,6 +262,38 @@ public class FilesHelper {
         }
 
     }
+
+    // Comprobar tamaño de ultimo archivo descargado
+    public void checkLastFile(AbstractScrapper scrapper, String frequency) throws ScrapEmptyException {
+
+        logger.log(Level.INFO, "Comprobando archivo cadena = " + scrapper.getCadena() + " frecuencia = " + frequency);
+
+        File downloadDir;
+
+        downloadDir = new File(DOWNLOAD_PATH);
+
+        File[] files = downloadDir.listFiles();
+
+        Arrays.sort(files, new Comparator<File>() {
+            public int compare(File f1, File f2)
+            {
+                return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
+            }
+        });
+
+        for(int i = 0; i < files.length; ++i) {
+            if(files[i].isFile()) {
+                if((int) files[i].length() == 0) {
+                    throw new ScrapEmptyException("El scrap está vacío!!");
+                }
+                else {
+                    break;
+                }
+            }
+        }
+
+    }
+
 
     public String getDownloadPath() {
         return DOWNLOAD_PATH + SEPARATOR;

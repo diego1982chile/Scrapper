@@ -229,6 +229,10 @@ public abstract class AbstractScrapper implements Runnable {
         FilesHelper.getInstance().renameLastFile(this, freq);
     }
 
+    abstract void doScrap(String since, String until) throws Exception;
+
+    abstract void login() throws Exception;
+
 
     private void scrap(boolean flag) throws Exception {
 
@@ -359,6 +363,7 @@ public abstract class AbstractScrapper implements Runnable {
                     }
                 }
                 doScrap(since, until);
+                FilesHelper.getInstance().checkLastFile(this, freq);
                 FilesHelper.getInstance().registerFileControlNew(this, freq);
                 downloads++;
 
@@ -386,11 +391,6 @@ public abstract class AbstractScrapper implements Runnable {
             }
         }
     }
-
-    abstract void doScrap(String since, String until) throws Exception;
-
-    abstract void login() throws Exception;
-
 
     @Override
     public void run() {
