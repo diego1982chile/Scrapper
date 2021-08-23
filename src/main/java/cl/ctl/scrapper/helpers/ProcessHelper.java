@@ -181,8 +181,8 @@ public class ProcessHelper {
         scrappers.put(walMartScrapperBless.toString(), walMartScrapperBless);
 
         scrappers.put(cencosudScrapperSoho.toString(), cencosudScrapperSoho);
-        //scrappers.put(smuScrapperSoho.toString(), smuScrapperSoho);
-        //scrappers.put(walMartScrapperSoho.toString(), walMartScrapperSoho);
+        scrappers.put(smuScrapperSoho.toString(), smuScrapperSoho);
+        scrappers.put(walMartScrapperSoho.toString(), walMartScrapperSoho);
 
         executor = Executors.newFixedThreadPool(scrappers.size());
 
@@ -222,7 +222,7 @@ public class ProcessHelper {
 
             //LocalDate date = today.minusDays(40);
 
-            LocalDate date = today.minusDays(13);
+            LocalDate date = today.minusDays(1);
 
             while(date.isBefore(today)) {
 
