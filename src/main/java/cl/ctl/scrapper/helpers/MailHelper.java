@@ -106,19 +106,21 @@ public class MailHelper {
 
         addRecords();
 
-        //if(newFileExists()) {
+        if(newFileExists()) {
             send();
-        //}
+        }
     }
 
     private boolean newFileExists() {
 
-        for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByClient(ProcessHelper.getInstance().getClient())) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 // Solo archivos registrados con nombre proceso actual
                 if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
                         fileControl.getFileName().toLowerCase().contains(scrapper.getHolding().toLowerCase())
-                        && fileControl.isNew()) {
+                        && scrapper.getNewScraps().contains(fileControl.getFileName())
+                        //&& fileControl.isNew()
+                        ) {
                     return true;
                 }
             }
@@ -130,7 +132,8 @@ public class MailHelper {
 
         String html = "";
 
-        for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+        //for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByClient(ProcessHelper.getInstance().getClient())) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 // Solo archivos registrados con nombre proceso actual
                 if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&

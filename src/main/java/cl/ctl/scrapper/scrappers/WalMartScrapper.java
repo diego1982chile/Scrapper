@@ -84,6 +84,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
     void login() throws Exception {
 
+
         int cont = 0;
 
         Actions actions = null;
@@ -95,13 +96,15 @@ public class WalMartScrapper extends AbstractScrapper {
             try {
                 String holding = getHolding().toLowerCase();
 
+                Thread.sleep(5000);
+
                 driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".walmart.user"));
                 Thread.sleep(2000);
                 driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".walmart.password"));
                 Thread.sleep(2000);
                 driver.findElement(By.className("spin-button-children")).click();
 
-                Thread.sleep(20000);
+                Thread.sleep(25000);
 
                 /*
                 if(true) {

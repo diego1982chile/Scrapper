@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -424,6 +425,15 @@ public abstract class AbstractScrapper implements Runnable {
         catch (Exception ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             ex.printStackTrace();
+        }
+        finally {
+            try {
+                ProcessHelper.getInstance().getBarrier().await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (BrokenBarrierException e) {
+                e.printStackTrace();
+            }
         }
     }
 

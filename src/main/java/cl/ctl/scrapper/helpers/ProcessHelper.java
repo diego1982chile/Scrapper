@@ -1,5 +1,6 @@
 package cl.ctl.scrapper.helpers;
 
+import cl.ctl.scrapper.controllers.UploadTask;
 import cl.ctl.scrapper.model.exceptions.ConcurrentAccessException;
 import cl.ctl.scrapper.model.FileControl;
 import cl.ctl.scrapper.model.exceptions.SignalExistsException;
@@ -29,8 +30,6 @@ public class ProcessHelper {
 
     private String client;
 
-    private Map<String, AbstractScrapper> scrappers = new TreeMap<>();
-
     private ExecutorService executor;
 
     private CyclicBarrier barrier;
@@ -44,20 +43,8 @@ public class ProcessHelper {
      * Constructor privado para el Singleton del Factory.
      */
     private ProcessHelper() {
+        processDate  = LocalDate.now().minusDays(1);
 
-        try {
-
-            if(scrappers.isEmpty()) {
-                processDate  = LocalDate.now().minusDays(1);
-                initScrappers();
-            }
-            executor = Executors.newFixedThreadPool(scrappers.size());
-            barrier = new CyclicBarrier(scrappers.size() + 1);
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public static ProcessHelper getInstance() {
@@ -89,10 +76,6 @@ public class ProcessHelper {
         this.client = client;
     }
 
-    public Map<String, AbstractScrapper> getScrappers() {
-        return scrappers;
-    }
-
     public CyclicBarrier getBarrier() {
         return barrier;
     }
@@ -100,94 +83,7 @@ public class ProcessHelper {
     public ExecutorService getExecutor() {
         return executor;
     }
-    
-    public void setScrappers(List<String> scrappers) {
 
-        this.scrappers.clear();
-
-        String packageName = this.getClass().getPackage().getName();
-
-        packageName = packageName.replace("helpers","scrappers");
-
-        for (String scrapper : scrappers) {
-            String className = StringUtils.capitalize(scrapper.toLowerCase());
-            className = className + "Scrapper";
-            AbstractScrapper abstractScrapper = (AbstractScrapper) createObject(packageName + "." + className);
-            if(abstractScrapper == null) {
-                if(scrapper.equalsIgnoreCase("WalMart")) {
-                    scrapper = "WalMart";
-                }
-                className = scrapper + "Scrapper";
-                abstractScrapper = (AbstractScrapper) createObject(packageName + "." + className);
-            }
-            //Setear el holding
-            abstractScrapper.setHolding(client);
-            this.scrappers.put(abstractScrapper.toString(), abstractScrapper);
-        }
-    }
-
-
-    static Object createObject(String className) {
-        Object object = null;
-        try {
-            Class classDefinition = Class.forName(className);
-            object = classDefinition.newInstance();
-        } catch (InstantiationException e) {
-            System.out.println(e);
-        } catch (IllegalAccessException e) {
-            System.out.println(e);
-        } catch (ClassNotFoundException e) {
-            System.out.println(e);
-        }
-        return object;
-    }
-
-
-    private void initScrappers() throws IOException {
-
-        ConstrumartScrapper construmartScrapper = new ConstrumartScrapper();
-        EasyScrapper easyScrapper = new EasyScrapper();
-        SodimacScrapper sodimacScrapper = new SodimacScrapper();
-        CencosudScrapper cencosudScrapperLegrand = new CencosudScrapper("Legrand");
-
-        SmuScrapper smuScrapper = new SmuScrapper();
-        TottusScrapper tottusScrapper = new TottusScrapper();
-        CencosudScrapper cencosudScrapper = new CencosudScrapper();
-        WalMartScrapper walMartScrapper = new WalMartScrapper();
-
-        CencosudScrapper cencosudScrapperBless = new CencosudScrapper("Bless");
-        TottusScrapper tottusScrapperBless = new TottusScrapper("Bless");
-
-        SmuScrapper smuScrapperBless = new SmuScrapper("Bless");
-        WalMartScrapper walMartScrapperBless = new WalMartScrapper("Bless");
-
-        CencosudScrapper cencosudScrapperSoho = new CencosudScrapper("Soho");
-        SmuScrapper smuScrapperSoho = new SmuScrapper("Soho");
-        WalMartScrapper walMartScrapperSoho = new WalMartScrapper("Soho");
-
-        scrappers.put(construmartScrapper.toString(), construmartScrapper);
-        scrappers.put(easyScrapper.toString(), easyScrapper);
-        scrappers.put(sodimacScrapper.toString(), sodimacScrapper);
-        scrappers.put(cencosudScrapperLegrand.toString(), cencosudScrapperLegrand);
-
-        scrappers.put(smuScrapper.toString(), smuScrapper);
-        scrappers.put(cencosudScrapper.toString(), cencosudScrapper);
-        scrappers.put(tottusScrapper.toString(), tottusScrapper);
-        scrappers.put(walMartScrapper.toString(), walMartScrapper);
-
-        scrappers.put(cencosudScrapperBless.toString(), cencosudScrapperBless);
-        scrappers.put(tottusScrapperBless.toString(), tottusScrapperBless);
-        scrappers.put(smuScrapperBless.toString(), smuScrapperBless);
-        scrappers.put(walMartScrapperBless.toString(), walMartScrapperBless);
-
-        scrappers.put(cencosudScrapperSoho.toString(), cencosudScrapperSoho);
-        scrappers.put(smuScrapperSoho.toString(), smuScrapperSoho);
-        scrappers.put(walMartScrapperSoho.toString(), walMartScrapperSoho);
-
-        executor = Executors.newFixedThreadPool(scrappers.size());
-
-        barrier = new CyclicBarrier(scrappers.size() + 1);
-    }
 
     public void process(String client) throws Exception {
 
@@ -204,25 +100,12 @@ public class ProcessHelper {
             }
             */
 
-            List<String> chains = new ArrayList<>();
-
-            initScrappers();
-
-            // Setear los scrappers de las cadenas correspondientes al cliente
-            for (AbstractScrapper scrapper : scrappers.values()) {
-                if(scrapper.getHolding().equalsIgnoreCase(client)) {
-                    chains.add(scrapper.getCadena());
-                }
-            }
-
-            setScrappers(chains);
-
             // Repasar los útltimos 3 días por si hay scraps pendientes
             LocalDate today = LocalDate.now();
 
             //LocalDate date = today.minusDays(40);
 
-            LocalDate date = today.minusDays(1);
+            LocalDate date = today.minusDays(2);
 
             while(date.isBefore(today)) {
 
@@ -239,43 +122,6 @@ public class ProcessHelper {
                 //semaphore.release();
             }
 
-            //logger.log(Level.INFO, "Fin del proceso general " + FilesHelper.getInstance().PROCESS_NAME + ", Se procede a subir los scraps");
-
-            // Si no se ha generado el signal, subir archivos y enviar correo
-            //if(!UploadHelper.getInstance().signalExists(client)) {
-                //UploadHelper.getInstance().upload();
-                //UploadHelper.getInstance().sendSignal(client);
-            //}
-
-            //UploadHelper.getInstance().sendSignal(client);
-
-            int contNew = 0;
-
-            for (AbstractScrapper scrapper : getScrappers().values()) {
-                for (FileControl fileControl : scrapper.getFileControlList()) {
-                    if (fileControl.isNew()) {
-                        logger.log(Level.INFO, "Nuevo scrap -> " + fileControl.getFileName());
-                        contNew++;
-                    }
-                }
-            }
-
-            // Se envia signal solo si se descargaron nuevos scraps (al menos 1)
-            //if(contNew > 0) {
-
-            if(UploadHelper.getInstance().getServer().equalsIgnoreCase("LOCAL")) {
-                UploadHelper.getInstance().generateSignal(client);
-            }
-            else {
-                UploadHelper.getInstance().sendSignal(client);
-            }
-
-                //UploadHelper.getInstance().generateSignal(client);
-            //}
-
-            // Cerrar la sesión explicitamente
-            //UploadHelper.getInstance().closeSession();
-
             semaphore.release();
         }
         catch(SignalExistsException ex) {
@@ -290,12 +136,9 @@ public class ProcessHelper {
 
     }
 
-
     private void scrap(boolean flag) throws Exception {
 
-        int max = 2;
-
-        int downloads = 0;
+        int max = 1;
 
         for (int i = 0; i < max; i++) {
 
@@ -303,109 +146,27 @@ public class ProcessHelper {
 
             logger.log(Level.INFO, "Descargando scraps -> Intento " + cont + " de " + max);
 
-            for (AbstractScrapper scrapper : getScrappers().values()) {
+            List<AbstractScrapper> scrappers = ScrapperHelper.getInstance().getScrappersByClient(client);
+
+            executor = Executors.newFixedThreadPool(scrappers.size());
+            barrier = new CyclicBarrier(scrappers.size() + 1, new UploadTask());
+
+            for (AbstractScrapper scrapper : scrappers) {
                 if (scrapper != null) {
                     //scrapper.setDownloads(0);
-                    scrapper.process(flag);
-                    //getExecutor().execute(scrapper);
+                    //scrapper.process(flag);
+                    executor.execute(scrapper);
                 }
                 //ProcessHelper.getInstance().getExecutor().execute(scrapper);
             }
 
-            //getBarrier().await();
+            barrier.await();
 
             //ProcessHelper.getInstance().getBarrier().await();
 
-            int errors = 0;
-
-            for (AbstractScrapper scrapper : getScrappers().values()) {
-                for (FileControl fileControl : scrapper.getFileControlList()) {
-                    if (!fileControl.getErrors().isEmpty()) {
-                        errors++;
-                    }
-                }
-            }
-
-            if (errors == 0) {
-                break;
-            }
         }
 
-        for (AbstractScrapper scrapper : getScrappers().values()) {
-            downloads = downloads + scrapper.getDownloads();
-        }
 
-        //Si hubo alguna descarga de algún scrapper subir los scraps para proceso actual
-        //if(downloads > 0) {
-            logger.log(Level.INFO, downloads + " nuevas descargas para proceso " + FilesHelper.getInstance().PROCESS_NAME + " " + client + "... ");
-            logger.log(Level.INFO, "Se procede a subir los Scraps...");
-
-            if(UploadHelper.getInstance().getServer().equalsIgnoreCase("LOCAL")) {
-                UploadHelper.getInstance().copy();
-            }
-            else {
-                UploadHelper.getInstance().upload();
-            }
-
-            //UploadHelper.getInstance().copy();
-            //UploadHelper.getInstance().sendSignal(client);
-        //}
-    }
-
-
-    private void validateChains(List<String> chains) throws Exception {
-
-        for (String chain : chains) {
-            if (chain.equals("")) {
-                throw new Exception("Nombre de cadena '" + chain + "' no válido. Cadenas válidas: " + ProcessHelper.getInstance().getScrappers().keySet().toString());
-            }
-        }
-
-        List<String> validChains = new ArrayList<>();
-
-        for (AbstractScrapper abstractScrapper : ProcessHelper.getInstance().getScrappers().values()) {
-            validChains.add(abstractScrapper.getCadena());
-        }
-
-        for (String chain : chains) {
-            if(!validChains.contains(chain) && !validChains.contains(chain.toUpperCase())) {
-                throw new Exception("Nombre de cadena '" + chain + "' no válido. Cadenas válidas: " + ProcessHelper.getInstance().getScrappers().keySet().toString());
-            }
-        }
-    }
-
-    private LocalDate getLocalDate(String process) {
-
-        DateTimeFormatter dtf;
-        LocalDate localDate;
-
-        try {
-            dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            localDate = LocalDate.parse(process, dtf);
-        }
-        catch (Exception e) {
-            try {
-                dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                localDate = LocalDate.parse(process, dtf);
-            }
-            catch (Exception e1) {
-                try {
-                    dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                    localDate = LocalDate.parse(process, dtf);
-                }
-                catch (Exception e2) {
-                    try {
-                        dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
-                        localDate = LocalDate.parse(process, dtf);
-                    }
-                    catch (Exception e3) {
-                        throw e3;
-                    }
-                }
-            }
-        }
-
-        return localDate;
     }
 
 }

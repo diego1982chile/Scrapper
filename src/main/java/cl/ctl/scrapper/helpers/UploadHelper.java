@@ -126,14 +126,14 @@ public class UploadHelper {
     public void uploadFiles() throws JSchException, IOException {
         String local = FilesHelper.getInstance().getUploadPath();
 
-        for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByClient(ProcessHelper.getInstance().getClient())) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 if(!fileControl.getStatus().equalsIgnoreCase("Error")) {
                     try {
                         // Solo archivos registrados con nombre proceso actual y cliente proceso actual
                         if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
                                 fileControl.getFileName().toLowerCase().contains(scrapper.getHolding().toLowerCase())
-                                //&& scrapper.getNewScraps().contains(fileControl.getFileName())
+                                && scrapper.getNewScraps().contains(fileControl.getFileName())
                                 //&& fileControl.isNew()
                                 ) {
                             copyLocalToRemote(local, remote, fileControl.getFileName());
@@ -158,14 +158,14 @@ public class UploadHelper {
     public void copyFiles() throws JSchException, IOException {
         String local = FilesHelper.getInstance().getUploadPath();
 
-        for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByClient(ProcessHelper.getInstance().getClient())) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 if(!fileControl.getStatus().equalsIgnoreCase("Error")) {
                     try {
                         // Solo archivos registrados con nombre proceso actual y cliente proceso actual
                         if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
                                 fileControl.getFileName().toLowerCase().contains(scrapper.getHolding().toLowerCase())
-                                //&& scrapper.getNewScraps().contains(fileControl.getFileName())
+                                && scrapper.getNewScraps().contains(fileControl.getFileName())
                                 //&& fileControl.isNew()
                             ) {
                             //copyLocalToRemote(local, remote, fileControl.getFileName());
