@@ -11,6 +11,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -57,6 +59,8 @@ public abstract class AbstractScrapper implements Runnable {
     List<FileControl> fileControlList = new ArrayList<>();
 
     List<String> newScraps = new ArrayList<>();
+
+    String downloadSubdirectory;
 
 
     public AbstractScrapper() throws IOException {
@@ -171,6 +175,14 @@ public abstract class AbstractScrapper implements Runnable {
         this.newScraps = newScraps;
     }
 
+    public String getDownloadSubdirectory() {
+        return downloadSubdirectory;
+    }
+
+    public void setDownloadSubdirectory(String downloadSubdirectory) {
+        this.downloadSubdirectory = downloadSubdirectory;
+    }
+
     void checkScraps() throws ScrapAlreadyExistsException {
         if(FilesHelper.getInstance().checkFiles(this)) {
             throw new ScrapAlreadyExistsException("Scrapper '" + cadena + "' -> Archivos ya fueron generados! se omite el proceso");
@@ -190,7 +202,12 @@ public abstract class AbstractScrapper implements Runnable {
 
         HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
         chromePrefs.put("profile.default_content_settings.popups", 0);
-        chromePrefs.put("download.default_directory", FilesHelper.getInstance().getDownloadPath());
+
+        //downloadSubdirectory = UUID.randomUUID().toString();
+        downloadSubdirectory = holding + "_" + cadena;
+        String downloadPath = FilesHelper.getInstance().getDownloadPath() + File.separator + downloadSubdirectory;
+
+        chromePrefs.put("download.default_directory", downloadPath);
 
         ChromeOptions chrome_options = new ChromeOptions();
         chrome_options.addArguments("--no-sandbox");
@@ -365,6 +382,7 @@ public abstract class AbstractScrapper implements Runnable {
                 }
                 doScrap(since, until);
                 FilesHelper.getInstance().checkLastFile(this, freq);
+                renameFile(cadena, count);
                 FilesHelper.getInstance().registerFileControlNew(this, freq);
                 downloads++;
 
@@ -386,11 +404,13 @@ public abstract class AbstractScrapper implements Runnable {
             logger.log(Level.SEVERE, e2.getMessage());
             FilesHelper.getInstance().registerFileControlError(this, freq, e2.getMessage());
         }
+        /*
         finally {
             if(flag) {
                 renameFile(cadena, count);
             }
         }
+        */
     }
 
     @Override

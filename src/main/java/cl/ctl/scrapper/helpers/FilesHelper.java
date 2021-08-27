@@ -224,7 +224,7 @@ public class FilesHelper {
 
             fileName = DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + baseName + "_" + PROCESS_NAME + ext;
 
-            downloadDir = new File(DOWNLOAD_PATH);
+            downloadDir = new File(DOWNLOAD_PATH + SEPARATOR + scrapper.getDownloadSubdirectory());
 
             File[] files = downloadDir.listFiles();
 
@@ -270,7 +270,7 @@ public class FilesHelper {
 
         File downloadDir;
 
-        downloadDir = new File(DOWNLOAD_PATH);
+        downloadDir = new File(DOWNLOAD_PATH + SEPARATOR + scrapper.getDownloadSubdirectory());
 
         File[] files = downloadDir.listFiles();
 

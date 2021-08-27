@@ -105,7 +105,7 @@ public class ProcessHelper {
 
             //LocalDate date = today.minusDays(40);
 
-            LocalDate date = today.minusDays(2);
+            LocalDate date = today.minusDays(1);
 
             while(date.isBefore(today)) {
 
