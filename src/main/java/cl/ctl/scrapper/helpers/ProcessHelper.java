@@ -105,7 +105,7 @@ public class ProcessHelper {
 
             //LocalDate date = today.minusDays(40);
 
-            LocalDate date = today.minusDays(1);
+            LocalDate date = today.minusDays(2);
 
             while(date.isBefore(today)) {
 
@@ -146,16 +146,17 @@ public class ProcessHelper {
 
             logger.log(Level.INFO, "Descargando scraps -> Intento " + cont + " de " + max);
 
-            List<AbstractScrapper> scrappers = ScrapperHelper.getInstance().getScrappersByClient(client);
+            Map<String, AbstractScrapper> scrappers = ScrapperHelper.getInstance().getScrappersByClient(client);
 
             executor = Executors.newFixedThreadPool(scrappers.size());
             barrier = new CyclicBarrier(scrappers.size() + 1, new UploadTask());
 
-            for (AbstractScrapper scrapper : scrappers) {
+            for (AbstractScrapper scrapper : scrappers.values()) {
                 if (scrapper != null) {
                     //scrapper.setDownloads(0);
                     //scrapper.process(flag);
                     executor.execute(scrapper);
+                    scrapper.getNewScraps().clear();
                 }
                 //ProcessHelper.getInstance().getExecutor().execute(scrapper);
             }

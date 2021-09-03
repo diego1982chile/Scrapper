@@ -33,7 +33,7 @@ public class FilesHelper {
 
     JSONParser parser = new JSONParser();
 
-    static String SEPARATOR;
+    String SEPARATOR;
 
     /** Logger para la clase */
     private static final Logger logger = Logger.getLogger(FilesHelper.class.getName());
@@ -45,6 +45,12 @@ public class FilesHelper {
     public static FilesHelper getInstance() {
         return instance;
     }
+
+
+    public String getSEPARATOR() {
+        return SEPARATOR;
+    }
+
 
     public void flushProcessName() {
         String month = String.valueOf(ProcessHelper.getInstance().getProcessDate().getMonthValue());

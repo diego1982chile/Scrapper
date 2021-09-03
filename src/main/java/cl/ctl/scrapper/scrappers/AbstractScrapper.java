@@ -7,6 +7,7 @@ import cl.ctl.scrapper.model.exceptions.ScrapAlreadyExistsException;
 import cl.ctl.scrapper.model.FileControl;
 import cl.ctl.scrapper.model.exceptions.ScrapUnavailableException;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.commons.lang.SystemUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -205,9 +206,10 @@ public abstract class AbstractScrapper implements Runnable {
 
         //downloadSubdirectory = UUID.randomUUID().toString();
         downloadSubdirectory = holding + "_" + cadena;
-        String downloadPath = FilesHelper.getInstance().getDownloadPath() + File.separator + downloadSubdirectory;
 
-        chromePrefs.put("download.default_directory", downloadPath);
+        String defaultDirectory = FilesHelper.getInstance().getDownloadPath() + downloadSubdirectory;
+
+        chromePrefs.put("download.default_directory", defaultDirectory);
 
         ChromeOptions chrome_options = new ChromeOptions();
         chrome_options.addArguments("--no-sandbox");
@@ -223,7 +225,7 @@ public abstract class AbstractScrapper implements Runnable {
 
         driver = new ChromeDriver(chrome_options);
 
-        driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
+        driver.manage().timeouts().pageLoadTimeout(60, TimeUnit.SECONDS);
     }
 
     private void renameFile(String cadena, int count) {
@@ -268,7 +270,7 @@ public abstract class AbstractScrapper implements Runnable {
 
                 if(!readyOnMorning) {
                     //TODO: Si son antes de las 14:00 omitir el login
-                    if(LocalDateTime.now().getHour() <= 14) {
+                    if(LocalDateTime.now().getHour() <= 8) {
                         //throw new ScrapUnavailableException("Scrap para cliente " + ProcessHelper.getInstance().getClient() + " aún no se encuentra disponible!");
                         logger.log(Level.WARNING, "Scrap para cliente " + ProcessHelper.getInstance().getClient() + " aún no se encuentra disponible!");
                         break;
@@ -294,7 +296,7 @@ public abstract class AbstractScrapper implements Runnable {
                     logger.log(Level.WARNING, e.getMessage());
                     if(cont >= 1) {
                         logger.log(Level.SEVERE, e.getMessage());
-                        //throw e;
+                        throw e;
                     }
                 }
 
@@ -376,7 +378,7 @@ public abstract class AbstractScrapper implements Runnable {
             if(flag) {
                 if(!readyOnMorning) {
                     //TODO: Si son antes de las 14:00 omitir el scrapping
-                    if(LocalDateTime.now().getHour() <= 14) {
+                    if(LocalDateTime.now().getHour() <= 8) {
                         throw new ScrapUnavailableException("Scrap " + freq + " para cliente " + ProcessHelper.getInstance().getClient() + " aún no se encuentra disponible");
                     }
                 }
@@ -496,17 +498,15 @@ public abstract class AbstractScrapper implements Runnable {
 
     String calculateFrequency(String since, String until) {
 
-        String freq = "Dom";
-
         if(since.equals(until)) {
-            freq = "Dia";
+            return "Dia";
         }
 
         if(since.split("-")[0].equals("01")) {
-            freq = "Mes";
+            return "Mes";
         }
 
-        return freq;
+        return "Dom";
     }
 
 

@@ -38,7 +38,8 @@ public class WalMartScrapper extends AbstractScrapper {
         super();
         cadena = "WalMart";
         holding = "Nutrisa";
-        url = "https://retaillink.login.wal-mart.com/?ServerType=IIS1&CTAuthMode=BASIC&language=en&utm_source=retaillink&utm_medium=redirect&utm_campaign=FalconRelease&CT_ORIG_URL=/&ct_orig_uri=/ ";
+        //url = "https://retaillink.login.wal-mart.com/?ServerType=IIS1&CTAuthMode=BASIC&language=en&utm_source=retaillink&utm_medium=redirect&utm_campaign=FalconRelease&CT_ORIG_URL=/&ct_orig_uri=/ ";
+        url = "https://retaillink.login.wal-mart.com/";
         logo = "walmart.jpg";
         fileExt = ".xlsx";
 
@@ -240,6 +241,8 @@ public class WalMartScrapper extends AbstractScrapper {
 
         int cont = 0;
 
+        jobIds.clear();
+
         while(cont < 1) {
 
             cont++;
@@ -260,7 +263,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
                 driver.get("https://retaillink.wal-mart.com/decision_support/Report_Builder.aspx?reopen=true&AppId=300&jobid=39040995&getSavedRequests=1&isShared=N&isScheduled=N&country_cd=K2&divid=1");
 
-                Thread.sleep(5000);
+                Thread.sleep(15000);
 
                 if(!jobIds.containsKey(since)) {
 
@@ -437,7 +440,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
                     //Actualizar status reporte
                     // Ojo: Se asume que el reporte mas reciente (1a coincidencia) es el que se generó por el robot
-                    Thread.sleep(2000);
+                    Thread.sleep(20000);
                     driver.switchTo().parentFrame();
                     driver.findElement(By.xpath(".//span[contains(text(),'" + locales.get("refresh") + "')]")).click();
                     Thread.sleep(2000);
@@ -476,7 +479,7 @@ public class WalMartScrapper extends AbstractScrapper {
                 for (int i = 0; i < numberOfTries; ++i) {
 
                     //Actualizar status reporte
-                    Thread.sleep(2000);
+                    Thread.sleep(10000);
                     driver.switchTo().parentFrame();
                     driver.findElement(By.xpath(".//span[contains(text(),'" + locales.get("refresh") + "')]")).click();
                     Thread.sleep(2000);
@@ -509,8 +512,8 @@ public class WalMartScrapper extends AbstractScrapper {
                         case "Formatter Error":
                             jobIds.remove(since);
                             throw new Exception("Status de Reporte '" + status + "' se descarta el reporte solicitado y se levanta excepción");
-                        //flag = false;
-                        //throw new Exception("Este reporte ha sido encolado para ser generado en la próxima ventana Operativa. Intentar nuevamente la descarga más tarde");
+                            //flag = false;
+                            //throw new Exception("Este reporte ha sido encolado para ser generado en la próxima ventana Operativa. Intentar nuevamente la descarga más tarde");
                         default:
                             throw new Exception("Status de Reporte '" + status + "' no soportado! Contacte al Administrador");
                     }

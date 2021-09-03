@@ -123,9 +123,13 @@ public class SodimacScrapper extends AbstractScrapper {
 
                 Thread.sleep(5000);
 
+                /*
                 if(FilesHelper.getInstance().countFiles() > numberOfFiles) {
                     flag = false;
                 }
+                */
+
+                flag = false;
             }
             catch(Exception e) {
                 logger.log(Level.SEVERE, e.getMessage());

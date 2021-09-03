@@ -126,7 +126,7 @@ public class UploadHelper {
     public void uploadFiles() throws JSchException, IOException {
         String local = FilesHelper.getInstance().getUploadPath();
 
-        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByClient(ProcessHelper.getInstance().getClient())) {
+        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByClient(ProcessHelper.getInstance().getClient()).values()) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 if(!fileControl.getStatus().equalsIgnoreCase("Error")) {
                     try {
@@ -158,7 +158,7 @@ public class UploadHelper {
     public void copyFiles() throws JSchException, IOException {
         String local = FilesHelper.getInstance().getUploadPath();
 
-        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByClient(ProcessHelper.getInstance().getClient())) {
+        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByClient(ProcessHelper.getInstance().getClient()).values()) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 if(!fileControl.getStatus().equalsIgnoreCase("Error")) {
                     try {

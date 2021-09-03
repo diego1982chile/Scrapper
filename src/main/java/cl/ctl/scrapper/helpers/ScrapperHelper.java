@@ -24,23 +24,25 @@ public class ScrapperHelper {
     public ScrapperHelper() {
 
         try {
-
+            // Scrappers Legrand
             ConstrumartScrapper construmartScrapper = new ConstrumartScrapper();
             EasyScrapper easyScrapper = new EasyScrapper();
             SodimacScrapper sodimacScrapper = new SodimacScrapper();
             CencosudScrapper cencosudScrapperLegrand = new CencosudScrapper("Legrand");
 
+            // Scrappers Nutrisa
             SmuScrapper smuScrapper = new SmuScrapper();
             TottusScrapper tottusScrapper = new TottusScrapper();
             CencosudScrapper cencosudScrapper = new CencosudScrapper();
             WalMartScrapper walMartScrapper = new WalMartScrapper();
 
+            // Scrappers Bless
             CencosudScrapper cencosudScrapperBless = new CencosudScrapper("Bless");
             TottusScrapper tottusScrapperBless = new TottusScrapper("Bless");
-
             SmuScrapper smuScrapperBless = new SmuScrapper("Bless");
             WalMartScrapper walMartScrapperBless = new WalMartScrapper("Bless");
 
+            // Scrappers Soho
             CencosudScrapper cencosudScrapperSoho = new CencosudScrapper("Soho");
             SmuScrapper smuScrapperSoho = new SmuScrapper("Soho");
             WalMartScrapper walMartScrapperSoho = new WalMartScrapper("Soho");
@@ -75,26 +77,26 @@ public class ScrapperHelper {
         return instance;
     }
 
-    public List<AbstractScrapper> getScrappersByHolding(String holding) {
+    public Map<String, AbstractScrapper> getScrappersByHolding(String holding) {
 
-        List<AbstractScrapper> scrappers = new ArrayList<>();
+        Map<String, AbstractScrapper> scrappers = new TreeMap<>();
 
         for (AbstractScrapper scrapper : this.scrappers.values()) {
             if(scrapper.getCadena().equalsIgnoreCase(holding)) {
-                scrappers.add(scrapper);
+                scrappers.put(scrapper.toString(), scrapper);
             }
         }
 
         return scrappers;
     }
 
-    public List<AbstractScrapper> getScrappersByClient(String client) {
+    public Map<String, AbstractScrapper> getScrappersByClient(String client) {
 
-        List<AbstractScrapper> scrappers = new ArrayList<>();
+        Map<String, AbstractScrapper> scrappers = new TreeMap<>();
 
         for (AbstractScrapper scrapper : this.scrappers.values()) {
             if(scrapper.getHolding().equalsIgnoreCase(client)) {
-                scrappers.add(scrapper);
+                scrappers.put(scrapper.toString(), scrapper);
             }
         }
 
