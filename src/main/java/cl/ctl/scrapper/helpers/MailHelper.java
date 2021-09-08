@@ -122,6 +122,8 @@ public class MailHelper {
 
     private boolean newFileExists() {
 
+        return true;
+        /*
         for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByClient(ProcessHelper.getInstance().getClient()).values()) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 // Solo archivos registrados con nombre proceso actual
@@ -140,6 +142,7 @@ public class MailHelper {
         }
 
         return false;
+        */
     }
 
     public void addRecords() {

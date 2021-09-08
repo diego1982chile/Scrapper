@@ -2,6 +2,8 @@ package cl.ctl.scrapper.helpers;
 
 import cl.ctl.scrapper.model.FileControl;
 import cl.ctl.scrapper.model.exceptions.ScrapEmptyException;
+import cl.ctl.scrapper.model.exceptions.ScrapSellsEqualsToZeroException;
+import cl.ctl.scrapper.model.scraps.SMURecord;
 import cl.ctl.scrapper.scrappers.AbstractScrapper;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -15,6 +17,7 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -270,7 +273,7 @@ public class FilesHelper {
     }
 
     // Comprobar tamaño de ultimo archivo descargado
-    public void checkLastFile(AbstractScrapper scrapper, String frequency) throws ScrapEmptyException {
+    public void checkLastFile(AbstractScrapper scrapper, String frequency) throws ScrapEmptyException, IOException, ScrapSellsEqualsToZeroException {
 
         logger.log(Level.INFO, "Comprobando archivo cadena = " + scrapper.getCadena() + " frecuencia = " + frequency);
 
@@ -287,15 +290,23 @@ public class FilesHelper {
             }
         });
 
+        File file = null;
+
         for(int i = 0; i < files.length; ++i) {
+
             if(files[i].isFile()) {
+
+                file = files[i];
+
                 if((int) files[i].length() == 0) {
                     throw new ScrapEmptyException("El scrap está vacío!!");
                 }
                 else {
                     break;
                 }
+
             }
+
         }
 
     }

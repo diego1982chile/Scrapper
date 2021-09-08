@@ -3,6 +3,7 @@ package cl.ctl.scrapper.helpers;
 import cl.ctl.scrapper.scrappers.ConstrumartScrapper;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
+import org.apache.hc.client5.http.HttpHostConnectException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -58,6 +59,7 @@ public class CaptchaHelper {
         try {
             siteId = elem.getAttribute("data-sitekey");
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Catpcha's div cannot be found or missing attribute data-sitekey");
             System.err.println("Catpcha's div cannot be found or missing attribute data-sitekey");
             e.printStackTrace();
         }
@@ -74,11 +76,17 @@ public class CaptchaHelper {
 
         boolean captchaSolved = false ;
         while(!captchaSolved) {
-            response = client.getPage(String.format("%sres.php?key=%s&action=get&id=%s", API_BASE_URL, API_KEY, jobId));
+            try {
+                response = client.getPage(String.format("%sres.php?key=%s&action=get&id=%s", API_BASE_URL, API_KEY, jobId));
+            }
+            catch(HttpHostConnectException e) {
+                logger.log(Level.WARNING, e.getMessage());
+                Thread.sleep(3000);
+            }
             if (response.getWebResponse().getContentAsString().contains("CAPCHA_NOT_READY")){
                 Thread.sleep(3000);
                 System.out.println("Waiting for 2Captcha.com ...");
-            }else {
+            } else {
                 captchaSolved = true ;
                 System.out.println("Captcha solved !");
             }
