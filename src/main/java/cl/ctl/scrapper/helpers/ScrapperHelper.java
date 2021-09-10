@@ -52,9 +52,9 @@ public class ScrapperHelper {
             scrappers.put(sodimacScrapper.toString(), sodimacScrapper);
             scrappers.put(cencosudScrapperLegrand.toString(), cencosudScrapperLegrand);
 
-            //scrappers.put(smuScrapper.toString(), smuScrapper);
-            //scrappers.put(cencosudScrapper.toString(), cencosudScrapper);
-            //scrappers.put(tottusScrapper.toString(), tottusScrapper);
+            scrappers.put(smuScrapper.toString(), smuScrapper);
+            scrappers.put(cencosudScrapper.toString(), cencosudScrapper);
+            scrappers.put(tottusScrapper.toString(), tottusScrapper);
             scrappers.put(walMartScrapper.toString(), walMartScrapper);
 
             scrappers.put(cencosudScrapperBless.toString(), cencosudScrapperBless);

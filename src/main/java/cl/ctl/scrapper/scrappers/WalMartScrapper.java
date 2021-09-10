@@ -1,7 +1,9 @@
 package cl.ctl.scrapper.scrappers;
 
+import cl.ctl.scrapper.helpers.AccountHelper;
 import cl.ctl.scrapper.helpers.ConfigHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
+import cl.ctl.scrapper.model.Account;
 import cl.ctl.scrapper.model.exceptions.MultipleSubmitsSameRequestException;
 import cl.ctl.scrapper.model.exceptions.NoReportsException;
 import cl.ctl.scrapper.model.exceptions.TimeOutException;
@@ -95,15 +97,23 @@ public class WalMartScrapper extends AbstractScrapper {
             cont++;
 
             try {
-                String holding = getHolding().toLowerCase();
 
                 Thread.sleep(5000);
 
+                driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys(account.getUser());
+                Thread.sleep(2000);
+                driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys(account.getPassword());
+                Thread.sleep(2000);
+                driver.findElement(By.className("spin-button-children")).click();
+
+                /*
+                String holding = getHolding().toLowerCase();
                 driver.findElements(By.className("form-control__formControl___3uDUX")).get(0).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".walmart.user"));
                 Thread.sleep(2000);
                 driver.findElements(By.className("form-control__formControl___3uDUX")).get(1).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".walmart.password"));
                 Thread.sleep(2000);
                 driver.findElement(By.className("spin-button-children")).click();
+                */
 
                 Thread.sleep(25000);
 

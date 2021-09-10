@@ -21,6 +21,7 @@ public class TottusScrapper extends AbstractScrapper {
         holding = "Nutrisa";
         url = "https://b2b.tottus.com/b2btoclpr/grafica/html/index.html";
         logo = "tottus.jpg";
+        hasCompany = true;
     }
 
     public TottusScrapper(String holding) throws IOException {
@@ -60,15 +61,24 @@ public class TottusScrapper extends AbstractScrapper {
             b2b.selectByValue("8");
             Thread.sleep(2000);
 
+            /*
             String holding = getHolding().toLowerCase();
-
             driver.findElement(By.id("empresa")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".tottus.company"));
             Thread.sleep(2000);
             driver.findElement(By.id("usuario")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".tottus.user"));
             Thread.sleep(2000);
-            //driver.findElement(By.id("clave")).sendKeys("diy012021");
             driver.findElement(By.id("clave")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".tottus.password"));
             Thread.sleep(2000);
+            */
+
+            driver.findElement(By.id("empresa")).sendKeys(account.getCompany());
+            Thread.sleep(2000);
+            driver.findElement(By.id("usuario")).sendKeys(account.getUser());
+            Thread.sleep(2000);
+            driver.findElement(By.id("clave")).sendKeys(account.getPassword());
+            Thread.sleep(2000);
+
+
             driver.findElement(By.id("entrar2")).click();
     }
 

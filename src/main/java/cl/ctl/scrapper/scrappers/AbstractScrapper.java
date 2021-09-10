@@ -1,8 +1,10 @@
 package cl.ctl.scrapper.scrappers;
 
+import cl.ctl.scrapper.helpers.AccountHelper;
 import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.LogHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
+import cl.ctl.scrapper.model.Account;
 import cl.ctl.scrapper.model.exceptions.ScrapAlreadyExistsException;
 import cl.ctl.scrapper.model.FileControl;
 import cl.ctl.scrapper.model.exceptions.ScrapUnavailableException;
@@ -58,11 +60,15 @@ public abstract class AbstractScrapper implements Runnable {
 
     boolean readyOnMorning = true;
 
+    boolean hasCompany = false;
+
     List<FileControl> fileControlList = new ArrayList<>();
 
     List<String> newScraps = new ArrayList<>();
 
     String downloadSubdirectory;
+
+    Account account;
 
 
     public AbstractScrapper() throws IOException {
@@ -292,6 +298,10 @@ public abstract class AbstractScrapper implements Runnable {
 
                     Thread.sleep(2000);
 
+                    account = AccountHelper.getInstance().getAccountByClientAndHolding(holding, cadena);
+
+                    Thread.sleep(2000);
+
                     login();
 
                     Thread.sleep(2000);
@@ -301,7 +311,15 @@ public abstract class AbstractScrapper implements Runnable {
                 catch (Exception e) {
                     logger.log(Level.WARNING, e.getMessage());
                     if(cont >= 1) {
+                        FilesHelper.getInstance().registerFileControlError(this, "DAY", e.getMessage());
+                        if(!onlyDiary) {
+                            FilesHelper.getInstance().registerFileControlError(this, "MONTH", e.getMessage());
+                            if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+                                FilesHelper.getInstance().registerFileControlError(this, "WEEK", e.getMessage());
+                            }
+                        }
                         logger.log(Level.SEVERE, e.getMessage());
+                        driver.quit();
                         throw e;
                     }
                 }

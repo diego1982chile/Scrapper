@@ -50,10 +50,17 @@ public class ConstrumartScrapper extends AbstractScrapper {
                  CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
                  captchaHelper.solveCaptcha();
 
+                 /*
                  String holding = getHolding().toLowerCase();
                  driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".construmart.user"));
                  Thread.sleep(2000);
                  driver.findElement(By.id("password")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".construmart.password"));
+                 Thread.sleep(2000);
+                 */
+
+                 driver.findElement(By.id("username")).sendKeys(account.getUser());
+                 Thread.sleep(2000);
+                 driver.findElement(By.id("password")).sendKeys(account.getPassword());
                  Thread.sleep(2000);
 
                  driver.getPageSource();

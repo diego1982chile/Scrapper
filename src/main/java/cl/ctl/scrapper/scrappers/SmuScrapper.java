@@ -45,9 +45,20 @@ public class SmuScrapper extends AbstractScrapper {
             captchaHelper.solveCaptcha();
             Thread.sleep(2000);
 
+            /*
             String holding = getHolding().toLowerCase();
             driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".smu.user"));
+            Thread.sleep(2000);
             driver.findElement(By.id("password")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".smu.password"));
+            Thread.sleep(2000);
+            */
+
+            driver.findElement(By.id("username")).sendKeys(account.getUser());
+            Thread.sleep(2000);
+            driver.findElement(By.id("password")).sendKeys(account.getPassword());
+            Thread.sleep(2000);
+
+
             driver.getPageSource();
             driver.findElement(By.id("kc-login")).click();
 
