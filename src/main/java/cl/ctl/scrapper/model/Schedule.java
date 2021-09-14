@@ -10,20 +10,20 @@ import java.util.List;
  */
 public class Schedule {
 
-    String client;
+    String holding;
     Date schedule;
 
-    public Schedule(String client, Date schedule) {
-        this.client = client;
+    public Schedule(String holding, Date schedule) {
+        this.holding = holding;
         this.schedule = schedule;
     }
 
-    public String getClient() {
-        return client;
+    public String getHolding() {
+        return holding;
     }
 
-    public void setClient(String client) {
-        this.client = client;
+    public void setHolding(String holding) {
+        this.holding = holding;
     }
 
     public Date getSchedule() {
@@ -36,6 +36,6 @@ public class Schedule {
 
     @Override
     public String toString() {
-        return "{" + client + "," + schedule + "}";
+        return "{" + holding + "," + schedule + "}";
     }
 }

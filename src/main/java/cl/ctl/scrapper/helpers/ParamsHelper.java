@@ -132,7 +132,7 @@ public class ParamsHelper {
     private Schedule parseScheduleObject(JSONObject scheduleJson)
     {
         //Get employee object within list
-        String client = scheduleJson.get("client").toString();
+        String client = scheduleJson.get("holding").toString();
 
         String schedule = scheduleJson.get("schedule").toString();
 

@@ -108,7 +108,7 @@ public class MailHelper {
 
         this.body = this.body.replace("[Server]", server);
         this.body = this.body.replace("[Process]", FilesHelper.getInstance().PROCESS_NAME);
-        this.body = this.body.replace("[Client]", ProcessHelper.getInstance().getClient());
+        this.body = this.body.replace("[Holding]", ProcessHelper.getInstance().getHolding());
         this.body = this.body.replace("[ProcessDay]", weekProcessDay + " " + processMonthDay + " de " + processMonth + " del " + processYear);
         this.body = this.body.replace("[ExecutionDay]", weekExecutionDay + " " + executionMonthDay + " de " + executionMonth + " del " + executionYear);
         this.body = this.body.replace("%email%", to);
@@ -150,7 +150,7 @@ public class MailHelper {
         String html = "";
 
         //for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
-        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByClient(ProcessHelper.getInstance().getClient()).values()) {
+        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByHolding(ProcessHelper.getInstance().getHolding()).values()) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 // Solo archivos registrados con nombre proceso actual
                 if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&

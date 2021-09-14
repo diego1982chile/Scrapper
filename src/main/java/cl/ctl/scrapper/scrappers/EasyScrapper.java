@@ -41,6 +41,8 @@ public class EasyScrapper extends AbstractScrapper {
 
         while(cont < 3) {
 
+            dateOutOfRangeFlag = false;
+
             cont++;
 
             try {

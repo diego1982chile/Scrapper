@@ -44,9 +44,9 @@ public class SchedulerHelper {
         logger.log(Level.INFO, "Programando Scrapper de acuerdo a programación: " + schedules.toString());
 
         for (Schedule schedule : schedules) {
-            String client = schedule.getClient();
+            String holding = schedule.getHolding();
             Date time = schedule.getSchedule();
-            timer.scheduleAtFixedRate(new ScrapTask(client, time), time, period );
+            timer.scheduleAtFixedRate(new ScrapTask(holding, time), time, period );
         }
 
     }

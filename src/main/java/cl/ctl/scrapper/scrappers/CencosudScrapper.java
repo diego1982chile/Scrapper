@@ -41,6 +41,8 @@ public class CencosudScrapper extends AbstractScrapper {
 
         try {
 
+            dateOutOfRangeFlag = false;
+
             // Select country
             selectCountry();
 

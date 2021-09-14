@@ -40,6 +40,9 @@ public class SmuScrapper extends AbstractScrapper {
     void login() throws Exception {
 
         try {
+
+            dateOutOfRangeFlag = false;
+
             // *SolveCaptcha
             CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
             captchaHelper.solveCaptcha();

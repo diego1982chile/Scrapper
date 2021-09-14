@@ -32,11 +32,11 @@ public class UploadTask implements Runnable{
         try {
             if(UploadHelper.getInstance().getServer().equalsIgnoreCase("LOCAL")) {
                 UploadHelper.getInstance().copy();
-                UploadHelper.getInstance().generateSignal(ProcessHelper.getInstance().getClient());
+                UploadHelper.getInstance().generateSignal(ProcessHelper.getInstance().getHolding());
             }
             else {
                 UploadHelper.getInstance().upload();
-                UploadHelper.getInstance().sendSignal(ProcessHelper.getInstance().getClient());
+                UploadHelper.getInstance().sendSignal(ProcessHelper.getInstance().getHolding());
             }
         }
         catch (Exception ex) {
