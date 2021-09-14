@@ -43,6 +43,8 @@ public class ConstrumartScrapper extends AbstractScrapper {
 
          while(cont < 3) {
 
+             dateOutOfRangeFlag = false;
+
              cont++;
 
              try {
