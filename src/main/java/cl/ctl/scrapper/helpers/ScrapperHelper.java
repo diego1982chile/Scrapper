@@ -47,6 +47,10 @@ public class ScrapperHelper {
             SmuScrapper smuScrapperSoho = new SmuScrapper("Soho");
             WalMartScrapper walMartScrapperSoho = new WalMartScrapper("Soho");
 
+            // Scrappers Polar
+            TottusScrapper tottusScrapperPolar = new TottusScrapper("Polar");
+            WalMartScrapper walMartScrapperPolar = new WalMartScrapper("Polar");
+
             scrappers.put(construmartScrapper.toString(), construmartScrapper);
             scrappers.put(easyScrapper.toString(), easyScrapper);
             scrappers.put(sodimacScrapper.toString(), sodimacScrapper);
@@ -65,6 +69,9 @@ public class ScrapperHelper {
             scrappers.put(cencosudScrapperSoho.toString(), cencosudScrapperSoho);
             scrappers.put(smuScrapperSoho.toString(), smuScrapperSoho);
             scrappers.put(walMartScrapperSoho.toString(), walMartScrapperSoho);
+
+            scrappers.put(tottusScrapperPolar.toString(), tottusScrapperPolar);
+            scrappers.put(walMartScrapperPolar.toString(), walMartScrapperPolar);
 
         }
         catch(IOException e) {

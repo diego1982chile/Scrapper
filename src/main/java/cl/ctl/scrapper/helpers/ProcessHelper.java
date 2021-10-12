@@ -28,7 +28,7 @@ public class ProcessHelper {
 
     private LocalDate processDate  = LocalDate.now().minusDays(1);
 
-    private String client;
+    private String holding;
 
     private ExecutorService executor;
 
@@ -68,12 +68,13 @@ public class ProcessHelper {
         }
     }
 
-    public String getClient() {
-        return client;
+
+    public String getHolding() {
+        return holding;
     }
 
-    public void setClient(String client) {
-        this.client = client;
+    public void setHolding(String holding) {
+        this.holding = holding;
     }
 
     public CyclicBarrier getBarrier() {
@@ -85,14 +86,14 @@ public class ProcessHelper {
     }
 
 
-    public void process(String client) throws Exception {
+    public void process(String holding) throws Exception {
 
         try {
             if(!semaphore.tryAcquire()) {
                 throw new ConcurrentAccessException("Se está intentando cambiar la fecha de proceso mientras hay un proceso en curso!!");
             }
 
-            setClient(WordUtils.capitalize(client));
+            setHolding(WordUtils.capitalize(holding));
 
             /*
             if(UploadHelper.getInstance().signalExists(client)) {
@@ -111,11 +112,11 @@ public class ProcessHelper {
 
                 setProcessDate(date);
 
-                logger.log(Level.INFO, "Ejecutando Scrap proceso " + FilesHelper.getInstance().PROCESS_NAME + " para cliente " + client);
+                logger.log(Level.INFO, "Ejecutando Scrap proceso " + FilesHelper.getInstance().PROCESS_NAME + " para holding " + holding);
 
                 scrap(true);
 
-                logger.log(Level.INFO, "Fin del proceso " + FilesHelper.getInstance().PROCESS_NAME + " para cliente " + client);
+                logger.log(Level.INFO, "Fin del proceso " + FilesHelper.getInstance().PROCESS_NAME + " para holding " + holding);
 
                 date = date.plusDays(1);
 
@@ -146,7 +147,7 @@ public class ProcessHelper {
 
             logger.log(Level.INFO, "Descargando scraps -> Intento " + cont + " de " + max);
 
-            Map<String, AbstractScrapper> scrappers = ScrapperHelper.getInstance().getScrappersByClient(client);
+            Map<String, AbstractScrapper> scrappers = ScrapperHelper.getInstance().getScrappersByHolding(holding);
 
             executor = Executors.newFixedThreadPool(scrappers.size());
             barrier = new CyclicBarrier(scrappers.size() + 1, new UploadTask());
