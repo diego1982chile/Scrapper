@@ -2,6 +2,7 @@ package cl.ctl.scrapper.controllers;
 
 import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.LogHelper;
+import cl.ctl.scrapper.helpers.ProcessHelper;
 import cl.ctl.scrapper.helpers.UploadHelper;
 
 import java.util.Date;
@@ -31,9 +32,11 @@ public class UploadTask implements Runnable{
         try {
             if(UploadHelper.getInstance().getServer().equalsIgnoreCase("LOCAL")) {
                 UploadHelper.getInstance().copy();
+                UploadHelper.getInstance().generateSignal(ProcessHelper.getInstance().getClient());
             }
             else {
                 UploadHelper.getInstance().upload();
+                UploadHelper.getInstance().sendSignal(ProcessHelper.getInstance().getClient());
             }
         }
         catch (Exception ex) {

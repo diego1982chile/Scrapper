@@ -28,9 +28,7 @@ public class ProcessHelper {
 
     private LocalDate processDate  = LocalDate.now().minusDays(1);
 
-    private String holding;
-
-    private Map<String, AbstractScrapper> scrappers = new TreeMap<>();
+    private String client;
 
     private ExecutorService executor;
 
@@ -70,17 +68,12 @@ public class ProcessHelper {
         }
     }
 
-
-    public String getHolding() {
-        return holding;
+    public String getClient() {
+        return client;
     }
 
-    public void setHolding(String holding) {
-        this.holding = holding;
-    }
-
-    public Map<String, AbstractScrapper> getScrappers() {
-        return scrappers;
+    public void setClient(String client) {
+        this.client = client;
     }
 
     public CyclicBarrier getBarrier() {
@@ -92,30 +85,14 @@ public class ProcessHelper {
     }
 
 
-    static Object createObject(String className) {
-        Object object = null;
-        try {
-            Class classDefinition = Class.forName(className);
-            object = classDefinition.newInstance();
-        } catch (InstantiationException e) {
-            System.out.println(e);
-        } catch (IllegalAccessException e) {
-            System.out.println(e);
-        } catch (ClassNotFoundException e) {
-            System.out.println(e);
-        }
-        return object;
-    }
-
-
-    public void process(String holding) throws Exception {
+    public void process(String client) throws Exception {
 
         try {
             if(!semaphore.tryAcquire()) {
                 throw new ConcurrentAccessException("Se está intentando cambiar la fecha de proceso mientras hay un proceso en curso!!");
             }
 
-            setHolding(WordUtils.capitalize(holding));
+            setClient(WordUtils.capitalize(client));
 
             /*
             if(UploadHelper.getInstance().signalExists(client)) {
@@ -128,59 +105,22 @@ public class ProcessHelper {
 
             //LocalDate date = today.minusDays(40);
 
-            LocalDate date = today.minusDays(1);
+            LocalDate date = today.minusDays(2);
 
             while(date.isBefore(today)) {
 
                 setProcessDate(date);
 
-                logger.log(Level.INFO, "Ejecutando Scrap proceso " + FilesHelper.getInstance().PROCESS_NAME + " para holding " + holding);
+                logger.log(Level.INFO, "Ejecutando Scrap proceso " + FilesHelper.getInstance().PROCESS_NAME + " para cliente " + client);
 
                 scrap(true);
 
-                logger.log(Level.INFO, "Fin del proceso " + FilesHelper.getInstance().PROCESS_NAME + " para holding " + holding);
+                logger.log(Level.INFO, "Fin del proceso " + FilesHelper.getInstance().PROCESS_NAME + " para cliente " + client);
 
                 date = date.plusDays(1);
 
                 //semaphore.release();
             }
-
-            //logger.log(Level.INFO, "Fin del proceso general " + FilesHelper.getInstance().PROCESS_NAME + ", Se procede a subir los scraps");
-
-            // Si no se ha generado el signal, subir archivos y enviar correo
-            //if(!UploadHelper.getInstance().signalExists(client)) {
-                //UploadHelper.getInstance().upload();
-                //UploadHelper.getInstance().sendSignal(client);
-            //}
-
-            //UploadHelper.getInstance().sendSignal(client);
-
-            int contNew = 0;
-
-            for (AbstractScrapper scrapper : getScrappers().values()) {
-                for (FileControl fileControl : scrapper.getFileControlList()) {
-                    if (fileControl.isNew()) {
-                        logger.log(Level.INFO, "Nuevo scrap -> " + fileControl.getFileName());
-                        contNew++;
-                    }
-                }
-            }
-
-            // Se envia signal solo si se descargaron nuevos scraps (al menos 1)
-            //if(contNew > 0) {
-
-            if(UploadHelper.getInstance().getServer().equalsIgnoreCase("LOCAL")) {
-                UploadHelper.getInstance().generateSignal(holding);
-            }
-            else {
-                UploadHelper.getInstance().sendSignal(holding);
-            }
-
-                //UploadHelper.getInstance().generateSignal(client);
-            //}
-
-            // Cerrar la sesión explicitamente
-            //UploadHelper.getInstance().closeSession();
 
             semaphore.release();
         }
@@ -196,12 +136,9 @@ public class ProcessHelper {
 
     }
 
-
     private void scrap(boolean flag) throws Exception {
 
-        int max = 2;
-
-        int downloads = 0;
+        int max = 1;
 
         for (int i = 0; i < max; i++) {
 
@@ -209,16 +146,17 @@ public class ProcessHelper {
 
             logger.log(Level.INFO, "Descargando scraps -> Intento " + cont + " de " + max);
 
-            List<AbstractScrapper> scrappers = ScrapperHelper.getInstance().getScrappersByHolding(holding);
+            Map<String, AbstractScrapper> scrappers = ScrapperHelper.getInstance().getScrappersByClient(client);
 
             executor = Executors.newFixedThreadPool(scrappers.size());
-            barrier = new CyclicBarrier(scrappers.size(), new UploadTask());
+            barrier = new CyclicBarrier(scrappers.size() + 1, new UploadTask());
 
-            for (AbstractScrapper scrapper : scrappers) {
+            for (AbstractScrapper scrapper : scrappers.values()) {
                 if (scrapper != null) {
                     //scrapper.setDownloads(0);
                     //scrapper.process(flag);
                     executor.execute(scrapper);
+                    scrapper.getNewScraps().clear();
                 }
                 //ProcessHelper.getInstance().getExecutor().execute(scrapper);
             }
@@ -231,8 +169,6 @@ public class ProcessHelper {
 
 
     }
-
-
 
 }
 

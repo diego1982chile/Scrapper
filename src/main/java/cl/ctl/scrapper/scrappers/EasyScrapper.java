@@ -41,6 +41,8 @@ public class EasyScrapper extends AbstractScrapper {
 
         while(cont < 3) {
 
+            dateOutOfRangeFlag = false;
+
             cont++;
 
             try {
@@ -48,10 +50,20 @@ public class EasyScrapper extends AbstractScrapper {
             CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
             captchaHelper.solveCaptcha();
 
+            /*
             String holding = getHolding().toLowerCase();
             driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".easy.user"));
             Thread.sleep(2000);
             driver.findElement(By.id("password")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".easy.password"));
+            Thread.sleep(2000);
+            */
+
+            driver.findElement(By.id("username")).sendKeys(account.getUser());
+            Thread.sleep(2000);
+            driver.findElement(By.id("password")).sendKeys(account.getPassword());
+            Thread.sleep(2000);
+
+
             driver.getPageSource();
             Thread.sleep(2000);
             driver.findElement(By.id("kc-login")).click();

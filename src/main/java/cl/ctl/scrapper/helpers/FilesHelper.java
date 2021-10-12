@@ -1,27 +1,26 @@
 package cl.ctl.scrapper.helpers;
 
 import cl.ctl.scrapper.model.FileControl;
+import cl.ctl.scrapper.model.exceptions.ScrapEmptyException;
+import cl.ctl.scrapper.model.exceptions.ScrapSellsEqualsToZeroException;
+import cl.ctl.scrapper.model.scraps.SMURecord;
 import cl.ctl.scrapper.scrappers.AbstractScrapper;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.WordUtils;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 import java.util.regex.Pattern;
 
 /**
@@ -37,7 +36,7 @@ public class FilesHelper {
 
     JSONParser parser = new JSONParser();
 
-    static String SEPARATOR;
+    String SEPARATOR;
 
     /** Logger para la clase */
     private static final Logger logger = Logger.getLogger(FilesHelper.class.getName());
@@ -49,6 +48,12 @@ public class FilesHelper {
     public static FilesHelper getInstance() {
         return instance;
     }
+
+
+    public String getSEPARATOR() {
+        return SEPARATOR;
+    }
+
 
     public void flushProcessName() {
         String month = String.valueOf(ProcessHelper.getInstance().getProcessDate().getMonthValue());
@@ -228,7 +233,7 @@ public class FilesHelper {
 
             fileName = DOWNLOAD_PATH + SEPARATOR + PROCESS_NAME + SEPARATOR + baseName + "_" + PROCESS_NAME + ext;
 
-            downloadDir = new File(DOWNLOAD_PATH);
+            downloadDir = new File(DOWNLOAD_PATH + SEPARATOR + scrapper.getDownloadSubdirectory());
 
             File[] files = downloadDir.listFiles();
 
@@ -266,6 +271,46 @@ public class FilesHelper {
         }
 
     }
+
+    // Comprobar tamaño de ultimo archivo descargado
+    public void checkLastFile(AbstractScrapper scrapper, String frequency) throws ScrapEmptyException, IOException, ScrapSellsEqualsToZeroException {
+
+        logger.log(Level.INFO, "Comprobando archivo cadena = " + scrapper.getCadena() + " frecuencia = " + frequency);
+
+        File downloadDir;
+
+        downloadDir = new File(DOWNLOAD_PATH + SEPARATOR + scrapper.getDownloadSubdirectory());
+
+        File[] files = downloadDir.listFiles();
+
+        Arrays.sort(files, new Comparator<File>() {
+            public int compare(File f1, File f2)
+            {
+                return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
+            }
+        });
+
+        File file = null;
+
+        for(int i = 0; i < files.length; ++i) {
+
+            if(files[i].isFile()) {
+
+                file = files[i];
+
+                if((int) files[i].length() == 0) {
+                    throw new ScrapEmptyException("El scrap está vacío!!");
+                }
+                else {
+                    break;
+                }
+
+            }
+
+        }
+
+    }
+
 
     public String getDownloadPath() {
         return DOWNLOAD_PATH + SEPARATOR;

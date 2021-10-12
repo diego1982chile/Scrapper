@@ -1,16 +1,21 @@
 package cl.ctl.scrapper.scrappers;
 
+import cl.ctl.scrapper.helpers.AccountHelper;
 import cl.ctl.scrapper.helpers.FilesHelper;
 import cl.ctl.scrapper.helpers.LogHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
+import cl.ctl.scrapper.model.Account;
 import cl.ctl.scrapper.model.exceptions.ScrapAlreadyExistsException;
 import cl.ctl.scrapper.model.FileControl;
 import cl.ctl.scrapper.model.exceptions.ScrapUnavailableException;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.commons.lang.SystemUtils;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -19,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -54,9 +60,15 @@ public abstract class AbstractScrapper implements Runnable {
 
     boolean readyOnMorning = true;
 
+    boolean hasCompany = false;
+
     List<FileControl> fileControlList = new ArrayList<>();
 
     List<String> newScraps = new ArrayList<>();
+
+    String downloadSubdirectory;
+
+    Account account;
 
 
     public AbstractScrapper() throws IOException {
@@ -171,6 +183,14 @@ public abstract class AbstractScrapper implements Runnable {
         this.newScraps = newScraps;
     }
 
+    public String getDownloadSubdirectory() {
+        return downloadSubdirectory;
+    }
+
+    public void setDownloadSubdirectory(String downloadSubdirectory) {
+        this.downloadSubdirectory = downloadSubdirectory;
+    }
+
     void checkScraps() throws ScrapAlreadyExistsException {
         if(FilesHelper.getInstance().checkFiles(this)) {
             throw new ScrapAlreadyExistsException("Scrapper '" + cadena + "' -> Archivos ya fueron generados! se omite el proceso");
@@ -190,7 +210,13 @@ public abstract class AbstractScrapper implements Runnable {
 
         HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
         chromePrefs.put("profile.default_content_settings.popups", 0);
-        chromePrefs.put("download.default_directory", FilesHelper.getInstance().getDownloadPath());
+
+        //downloadSubdirectory = UUID.randomUUID().toString();
+        downloadSubdirectory = holding + "_" + cadena;
+
+        String defaultDirectory = FilesHelper.getInstance().getDownloadPath() + downloadSubdirectory;
+
+        chromePrefs.put("download.default_directory", defaultDirectory);
 
         ChromeOptions chrome_options = new ChromeOptions();
         chrome_options.addArguments("--no-sandbox");
@@ -206,7 +232,8 @@ public abstract class AbstractScrapper implements Runnable {
 
         driver = new ChromeDriver(chrome_options);
 
-        driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
+        driver.manage().timeouts().pageLoadTimeout(60, TimeUnit.SECONDS);
+
     }
 
     private void renameFile(String cadena, int count) {
@@ -230,6 +257,10 @@ public abstract class AbstractScrapper implements Runnable {
         FilesHelper.getInstance().renameLastFile(this, freq);
     }
 
+    abstract void doScrap(String since, String until) throws Exception;
+
+    abstract void login() throws Exception;
+
 
     private void scrap(boolean flag) throws Exception {
 
@@ -247,9 +278,9 @@ public abstract class AbstractScrapper implements Runnable {
 
                 if(!readyOnMorning) {
                     //TODO: Si son antes de las 14:00 omitir el login
-                    if(LocalDateTime.now().getHour() <= 14) {
+                    if(LocalDateTime.now().getHour() <= 14 && ProcessHelper.getInstance().getProcessDate().equals(LocalDate.now().minusDays(1))) {
                         //throw new ScrapUnavailableException("Scrap para cliente " + ProcessHelper.getInstance().getClient() + " aún no se encuentra disponible!");
-                        logger.log(Level.WARNING, "Scrap para holding " + ProcessHelper.getInstance().getHolding() + " aún no se encuentra disponible!");
+                        logger.log(Level.WARNING, "Scrap para cliente " + ProcessHelper.getInstance().getClient() + " aún no se encuentra disponible!");
                         break;
                     }
                 }
@@ -260,6 +291,14 @@ public abstract class AbstractScrapper implements Runnable {
                     Thread.sleep(2000);
 
                     driver.get(url);
+
+                    String script = "document.title = '" + holding + " " + cadena + "'";
+                    JavascriptExecutor js = (JavascriptExecutor) driver;
+                    js.executeScript(script);
+
+                    Thread.sleep(2000);
+
+                    account = AccountHelper.getInstance().getAccountByClientAndHolding(holding, cadena);
 
                     Thread.sleep(2000);
 
@@ -272,8 +311,16 @@ public abstract class AbstractScrapper implements Runnable {
                 catch (Exception e) {
                     logger.log(Level.WARNING, e.getMessage());
                     if(cont >= 1) {
+                        FilesHelper.getInstance().registerFileControlError(this, "DAY", e.getMessage());
+                        if(!onlyDiary) {
+                            FilesHelper.getInstance().registerFileControlError(this, "MONTH", e.getMessage());
+                            if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+                                FilesHelper.getInstance().registerFileControlError(this, "WEEK", e.getMessage());
+                            }
+                        }
                         logger.log(Level.SEVERE, e.getMessage());
-                        //throw e;
+                        driver.quit();
+                        throw e;
                     }
                 }
 
@@ -288,10 +335,17 @@ public abstract class AbstractScrapper implements Runnable {
 
         // Generar Scrap Diario
         if(flag) {
-            logger.log(Level.INFO, "Descargando Scrap Diario " + cadena + "...");
 
-            generateScrap(since, until, 1, flag);
-            Thread.sleep(2000);
+            try {
+                logger.log(Level.INFO, "Descargando Scrap Diario " + cadena + "...");
+                generateScrap(since, until, 1, flag);
+                Thread.sleep(2000);
+            }
+            catch(Exception e) {
+                logger.log(Level.SEVERE, e.getMessage());
+                driver.quit();
+            }
+
         }
 
         // Si la cadena genera solo scraps diarios retornar en este punto
@@ -308,9 +362,16 @@ public abstract class AbstractScrapper implements Runnable {
         since = formatter.format(ProcessHelper.getInstance().getProcessDate().minusDays(ProcessHelper.getInstance().getProcessDate().getDayOfMonth()).plusDays(1));
 
         if(flag) {
-            logger.log(Level.INFO, "Descargando Scrap Mensual " + cadena + "...");
-            generateScrap(since, until, 2, flag);
-            Thread.sleep(2000);
+            try {
+                logger.log(Level.INFO, "Descargando Scrap Mensual " + cadena + "...");
+                generateScrap(since, until, 2, flag);
+                Thread.sleep(2000);
+            }
+            catch(Exception e) {
+                logger.log(Level.SEVERE, e.getMessage());
+                driver.quit();
+            }
+
         }
 
         // Si es proceso de Domingo
@@ -318,8 +379,16 @@ public abstract class AbstractScrapper implements Runnable {
         if(ProcessHelper.getInstance().getProcessDate().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
             since = formatter.format(ProcessHelper.getInstance().getProcessDate().minusDays(6));
             if(flag) {
-                logger.log(Level.INFO, "Descargando Scrap Semanal " + cadena + "...");
-                generateScrap(since, until, 3, flag);
+                try {
+                    logger.log(Level.INFO, "Descargando Scrap Semanal " + cadena + "...");
+                    generateScrap(since, until, 3, flag);
+                    Thread.sleep(2000);
+                }
+                catch(Exception e) {
+                    logger.log(Level.SEVERE, e.getMessage());
+                    driver.quit();
+                }
+
             }
         }
 
@@ -355,11 +424,13 @@ public abstract class AbstractScrapper implements Runnable {
             if(flag) {
                 if(!readyOnMorning) {
                     //TODO: Si son antes de las 14:00 omitir el scrapping
-                    if(LocalDateTime.now().getHour() <= 14) {
-                        throw new ScrapUnavailableException("Scrap " + freq + " para holding " + ProcessHelper.getInstance().getHolding() + " aún no se encuentra disponible");
+                    if(LocalDateTime.now().getHour() <= 14 && ProcessHelper.getInstance().getProcessDate().equals(LocalDate.now().minusDays(1))) {
+                        throw new ScrapUnavailableException("Scrap " + freq + " para cliente " + ProcessHelper.getInstance().getClient() + " aún no se encuentra disponible");
                     }
                 }
                 doScrap(since, until);
+                FilesHelper.getInstance().checkLastFile(this, freq);
+                renameFile(cadena, count);
                 FilesHelper.getInstance().registerFileControlNew(this, freq);
                 downloads++;
 
@@ -381,17 +452,14 @@ public abstract class AbstractScrapper implements Runnable {
             logger.log(Level.SEVERE, e2.getMessage());
             FilesHelper.getInstance().registerFileControlError(this, freq, e2.getMessage());
         }
+        /*
         finally {
             if(flag) {
                 renameFile(cadena, count);
             }
         }
+        */
     }
-
-    abstract void doScrap(String since, String until) throws Exception;
-
-    abstract void login() throws Exception;
-
 
     @Override
     public void run() {
@@ -476,17 +544,15 @@ public abstract class AbstractScrapper implements Runnable {
 
     String calculateFrequency(String since, String until) {
 
-        String freq = "Dom";
-
         if(since.equals(until)) {
-            freq = "Dia";
+            return "Dia";
         }
 
         if(since.split("-")[0].equals("01")) {
-            freq = "Mes";
+            return "Mes";
         }
 
-        return freq;
+        return "Dom";
     }
 
 

@@ -24,6 +24,7 @@ public class SodimacScrapper extends AbstractScrapper {
         logo = "sodimac.jpg";
         onlyDiary = true;
         fileExt = ".txt";
+        hasCompany = true;
     }
 
     public SodimacScrapper(String holding) throws IOException {
@@ -63,15 +64,21 @@ public class SodimacScrapper extends AbstractScrapper {
             b2b.selectByValue("6");
             Thread.sleep(2000);
 
-            String holding = getHolding().toLowerCase();
+            driver.findElement(By.id("empresa")).sendKeys(account.getCompany());
+            Thread.sleep(2000);
+            driver.findElement(By.id("usuario")).sendKeys(account.getUser());
+            Thread.sleep(2000);
+            driver.findElement(By.id("clave")).sendKeys(account.getPassword());
 
+            /*
+            String holding = getHolding().toLowerCase();
             driver.findElement(By.id("empresa")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".sodimac.company"));
             Thread.sleep(2000);
             driver.findElement(By.id("usuario")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".sodimac.user"));
             Thread.sleep(2000);
-            //driver.findElement(By.id("clave")).sendKeys("diy012021");
-            //driver.findElement(By.id("clave")).sendKeys("diymarzo2021");
             driver.findElement(By.id("clave")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".sodimac.password"));
+            */
+
             Thread.sleep(2000);
             driver.findElement(By.id("entrar2")).click();
     }
@@ -123,9 +130,13 @@ public class SodimacScrapper extends AbstractScrapper {
 
                 Thread.sleep(5000);
 
+                /*
                 if(FilesHelper.getInstance().countFiles() > numberOfFiles) {
                     flag = false;
                 }
+                */
+
+                flag = false;
             }
             catch(Exception e) {
                 logger.log(Level.SEVERE, e.getMessage());

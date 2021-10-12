@@ -4,6 +4,7 @@ import cl.ctl.scrapper.helpers.CaptchaHelper;
 import cl.ctl.scrapper.helpers.ConfigHelper;
 import cl.ctl.scrapper.model.exceptions.BadDateException;
 import cl.ctl.scrapper.model.exceptions.DateOutOfRangeException;
+import cl.ctl.scrapper.model.exceptions.ScrapSellsEqualsToZeroException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
@@ -39,14 +40,28 @@ public class SmuScrapper extends AbstractScrapper {
     void login() throws Exception {
 
         try {
+
+            dateOutOfRangeFlag = false;
+
             // *SolveCaptcha
             CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
             captchaHelper.solveCaptcha();
             Thread.sleep(2000);
 
+            /*
             String holding = getHolding().toLowerCase();
             driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".smu.user"));
+            Thread.sleep(2000);
             driver.findElement(By.id("password")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".smu.password"));
+            Thread.sleep(2000);
+            */
+
+            driver.findElement(By.id("username")).sendKeys(account.getUser());
+            Thread.sleep(2000);
+            driver.findElement(By.id("password")).sendKeys(account.getPassword());
+            Thread.sleep(2000);
+
+
             driver.getPageSource();
             driver.findElement(By.id("kc-login")).click();
 
@@ -79,8 +94,9 @@ public class SmuScrapper extends AbstractScrapper {
 
     void doScrap(String since, String until) throws Exception {
 
-        // GoTo Comercial
         int cont = 0;
+
+        // GoTo Comercial
 
         while(cont < 10) {
 
@@ -228,12 +244,21 @@ public class SmuScrapper extends AbstractScrapper {
 
                 Thread.sleep(40000);
 
+                String totalString = driver.findElements(By.xpath(".//div[contains(text(),'TOTAL')]/parent::td/following-sibling::td/following-sibling::td/following-sibling::td/child::div")).get(0).getAttribute("innerHTML");
+
+                int totalVtaUnid = Integer.parseInt(totalString.replace(".",""));
+
+                if(totalVtaUnid == 0) {
+                    logger.log(Level.WARNING, "Los valores de ventas vienen todos en 0!!");
+                    //throw new ScrapSellsEqualsToZeroException("Los valores de ventas vienen todos en 0!!");
+                }
+
                 break;
             }
             catch (Throwable e) {
                 e.printStackTrace();
 
-                if(e instanceof DateOutOfRangeException) {
+                if(e instanceof DateOutOfRangeException /*|| e instanceof ScrapSellsEqualsToZeroException*/) {
                     logger.log(Level.SEVERE, e.getMessage());
                     throw e;
                 }
@@ -294,18 +319,20 @@ public class SmuScrapper extends AbstractScrapper {
                 e.printStackTrace();
                 logger.log(Level.WARNING, e.getMessage());
 
+                if(cont >= 10) {
+                    logger.log(Level.SEVERE, e.getMessage());
+                    throw e;
+                }
+
                 // Si hubo un error al generar el archivo, cerrar mensaje de error y reintentar
                 if(!driver.findElements(By.xpath(".//div[contains(text(),'Error generando el archivo.')]")).isEmpty()) {
                     for(int i = driver.findElements(By.xpath("//div[@class='v-window-closebox']")).size(); i > 0; --i ) {
                         driver.findElements(By.xpath("//div[@class='v-window-closebox']")).get(i-1).click();
                         Thread.sleep(2000);
                     }
+                    //doScrap(since, until);
                 }
 
-                if(cont >= 10) {
-                    logger.log(Level.SEVERE, e.getMessage());
-                    throw e;
-                }
             }
         }
 

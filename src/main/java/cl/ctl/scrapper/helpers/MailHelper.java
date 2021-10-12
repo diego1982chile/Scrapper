@@ -49,7 +49,7 @@ public class MailHelper {
 
     private static final String password = ConfigHelper.getInstance().CONFIG.get("mail.from.password");;
 
-    private static final String subject = "CTL - Descarga Scraps";
+    private static String subject = "CTL - Descarga Scraps";
 
     //private static String body = "<b>Bienvenido a Semantikos</b><br><br>Una cuenta asociada a este correo ha sido creada. <ul><li>Para activar su cuenta, por favor pinche el siguiente link: <br>%link%</li><li>Su contraseña inicial es: %password%</li><li>Cambie su contraseña inicial</li><li>Configure sus preguntas de seguridad</li></ul>El Equipo Semantikos";
 
@@ -98,8 +98,17 @@ public class MailHelper {
         String executionMonth = WordUtils.capitalize(LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES")));
         String executionYear = String.valueOf(LocalDate.now().getYear());
 
+        String server = "IDTECHSUPP";
+
+        if(UploadHelper.getInstance().getServer().equalsIgnoreCase("LOCAL")) {
+            server = "CTL3";
+        }
+
+        subject = "Scraps CTL: Proceso " + FilesHelper.getInstance().PROCESS_NAME + " - " + server;
+
+        this.body = this.body.replace("[Server]", server);
         this.body = this.body.replace("[Process]", FilesHelper.getInstance().PROCESS_NAME);
-        this.body = this.body.replace("[Holding]", ProcessHelper.getInstance().getHolding());
+        this.body = this.body.replace("[Client]", ProcessHelper.getInstance().getClient());
         this.body = this.body.replace("[ProcessDay]", weekProcessDay + " " + processMonthDay + " de " + processMonth + " del " + processYear);
         this.body = this.body.replace("[ExecutionDay]", weekExecutionDay + " " + executionMonthDay + " de " + executionMonth + " del " + executionYear);
         this.body = this.body.replace("%email%", to);
@@ -113,7 +122,9 @@ public class MailHelper {
 
     private boolean newFileExists() {
 
-        for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
+        return true;
+        /*
+        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByClient(ProcessHelper.getInstance().getClient()).values()) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 // Solo archivos registrados con nombre proceso actual
                 if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
@@ -125,7 +136,13 @@ public class MailHelper {
                 }
             }
         }
+
+        if(ProcessHelper.getInstance().getProcessDate().equals(LocalDate.now().minusDays(1))) {
+            return true;
+        }
+
         return false;
+        */
     }
 
     public void addRecords() {
@@ -133,7 +150,7 @@ public class MailHelper {
         String html = "";
 
         //for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
-        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByHolding(ProcessHelper.getInstance().getHolding())) {
+        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByClient(ProcessHelper.getInstance().getClient()).values()) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 // Solo archivos registrados con nombre proceso actual
                 if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
