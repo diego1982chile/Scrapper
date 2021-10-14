@@ -149,6 +149,8 @@ public class ProcessHelper {
 
             Map<String, AbstractScrapper> scrappers = ScrapperHelper.getInstance().getScrappersByHolding(holding);
 
+            //Map<String, AbstractScrapper> scrappers = ScrapperHelper.getInstance().getScrappersByClientAndHolding("Polar", holding);
+
             executor = Executors.newFixedThreadPool(scrappers.size());
             barrier = new CyclicBarrier(scrappers.size() + 1, new UploadTask());
 

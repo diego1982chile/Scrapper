@@ -110,7 +110,9 @@ public class TottusScrapper extends AbstractScrapper {
 
         Thread.sleep(3000);
 
-        driver.findElement(By.id("menuItem226_7")).click();
+        //driver.findElement(By.id("menuItem226_6")).click();
+
+        driver.findElement(By.xpath(".//font[contains(text(),'Informe de Ventas e Inventario')]")).click();
 
         Thread.sleep(3000);
 

@@ -110,6 +110,19 @@ public class ScrapperHelper {
         return scrappers;
     }
 
+    public Map<String, AbstractScrapper> getScrappersByClientAndHolding(String client, String holding) {
+
+        Map<String, AbstractScrapper> scrappers = new TreeMap<>();
+
+        for (AbstractScrapper scrapper : this.scrappers.values()) {
+            if(scrapper.getHolding().equalsIgnoreCase(client) && scrapper.getCadena().equalsIgnoreCase(holding)) {
+                scrappers.put(scrapper.toString(), scrapper);
+            }
+        }
+
+        return scrappers;
+    }
+
     static Object createObject(String className) {
         Object object = null;
         try {
