@@ -249,8 +249,8 @@ public class SmuScrapper extends AbstractScrapper {
                 int totalVtaUnid = Integer.parseInt(totalString.replace(".",""));
 
                 if(totalVtaUnid == 0) {
-                    logger.log(Level.WARNING, "Los valores de ventas vienen todos en 0!!");
-                    //throw new ScrapSellsEqualsToZeroException("Los valores de ventas vienen todos en 0!!");
+                    //logger.log(Level.WARNING, "Los valores de ventas vienen todos en 0!!");
+                    throw new ScrapSellsEqualsToZeroException("Los valores de ventas vienen todos en 0!!");
                 }
 
                 break;

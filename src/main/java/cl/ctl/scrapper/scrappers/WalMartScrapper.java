@@ -215,6 +215,10 @@ public class WalMartScrapper extends AbstractScrapper {
                     case "Soho":
                         nutrisaCTL = driver.findElement(By.id("CD42727978"));
                         break;
+                    case "Polar":
+                        //nutrisaCTL = driver.findElements(By.xpath(".//span[contains(text(),'Modelo CTL')]")).get(1);
+                        nutrisaCTL = driver.findElement(By.id("CD42906241"));
+                        break;
                     default:
                         nutrisaCTL = driver.findElement(By.xpath(".//span[contains(text(),'MODELO CTL')]"));
                         break;
