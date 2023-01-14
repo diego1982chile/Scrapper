@@ -10,20 +10,23 @@ import java.util.List;
  */
 public class Schedule {
 
-    String holding;
+    Retailer retailer;
     Date schedule;
 
-    public Schedule(String holding, Date schedule) {
-        this.holding = holding;
+    public Schedule() {
+    }
+
+    public Schedule(Retailer retailer, Date schedule) {
+        this.retailer = retailer;
         this.schedule = schedule;
     }
 
-    public String getHolding() {
-        return holding;
+    public Retailer getRetailer() {
+        return retailer;
     }
 
-    public void setHolding(String holding) {
-        this.holding = holding;
+    public void setRetailer(Retailer retailer) {
+        this.retailer = retailer;
     }
 
     public Date getSchedule() {
@@ -36,6 +39,6 @@ public class Schedule {
 
     @Override
     public String toString() {
-        return "{" + holding + "," + schedule + "}";
+        return "{" + retailer.getName() + "," + schedule + "}";
     }
 }

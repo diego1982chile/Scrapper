@@ -35,16 +35,16 @@ public class AccountHelper {
 
     }
 
-    public Account getAccountByClientAndHolding(String client, String holding) {
+    public Account getAccountByClientAndHolding(String retailer, String holding) {
 
         Account account = new Account();
 
-        client = client.toLowerCase();
+        retailer = retailer.toLowerCase();
         holding = holding.toLowerCase();
 
         try {
 
-            URL url = new URL(ENDPOINT + client.toLowerCase() + "/" + holding.toLowerCase());
+            URL url = new URL(ENDPOINT + retailer.toLowerCase() + "/" + holding.toLowerCase());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
@@ -71,29 +71,13 @@ public class AccountHelper {
 
             conn.disconnect();
 
-        } catch (MalformedURLException e) {
-
-            e.printStackTrace();
-
         } catch (IOException e) {
 
             e.printStackTrace();
 
         }
-        finally {
-            // Si no se logró traer la account desde el servicio, setearla desde el archivo de configuración
-            if(account.getId() == 0) {
-                account.setUser(ConfigHelper.getInstance().CONFIG.get(client + "." + holding + ".user"));
-                account.setPassword(ConfigHelper.getInstance().CONFIG.get(client + "." + holding + ".password"));
-                try {
-                    account.setCompany(ConfigHelper.getInstance().CONFIG.get(client + "." + holding + ".company"));
-                }
-                catch (Exception e) {
-                    logger.log(Level.WARNING, "Esta cuenta no posee el atributo Company, se omite");
-                }
-            }
-            return  account;
-        }
+
+        return  account;
 
     }
 

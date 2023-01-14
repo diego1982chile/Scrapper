@@ -7,6 +7,7 @@ import cl.ctl.scrapper.scrappers.AbstractScrapper;
 import cl.ctl.scrapper.scrappers.ConstrumartScrapper;
 import cl.ctl.scrapper.scrappers.EasyScrapper;
 import cl.ctl.scrapper.scrappers.SodimacScrapper;
+import org.apache.james.mime4j.field.address.parser.Token;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 
@@ -17,6 +18,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static cl.ctl.scrapper.model.ParameterEnum.TOKEN;
 
 /**
  * Created by root on 07-12-20.
@@ -34,14 +37,20 @@ public class Main {
         try {
             logger.addHandler(fh);
 
-            if(args.length != 1) {
-                logger.log(Level.SEVERE, "Falta el nombre del archivo json de parámetros!!");
+            if(args.length < 2) {
+                logger.log(Level.SEVERE, "You need to provide Retailer and Token!!");
             }
 
-            String parametersFile = args[0];
+            String retailer = args[1];
 
-            logger.log(Level.INFO, "Leyendo archivo de parámetros " + parametersFile + "...");
-            ParamsHelper.getInstance().loadParameters(parametersFile);
+            ConfigHelper.getInstance().setParameter("RETAILER", retailer);
+
+            String token = args[1];
+
+            ConfigHelper.getInstance().setParameter(TOKEN.name(), token);
+
+            logger.log(Level.INFO, "Loading parameters from ScrapperService...");
+            ParamsHelper.getInstance().loadParameters();
 
         } catch (SecurityException e) {
             logger.log(Level.SEVERE, e.getMessage());

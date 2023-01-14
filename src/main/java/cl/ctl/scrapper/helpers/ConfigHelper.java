@@ -28,6 +28,7 @@ public class ConfigHelper {
      */
     public ConfigHelper() {
 
+        /*
         try (//InputStream input = new FileInputStream("config.properties")
              InputStream input = this.getClass().getResourceAsStream("/config.properties")) {
 
@@ -41,6 +42,7 @@ public class ConfigHelper {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        */
 
     }
 
@@ -50,6 +52,10 @@ public class ConfigHelper {
 
     public void setParameter(String name, String value) {
         CONFIG.put(name, value);
+    }
+
+    public String getParameter(String name) {
+        return CONFIG.get(name);
     }
 
 }

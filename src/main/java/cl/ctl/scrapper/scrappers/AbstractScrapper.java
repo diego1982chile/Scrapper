@@ -280,7 +280,7 @@ public abstract class AbstractScrapper implements Runnable {
                     //TODO: Si son antes de las 14:00 omitir el login
                     if(LocalDateTime.now().getHour() <= 14 && ProcessHelper.getInstance().getProcessDate().equals(LocalDate.now().minusDays(1))) {
                         //throw new ScrapUnavailableException("Scrap para cliente " + ProcessHelper.getInstance().getClient() + " aún no se encuentra disponible!");
-                        logger.log(Level.WARNING, "Scrap para holding " + ProcessHelper.getInstance().getHolding() + " aún no se encuentra disponible!");
+                        logger.log(Level.WARNING, "Scrap for retailer " + ProcessHelper.getInstance().getRetailer() + " not yet available!");
                         break;
                     }
                 }
@@ -425,7 +425,7 @@ public abstract class AbstractScrapper implements Runnable {
                 if(!readyOnMorning) {
                     //TODO: Si son antes de las 14:00 omitir el scrapping
                     if(LocalDateTime.now().getHour() <= 14 && ProcessHelper.getInstance().getProcessDate().equals(LocalDate.now().minusDays(1))) {
-                        throw new ScrapUnavailableException("Scrap " + freq + " para holding " + ProcessHelper.getInstance().getHolding() + " aún no se encuentra disponible");
+                        throw new ScrapUnavailableException("Scrap " + freq + " for retailer " + ProcessHelper.getInstance().getRetailer() + " not yet available");
                     }
                 }
                 doScrap(since, until);

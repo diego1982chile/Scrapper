@@ -1,18 +1,25 @@
 package cl.ctl.scrapper.helpers;
 
 import cl.ctl.scrapper.controllers.ScrapTask;
+import cl.ctl.scrapper.model.Account;
+import cl.ctl.scrapper.model.Parameter;
 import cl.ctl.scrapper.model.Schedule;
+import cl.ctl.scrapper.model.exceptions.MissingParameterException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static cl.ctl.scrapper.model.ParameterEnum.*;
 
 /**
  * Created by des01c7 on 18-12-20.
@@ -28,6 +35,15 @@ public class ParamsHelper {
 
     static LogHelper fh;
 
+    private static final String BASE_URL = "http://localhost:8080/ScrapperService/api/";
+
+    private static final String PARAMETERS_ENDPOINT = BASE_URL + "parameters";
+
+    private static final String SCHEDULES_ENDPOINT = BASE_URL + "schedules/" + ConfigHelper.getInstance().getParameter(RETAILER.name());
+
+    private List<Parameter> parameters;
+
+    private List<Schedule> schedules;
 
     /**
      * Constructor privado para el Singleton del Factory.
@@ -39,114 +55,191 @@ public class ParamsHelper {
         logger = Logger.getLogger(ParamsHelper.class.getName());
         logger.addHandler(fh);
 
+        populateParameters();
+        populateSchedules();
     }
 
-    public void loadParameters(String parametersFile) throws Exception {
+    public void loadParameters() throws Exception {
 
-        //JSON parser object to parse read file
-        JSONParser jsonParser = new JSONParser();
+        String captchaApiKey = parameters.stream()
+                .filter(e -> e.getName().equals(CAPTCHA_API_KEY.name()))
+                .map(Parameter::getValue)
+                .findFirst()
+                .orElseThrow(() -> new MissingParameterException("No parameter " + CAPTCHA_API_KEY.name() + " found"));
 
-        try (FileReader reader = new FileReader(parametersFile)) {
+        ConfigHelper.getInstance().setParameter(CAPTCHA_API_KEY.name(), captchaApiKey);
 
-            logger.log(Level.INFO, "Obteniendo parámetro 'downloads'...");
+        String errorTo = parameters.stream()
+                .filter(e -> e.getName().equals(ERROR_TO.name()))
+                .map(Parameter::getValue)
+                .findFirst()
+                .orElseThrow(() -> new MissingParameterException("No parameter " + ERROR_TO.name() + " found"));
 
-            //Read JSON file
-            Object obj = jsonParser.parse(reader);
+        ConfigHelper.getInstance().setParameter(ERROR_TO.name(), errorTo);
 
-            // Leyendo downloads
-            JSONObject params = (JSONObject) obj;
+        String fileDownloadPath = parameters.stream()
+                .filter(e -> e.getName().equals(FILE_DOWNLOAD_PATH.name()))
+                .map(Parameter::getValue)
+                .findFirst()
+                .orElseThrow(() -> new MissingParameterException("No parameter " + FILE_DOWNLOAD_PATH.name() + " found"));
 
-            if(params.containsKey("downloads")) {
-                String downloadPath = params.get("downloads").toString();
-                ConfigHelper.getInstance().setParameter("file.download_path",downloadPath);
-            }
-            else {
-                logger.log(Level.WARNING, "No se ha especificado el parámetro 'downloads' se utilizará el del archivo de propiedades");
-            }
+        ConfigHelper.getInstance().setParameter(FILE_DOWNLOAD_PATH.name(), fileDownloadPath);
 
-            // Leyendo uploads
-            logger.log(Level.INFO, "Obteniendo parámetro 'uploads'...");
+        String mailFromPassword = parameters.stream()
+                .filter(e -> e.getName().equals(MAIL_FROM_PASSWORD.name()))
+                .map(Parameter::getValue)
+                .findFirst()
+                .orElseThrow(() -> new MissingParameterException("No parameter " + MAIL_FROM_PASSWORD.name() + " found"));
 
-            if(params.containsKey("uploads")) {
-                JSONObject uploads = (JSONObject) params.get("uploads");
+        ConfigHelper.getInstance().setParameter(MAIL_FROM_PASSWORD.name(), mailFromPassword);
 
-                UploadHelper.getInstance().setServer(uploads.get("server").toString());
+        String mailFromUser = parameters.stream()
+                .filter(e -> e.getName().equals(MAIL_FROM_USER.name()))
+                .map(Parameter::getValue)
+                .findFirst()
+                .orElseThrow(() -> new MissingParameterException("No parameter " + MAIL_FROM_USER.name() + " found"));
 
-                switch(uploads.get("server").toString().toUpperCase()) {
-                    case "LOCAL":
-                        ConfigHelper.getInstance().setParameter("upload.target",uploads.get("target").toString());
-                        break;
-                    case "REMOTE":
-                        ConfigHelper.getInstance().setParameter("upload.host",uploads.get("host").toString());
-                        ConfigHelper.getInstance().setParameter("upload.path",uploads.get("path").toString());
-                        ConfigHelper.getInstance().setParameter("upload.user",uploads.get("user").toString());
-                        ConfigHelper.getInstance().setParameter("upload.password",uploads.get("password").toString());
-                        ConfigHelper.getInstance().setParameter("upload.target",uploads.get("target").toString());
-                        break;
-                    default:
-                        throw new Exception("Parámetro 'uploads' tipo de servidor no válido " + uploads.get("server").toString());
-                }
-            }
-            else {
-                logger.log(Level.WARNING, "No se ha especificado el parámetro 'uploads' se utilizará el del archivo de propiedades");
-            }
+        ConfigHelper.getInstance().setParameter(MAIL_FROM_USER.name(), mailFromUser);
 
-            // Leyendo schedules
-            if(params.containsKey("schedules")) {
-                logger.log(Level.INFO, "Obteniendo parámetro 'schedules'...");
+        String mailTo = parameters.stream()
+                .filter(e -> e.getName().equals(MAIL_TO.name()))
+                .map(Parameter::getValue)
+                .findFirst()
+                .orElseThrow(() -> new MissingParameterException("No parameter " + MAIL_TO.name() + " found"));
 
-                JSONArray schedules = (JSONArray) params.get("schedules");
+        ConfigHelper.getInstance().setParameter(MAIL_TO.name(), mailTo);
 
-                List<Schedule> scheduleList = new ArrayList<>();
+        String uploadHost = parameters.stream()
+                .filter(e -> e.getName().equals(UPLOAD_HOST.name()))
+                .map(Parameter::getValue)
+                .findFirst()
+                .orElseThrow(() -> new MissingParameterException("No parameter " + UPLOAD_HOST.name() + " found"));
 
-                //Iterate over employee array
-                for (int i=0; i < schedules.size(); i++) {
-                    Schedule schedule = parseScheduleObject( (JSONObject) schedules.get(i) );
-                    scheduleList.add(schedule);
-                }
+        ConfigHelper.getInstance().setParameter(UPLOAD_HOST.name(), uploadHost);
 
-                SchedulerHelper.getInstance().schedule(scheduleList);
-            }
-            else {
-                logger.log(Level.WARNING, "No se ha especificado el parámetro 'schedules'!");
-                throw new Exception("No se ha especificado el parámetro 'schedules'!");
-            }
+        String uploadPassword = parameters.stream()
+                .filter(e -> e.getName().equals(UPLOAD_PASSWORD.name()))
+                .map(Parameter::getValue)
+                .findFirst()
+                .orElseThrow(() -> new MissingParameterException("No parameter " + UPLOAD_PASSWORD.name() + " found"));
 
+        ConfigHelper.getInstance().setParameter(UPLOAD_PASSWORD.name(), uploadPassword);
 
-        } catch (FileNotFoundException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            e.printStackTrace();
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            e.printStackTrace();
-        } catch (ParseException e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            e.printStackTrace();
-        }
+        String uploadPath = parameters.stream()
+                .filter(e -> e.getName().equals(UPLOAD_PATH.name()))
+                .map(Parameter::getValue)
+                .findFirst()
+                .orElseThrow(() -> new MissingParameterException("No parameter " + UPLOAD_PATH.name() + " found"));
+
+        ConfigHelper.getInstance().setParameter(UPLOAD_PATH.name(), uploadPath);
+
+        String uploadServer = parameters.stream()
+                .filter(e -> e.getName().equals(UPLOAD_SERVER.name()))
+                .map(Parameter::getValue)
+                .findFirst()
+                .orElseThrow(() -> new MissingParameterException("No parameter " + UPLOAD_SERVER.name() + " found"));
+
+        ConfigHelper.getInstance().setParameter(UPLOAD_SERVER.name(), uploadServer);
+
+        String uploadTarget = parameters.stream()
+                .filter(e -> e.getName().equals(UPLOAD_TARGET.name()))
+                .map(Parameter::getValue)
+                .findFirst()
+                .orElseThrow(() -> new MissingParameterException("No parameter " + UPLOAD_TARGET.name() + " found"));
+
+        ConfigHelper.getInstance().setParameter(UPLOAD_TARGET.name(), uploadTarget);
+
+        // Leyendo schedules
+
+        SchedulerHelper.getInstance().schedule(schedules);
+
     }
 
     public static ParamsHelper getInstance() {
         return instance;
     }
 
-    private Schedule parseScheduleObject(JSONObject scheduleJson)
-    {
-        //Get employee object within list
-        String client = scheduleJson.get("holding").toString();
+    private void populateParameters() {
 
-        String schedule = scheduleJson.get("schedule").toString();
+        try {
 
-        int hour = Integer.parseInt(schedule.split(":")[0]);
-        int minute = Integer.parseInt(schedule.split(":")[1]);
+            URL url = new URL(PARAMETERS_ENDPOINT);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("Authorization","Bearer " + ConfigHelper.getInstance().getParameter("TOKEN"));
 
-        Calendar date = GregorianCalendar.getInstance(Locale.forLanguageTag("es-ES"));
+            if (conn.getResponseCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + conn.getResponseCode());
+            }
 
-        date.set(Calendar.HOUR_OF_DAY, hour);
-        date.set(Calendar.MINUTE, minute );
-        date.set(Calendar.SECOND, 0);
-        date.set(Calendar.MILLISECOND, 0);
+            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
 
-        return new Schedule(client, date.getTime());
+            String output;
+            System.out.println("Output from Server .... \n");
+
+            while ((output = br.readLine()) != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode tree = mapper.readTree(output);
+
+                //JsonNode node = tree.at("/glossary/GlossDiv/GlossList/GlossEntry");
+                Parameter parameter = mapper.treeToValue(tree, Parameter.class);
+
+                parameters.add(parameter);
+
+                System.out.println(output);
+            }
+
+            conn.disconnect();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+    private void populateSchedules() {
+
+        try {
+
+            URL url = new URL(SCHEDULES_ENDPOINT);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("Authorization","Bearer " + ConfigHelper.getInstance().getParameter("TOKEN"));
+
+            if (conn.getResponseCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + conn.getResponseCode());
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+
+            String output;
+            System.out.println("Output from Server .... \n");
+
+            while ((output = br.readLine()) != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode tree = mapper.readTree(output);
+
+                //JsonNode node = tree.at("/glossary/GlossDiv/GlossList/GlossEntry");
+                Schedule schedule = mapper.treeToValue(tree, Schedule.class);
+
+                schedules.add(schedule);
+
+                System.out.println(output);
+            }
+
+            conn.disconnect();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        }
 
     }
 

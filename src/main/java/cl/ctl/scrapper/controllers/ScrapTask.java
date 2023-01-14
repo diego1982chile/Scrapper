@@ -16,15 +16,15 @@ import static java.time.temporal.ChronoField.*;
  */
 public class ScrapTask extends TimerTask {
 
-    String holding;
+    String retailer;
     Date date;
 
     private static final Logger logger = Logger.getLogger(TimerTask.class.getName());
 
     static LogHelper fh = LogHelper.getInstance();
 
-    public ScrapTask(String holding, Date date) {
-        this.holding = holding;
+    public ScrapTask(String retailer, Date date) {
+        this.retailer = retailer;
         this.date = date;
 
         logger.addHandler(fh);
@@ -45,11 +45,11 @@ public class ScrapTask extends TimerTask {
             int sched_second = this.date.getSeconds();
 
             if(hour == sched_hour && minute == sched_minute /*&& second == sched_second*/) {
-                logger.log(Level.INFO, "Ejecutando proceso para holding '" + holding + "' en horario programado '" + date + "'");
-                ProcessHelper.getInstance().process(holding);
+                logger.log(Level.INFO, "Running process for retailer '" + retailer + "' at schedule '" + date + "'");
+                ProcessHelper.getInstance().process(retailer);
             }
             else {
-                logger.log(Level.WARNING, "Se está intentando ejecutar proceso para holding '" + holding + "' en un horario no programado!, Se omite ejecución");
+                logger.log(Level.WARNING, "Attempting to run process for retailer '" + retailer + "' at an unscheduled time!, Execution is skipped");
             }
 
         } catch (Exception e) {
