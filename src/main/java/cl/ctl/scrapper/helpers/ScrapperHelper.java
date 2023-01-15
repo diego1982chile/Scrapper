@@ -77,12 +77,12 @@ public class ScrapperHelper {
         return instance;
     }
 
-    public Map<String, AbstractScrapper> getScrappersByHolding(String holding) {
+    public Map<String, AbstractScrapper> getScrappersByRetailer(String retailer) {
 
         Map<String, AbstractScrapper> scrappers = new TreeMap<>();
 
         for (AbstractScrapper scrapper : this.scrappers.values()) {
-            if(scrapper.getCadena().equalsIgnoreCase(holding)) {
+            if(scrapper.getRetailer().equalsIgnoreCase(retailer)) {
                 scrappers.put(scrapper.toString(), scrapper);
             }
         }
@@ -95,7 +95,7 @@ public class ScrapperHelper {
         Map<String, AbstractScrapper> scrappers = new TreeMap<>();
 
         for (AbstractScrapper scrapper : this.scrappers.values()) {
-            if(scrapper.getHolding().equalsIgnoreCase(client)) {
+            if(scrapper.getClient().equalsIgnoreCase(client)) {
                 scrappers.put(scrapper.toString(), scrapper);
             }
         }

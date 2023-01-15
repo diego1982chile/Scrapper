@@ -38,8 +38,8 @@ public class WalMartScrapper extends AbstractScrapper {
 
     public WalMartScrapper() throws IOException {
         super();
-        cadena = "WalMart";
-        holding = "Nutrisa";
+        retailer = "WalMart";
+        client = "Nutrisa";
         //url = "https://retaillink.login.wal-mart.com/?ServerType=IIS1&CTAuthMode=BASIC&language=en&utm_source=retaillink&utm_medium=redirect&utm_campaign=FalconRelease&CT_ORIG_URL=/&ct_orig_uri=/ ";
         url = "https://retaillink.login.wal-mart.com/";
         logo = "walmart.jpg";
@@ -54,9 +54,9 @@ public class WalMartScrapper extends AbstractScrapper {
         locales.put("querySubmitted","Query Submitted");
     }
 
-    public WalMartScrapper(String holding) throws IOException {
+    public WalMartScrapper(String client) throws IOException {
         this();
-        this.holding = holding;
+        this.client = client;
     }
 
 
@@ -189,7 +189,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
                 Thread.sleep(5000);
 
-                switch(holding) {
+                switch(client) {
                     case "Nutrisa":
                         actions.moveToElement(driver.findElement(By.id("IMG27305673"))).click().build().perform();
                         break;
@@ -205,7 +205,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
                 WebElement nutrisaCTL;
 
-                switch(holding) {
+                switch(client) {
                     case "Nutrisa":
                         nutrisaCTL = driver.findElement(By.id("CD39040995"));
                         break;
@@ -399,7 +399,7 @@ public class WalMartScrapper extends AbstractScrapper {
                     // Setear el titulo del reporte
                     WebElement titleInput = driver.findElement(By.xpath("//input[@id='title']"));
                     titleInput.clear();
-                    String title = WordUtils.capitalize(holding.toLowerCase()) + "_" + WordUtils.capitalize(cadena.toLowerCase()) + "_" + calculateFrequency(since, until) + "_" + ProcessHelper.getInstance().getProcessDate().toString().replace("-","");
+                    String title = WordUtils.capitalize(client.toLowerCase()) + "_" + WordUtils.capitalize(retailer.toLowerCase()) + "_" + calculateFrequency(since, until) + "_" + ProcessHelper.getInstance().getProcessDate().toString().replace("-","");
                     titleInput.sendKeys(title);
 
                     Thread.sleep(3000);

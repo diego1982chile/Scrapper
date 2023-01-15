@@ -11,12 +11,12 @@ import java.util.List;
 public class Schedule {
 
     Retailer retailer;
-    Date schedule;
+    String schedule;
 
     public Schedule() {
     }
 
-    public Schedule(Retailer retailer, Date schedule) {
+    public Schedule(Retailer retailer, String schedule) {
         this.retailer = retailer;
         this.schedule = schedule;
     }
@@ -29,11 +29,11 @@ public class Schedule {
         this.retailer = retailer;
     }
 
-    public Date getSchedule() {
+    public String getSchedule() {
         return schedule;
     }
 
-    public void setSchedule(Date schedule) {
+    public void setSchedule(String schedule) {
         this.schedule = schedule;
     }
 

@@ -24,17 +24,17 @@ public class CencosudScrapper extends AbstractScrapper {
 
     public CencosudScrapper() throws IOException {
         super();
-        holding = "Nutrisa";
-        cadena = "Cencosud";
+        client = "Nutrisa";
+        retailer = "Cencosud";
         url = "https://www.cenconlineb2b.com/";
         logo = "cencosud.png";
 
         readyOnMorning = false;
     }
 
-    public CencosudScrapper(String holding) throws IOException {
+    public CencosudScrapper(String client) throws IOException {
         this();
-        this.holding = holding;
+        this.client = client;
     }
 
     void login() throws Exception {
@@ -50,7 +50,7 @@ public class CencosudScrapper extends AbstractScrapper {
             CaptchaHelper captchaHelper = new CaptchaHelper(driver, url);
             captchaHelper.solveCaptcha();
             Thread.sleep(2000);
-            String holding = getHolding().toLowerCase();
+            String client = getClient().toLowerCase();
 
             /*
             driver.findElement(By.id("username")).sendKeys(ConfigHelper.getInstance().CONFIG.get(holding + ".cencosud.user"));

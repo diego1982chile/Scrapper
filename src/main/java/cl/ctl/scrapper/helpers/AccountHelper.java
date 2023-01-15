@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static cl.ctl.scrapper.model.ParameterEnum.TOKEN;
+
 /**
  * Created by root on 10-09-21.
  */
@@ -35,19 +37,20 @@ public class AccountHelper {
 
     }
 
-    public Account getAccountByClientAndHolding(String retailer, String holding) {
+    public Account getAccountByClientAndRetailer(String client, String retailer) {
 
         Account account = new Account();
 
+        client = client.toLowerCase();
         retailer = retailer.toLowerCase();
-        holding = holding.toLowerCase();
 
         try {
 
-            URL url = new URL(ENDPOINT + retailer.toLowerCase() + "/" + holding.toLowerCase());
+            URL url = new URL(ENDPOINT + client.toLowerCase() + "/" + retailer.toLowerCase());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("Authorization", "Bearer " + ConfigHelper.getInstance().getParameter(TOKEN.getParameter()));
 
             if (conn.getResponseCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : "
@@ -63,10 +66,7 @@ public class AccountHelper {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode tree = mapper.readTree(output);
 
-                //JsonNode node = tree.at("/glossary/GlossDiv/GlossList/GlossEntry");
                 account = mapper.treeToValue(tree, Account.class);
-
-                System.out.println(output);
             }
 
             conn.disconnect();

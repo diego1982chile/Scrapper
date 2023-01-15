@@ -147,7 +147,7 @@ public class ProcessHelper {
 
             logger.log(Level.INFO, "Descargando scraps -> Intento " + cont + " de " + max);
 
-            Map<String, AbstractScrapper> scrappers = ScrapperHelper.getInstance().getScrappersByHolding(retailer);
+            Map<String, AbstractScrapper> scrappers = ScrapperHelper.getInstance().getScrappersByRetailer(retailer);
 
             executor = Executors.newFixedThreadPool(scrappers.size());
             barrier = new CyclicBarrier(scrappers.size() + 1, new UploadTask());

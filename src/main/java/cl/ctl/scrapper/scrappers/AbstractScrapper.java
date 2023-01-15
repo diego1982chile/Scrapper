@@ -42,9 +42,9 @@ public abstract class AbstractScrapper implements Runnable {
     Logger logger = Logger.getLogger(ConstrumartScrapper.class.getName());
     LogHelper fh = LogHelper.getInstance();
 
-    String holding;
+    String client;
 
-    String cadena;
+    String retailer;
 
     String url;
 
@@ -111,12 +111,12 @@ public abstract class AbstractScrapper implements Runnable {
         return null;
     }
 
-    public String getCadena() {
-        return cadena;
+    public String getRetailer() {
+        return retailer;
     }
 
-    public void setCadena(String cadena) {
-        this.cadena = cadena;
+    public void setRetailer(String retailer) {
+        this.retailer = retailer;
     }
 
     public String getUrl() {
@@ -143,12 +143,12 @@ public abstract class AbstractScrapper implements Runnable {
         this.onlyDiary = onlyDiary;
     }
 
-    public String getHolding() {
-        return holding;
+    public String getClient() {
+        return client;
     }
 
-    public void setHolding(String holding) {
-        this.holding = holding;
+    public void setClient(String client) {
+        this.client = client;
     }
 
     public String getLogo() {
@@ -191,16 +191,16 @@ public abstract class AbstractScrapper implements Runnable {
         this.downloadSubdirectory = downloadSubdirectory;
     }
 
-    void checkScraps() throws ScrapAlreadyExistsException {
+    private void checkScraps() throws ScrapAlreadyExistsException {
         if(FilesHelper.getInstance().checkFiles(this)) {
-            throw new ScrapAlreadyExistsException("Scrapper '" + cadena + "' -> Archivos ya fueron generados! se omite el proceso");
+            throw new ScrapAlreadyExistsException("Scrapper '" + retailer + "' -> Archivos ya fueron generados! se omite el proceso");
         }
     }
 
-    void checkScrap(String freq) throws ScrapAlreadyExistsException {
+    private void checkScrap(String freq) throws ScrapAlreadyExistsException {
 
         if(FilesHelper.getInstance().checkFile(this, freq)) {
-            throw new ScrapAlreadyExistsException("Scrapper " + this.getCadena() + " -> Archivo de frecuencia '" + freq + "' ya fue generado! se omite el proceso diario");
+            throw new ScrapAlreadyExistsException("Scrapper " + this.getRetailer() + " -> Archivo de frecuencia '" + freq + "' ya fue generado! se omite el proceso diario");
         }
     }
 
@@ -212,7 +212,7 @@ public abstract class AbstractScrapper implements Runnable {
         chromePrefs.put("profile.default_content_settings.popups", 0);
 
         //downloadSubdirectory = UUID.randomUUID().toString();
-        downloadSubdirectory = holding + "_" + cadena;
+        downloadSubdirectory = client + "_" + retailer;
 
         String defaultDirectory = FilesHelper.getInstance().getDownloadPath() + downloadSubdirectory;
 
@@ -292,13 +292,13 @@ public abstract class AbstractScrapper implements Runnable {
 
                     driver.get(url);
 
-                    String script = "document.title = '" + holding + " " + cadena + "'";
+                    String script = "document.title = '" + client + " " + retailer + "'";
                     JavascriptExecutor js = (JavascriptExecutor) driver;
                     js.executeScript(script);
 
                     Thread.sleep(2000);
 
-                    account = AccountHelper.getInstance().getAccountByClientAndHolding(holding, cadena);
+                    account = AccountHelper.getInstance().getAccountByClientAndRetailer(client, retailer);
 
                     Thread.sleep(2000);
 
@@ -337,7 +337,7 @@ public abstract class AbstractScrapper implements Runnable {
         if(flag) {
 
             try {
-                logger.log(Level.INFO, "Descargando Scrap Diario " + cadena + "...");
+                logger.log(Level.INFO, "Descargando Scrap Diario " + retailer + "...");
                 generateScrap(since, until, 1, flag);
                 Thread.sleep(2000);
             }
@@ -363,7 +363,7 @@ public abstract class AbstractScrapper implements Runnable {
 
         if(flag) {
             try {
-                logger.log(Level.INFO, "Descargando Scrap Mensual " + cadena + "...");
+                logger.log(Level.INFO, "Descargando Scrap Mensual " + retailer + "...");
                 generateScrap(since, until, 2, flag);
                 Thread.sleep(2000);
             }
@@ -380,7 +380,7 @@ public abstract class AbstractScrapper implements Runnable {
             since = formatter.format(ProcessHelper.getInstance().getProcessDate().minusDays(6));
             if(flag) {
                 try {
-                    logger.log(Level.INFO, "Descargando Scrap Semanal " + cadena + "...");
+                    logger.log(Level.INFO, "Descargando Scrap Semanal " + retailer + "...");
                     generateScrap(since, until, 3, flag);
                     Thread.sleep(2000);
                 }
@@ -430,7 +430,7 @@ public abstract class AbstractScrapper implements Runnable {
                 }
                 doScrap(since, until);
                 FilesHelper.getInstance().checkLastFile(this, freq);
-                renameFile(cadena, count);
+                renameFile(retailer, count);
                 FilesHelper.getInstance().registerFileControlNew(this, freq);
                 downloads++;
 
@@ -539,7 +539,7 @@ public abstract class AbstractScrapper implements Runnable {
 
     @Override
     public String toString() {
-        return holding + " -> " + cadena;
+        return client + " -> " + retailer;
     }
 
     String calculateFrequency(String since, String until) {

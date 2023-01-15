@@ -150,11 +150,11 @@ public class MailHelper {
         String html = "";
 
         //for (AbstractScrapper scrapper : ProcessHelper.getInstance().getScrappers().values()) {
-        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByHolding(ProcessHelper.getInstance().getRetailer()).values()) {
+        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByRetailer(ProcessHelper.getInstance().getRetailer()).values()) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 // Solo archivos registrados con nombre proceso actual
                 if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
-                        fileControl.getFileName().toLowerCase().contains(scrapper.getHolding().toLowerCase())) {
+                        fileControl.getFileName().toLowerCase().contains(scrapper.getClient().toLowerCase())) {
 
                     String fileName = fileControl.getFileName();
                     String status = fileControl.getStatus();

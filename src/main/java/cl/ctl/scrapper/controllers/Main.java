@@ -12,14 +12,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
-import static cl.ctl.scrapper.model.ParameterEnum.TOKEN;
+import static cl.ctl.scrapper.model.ParameterEnum.*;
 
 /**
  * Created by root on 07-12-20.
@@ -37,19 +35,34 @@ public class Main {
         try {
             logger.addHandler(fh);
 
-            if(args.length < 2) {
-                logger.log(Level.SEVERE, "You need to provide Retailer and Token!!");
+            if(args.length < 10) {
+                //logger.log(Level.SEVERE, "You need to provide Retailer and Token!! exiting now");
+                throw new IllegalArgumentException("Some required parameters missing, you need to provide: RETAILER, BASE_URL_CONFIG, BASE_URL_TOKEN, USER_NAME and PASSWORD. Exiting now");
             }
 
-            String retailer = args[1];
+            for(int i = 0; i < args.length; ++i) {
+                switch (args[i].toUpperCase()) {
+                    case "-RETAILER":
+                        ConfigHelper.getInstance().setParameter(RETAILER.getParameter(), args[i+1]);
+                        break;
+                    case "-BASE_URL_CONFIG":
+                        ConfigHelper.getInstance().setParameter(BASE_URL_CONFIG.getParameter(), args[i+1]);
+                        break;
+                    case "-BASE_URL_TOKEN":
+                        ConfigHelper.getInstance().setParameter(BASE_URL_TOKEN.getParameter(), args[i+1]);
+                        break;
+                    case "-USERNAME":
+                        ConfigHelper.getInstance().setParameter(USER_NAME.getParameter(), args[i+1]);
+                        break;
+                    case "-PASSWORD":
+                        ConfigHelper.getInstance().setParameter(PASSWORD.getParameter(), args[i+1]);
+                        break;
+                }
+            }
 
-            ConfigHelper.getInstance().setParameter("RETAILER", retailer);
+            TokenHelper.getInstance().start();
 
-            String token = args[1];
-
-            ConfigHelper.getInstance().setParameter(TOKEN.name(), token);
-
-            logger.log(Level.INFO, "Loading parameters from ScrapperService...");
+            logger.log(Level.INFO, "Loading parameters from ScrapperConfig...");
             ParamsHelper.getInstance().loadParameters();
 
         } catch (SecurityException e) {
@@ -57,22 +70,7 @@ public class Main {
             e.printStackTrace();
         }
 
-
-        /*
-        LocalDate localDate = LocalDate.of(2021, 4, 9);
-        LocalDate today = LocalDate.now();
-
-        while(localDate.isBefore(today)) {
-            //ProcessHelper.getInstance().setProcessDate(localDate);
-            scrap();
-            localDate = localDate.plusDays(1);
-            return;
-        }
-        */
-
     }
-
-
 
 
 }

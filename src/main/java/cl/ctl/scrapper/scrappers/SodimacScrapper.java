@@ -18,8 +18,8 @@ public class SodimacScrapper extends AbstractScrapper {
 
     public SodimacScrapper() throws IOException {
         super();
-        holding = "Legrand";
-        cadena = "Sodimac";
+        client = "Legrand";
+        retailer = "Sodimac";
         url = "https://b2b.sodimac.com/b2bsocopr/grafica/html/index.html";
         logo = "sodimac.jpg";
         onlyDiary = true;
@@ -27,9 +27,9 @@ public class SodimacScrapper extends AbstractScrapper {
         hasCompany = true;
     }
 
-    public SodimacScrapper(String holding) throws IOException {
+    public SodimacScrapper(String client) throws IOException {
         this();
-        this.holding = holding;
+        this.client = client;
     }
 
     void login() throws InterruptedException {

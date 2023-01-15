@@ -25,16 +25,16 @@ public class SmuScrapper extends AbstractScrapper {
 
     public SmuScrapper() throws IOException {
         super();
-        holding = "Nutrisa";
-        cadena = "SMU";
+        client = "Nutrisa";
+        retailer = "SMU";
         url = "https://sso.bbr.cl/auth/realms/unimarc/protocol/openid-connect/auth?response_type=code&client_id=unimarc-client-prod&redirect_uri=https%3A%2F%2Fb2b.smu.cl%2FBBRe-commerce%2Fmain&state=175f2d2f-36ee-4575-aae0-28075fd437ab&login=true&scope=openid";
         logo = "smu.jpg";
         fileExt = ".xlsx";
     }
 
-    public SmuScrapper(String holding) throws IOException {
+    public SmuScrapper(String client) throws IOException {
         this();
-        this.holding = holding;
+        this.client = client;
     }
 
     void login() throws Exception {

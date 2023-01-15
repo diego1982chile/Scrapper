@@ -24,15 +24,15 @@ public class EasyScrapper extends AbstractScrapper {
 
     public EasyScrapper() throws IOException {
         super();
-        holding = "Legrand";
-        cadena = "Easy";
+        client = "Legrand";
+        retailer = "Easy";
         url = "https://www.cenconlineb2b.com/auth/realms/cencosud/protocol/openid-connect/auth?response_type=code&client_id=easycl-client-prod&redirect_uri=https%3A%2F%2Fwww.cenconlineb2b.com%2FEasyCL%2FBBRe-commerce%2Fswf%2Fmain.html&state=bad15b30-d2d2-4738-8409-ffaad6602ac6&login=true&scope=openid";
         logo = "easy.jpg";
     }
 
-    public EasyScrapper(String holding) throws IOException {
+    public EasyScrapper(String client) throws IOException {
         this();
-        this.holding = holding;
+        this.client = client;
     }
 
     void login() throws Exception {

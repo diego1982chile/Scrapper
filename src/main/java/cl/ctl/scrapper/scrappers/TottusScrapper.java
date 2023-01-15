@@ -17,16 +17,16 @@ public class TottusScrapper extends AbstractScrapper {
 
     public TottusScrapper() throws IOException {
         super();
-        cadena = "Tottus";
-        holding = "Nutrisa";
+        retailer = "Tottus";
+        client = "Nutrisa";
         url = "https://b2b.tottus.com/b2btoclpr/grafica/html/index.html";
         logo = "tottus.jpg";
         hasCompany = true;
     }
 
-    public TottusScrapper(String holding) throws IOException {
+    public TottusScrapper(String client) throws IOException {
         this();
-        this.holding = holding;
+        this.client = client;
     }
 
     void login() throws InterruptedException {

@@ -126,13 +126,13 @@ public class UploadHelper {
     public void uploadFiles() throws JSchException, IOException {
         String local = FilesHelper.getInstance().getUploadPath();
 
-        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByHolding(ProcessHelper.getInstance().getHolding()).values()) {
+        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByRetailer(ProcessHelper.getInstance().getRetailer()).values()) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 if(!fileControl.getStatus().equalsIgnoreCase("Error")) {
                     try {
                         // Solo archivos registrados con nombre proceso actual y cliente proceso actual
                         if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
-                                fileControl.getFileName().toLowerCase().contains(scrapper.getHolding().toLowerCase())
+                                fileControl.getFileName().toLowerCase().contains(scrapper.getClient().toLowerCase())
                                 && scrapper.getNewScraps().contains(fileControl.getFileName())
                                 //&& fileControl.isNew()
                                 ) {
@@ -158,13 +158,13 @@ public class UploadHelper {
     public void copyFiles() throws JSchException, IOException {
         String local = FilesHelper.getInstance().getUploadPath();
 
-        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByHolding(ProcessHelper.getInstance().getHolding()).values()) {
+        for (AbstractScrapper scrapper : ScrapperHelper.getInstance().getScrappersByRetailer(ProcessHelper.getInstance().getRetailer()).values()) {
             for (FileControl fileControl : scrapper.getFileControlList()) {
                 if(!fileControl.getStatus().equalsIgnoreCase("Error")) {
                     try {
                         // Solo archivos registrados con nombre proceso actual y cliente proceso actual
                         if(fileControl.getFileName().contains(FilesHelper.getInstance().PROCESS_NAME) &&
-                                fileControl.getFileName().toLowerCase().contains(scrapper.getHolding().toLowerCase())
+                                fileControl.getFileName().toLowerCase().contains(scrapper.getClient().toLowerCase())
                                 && scrapper.getNewScraps().contains(fileControl.getFileName())
                                 //&& fileControl.isNew()
                             ) {
