@@ -14,6 +14,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import static cl.ctl.scrapper.model.ParameterEnum.*;
+
 /**
  * Created by des01c7 on 17-12-20.
  */
@@ -24,20 +26,20 @@ public class UploadHelper {
     private static Channel sftp;
     private static ChannelSftp sftpChannel;
 
-    private static String server = ConfigHelper.getInstance().CONFIG.get("upload.server");
+    private static String server = ConfigHelper.getInstance().getParameter(UPLOAD_SERVER.getParameter());
 
     private static String destiny = "/di/projects/Legrand/_Scraps_Hoy/";
-    private static String remote = ConfigHelper.getInstance().CONFIG.get("upload.path");//"/home/dsoto/temp/";
+    private static String remote = ConfigHelper.getInstance().getParameter(UPLOAD_PATH.getParameter()); //"/home/dsoto/temp/";
 
-    private static String target = ConfigHelper.getInstance().CONFIG.get("upload.target");;
+    private static String target = ConfigHelper.getInstance().getParameter(UPLOAD_TARGET.getParameter());
 
-    private static String user =  ConfigHelper.getInstance().CONFIG.get("upload.user");//"dsoto";
-    private static String host = ConfigHelper.getInstance().CONFIG.get("upload.host");//"cfiedler.dyndns.org";
+    private static String user =  ConfigHelper.getInstance().getParameter(UPLOAD_USER.getParameter()); //"dsoto";
+    private static String host = ConfigHelper.getInstance().getParameter(UPLOAD_HOST.getParameter()); //"cfiedler.dyndns.org";
     int port = 22;
 
     private static final int CHANNEL_TIMEOUT = 5000;
 
-    private static String keyPassword = ConfigHelper.getInstance().CONFIG.get("upload.password");//"diegoabelardo";
+    private static String keyPassword = ConfigHelper.getInstance().getParameter(UPLOAD_PASSWORD.getParameter()); //"diegoabelardo";
 
     /** Logger para la clase */
     private static final Logger logger = Logger.getLogger(UploadHelper.class.getName());

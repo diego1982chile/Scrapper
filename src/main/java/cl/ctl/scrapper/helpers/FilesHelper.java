@@ -23,6 +23,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import static cl.ctl.scrapper.model.ParameterEnum.FILE_DOWNLOAD_PATH;
+
 /**
  * Created by des01c7 on 17-12-20.
  */
@@ -30,18 +32,18 @@ public class FilesHelper {
 
     //String DOWNLOAD_PATH = System.getProperty("user.home");;
 
-    String DOWNLOAD_PATH = ConfigHelper.getInstance().CONFIG.get("file.download_path");//"C:\\Users\\home-user\\Downloads";
+    private String DOWNLOAD_PATH = ConfigHelper.getInstance().getParameter(FILE_DOWNLOAD_PATH.getParameter()); //"C:\\Users\\home-user\\Downloads";
 
     String PROCESS_NAME;
 
     JSONParser parser = new JSONParser();
 
-    String SEPARATOR;
+    private String SEPARATOR;
 
     /** Logger para la clase */
     private static final Logger logger = Logger.getLogger(FilesHelper.class.getName());
 
-    static LogHelper fh = LogHelper.getInstance();
+    private static LogHelper fh = LogHelper.getInstance();
 
     private static final FilesHelper instance = new FilesHelper();
 
@@ -55,7 +57,7 @@ public class FilesHelper {
     }
 
 
-    public void flushProcessName() {
+    void flushProcessName() {
         String month = String.valueOf(ProcessHelper.getInstance().getProcessDate().getMonthValue());
 
         if(ProcessHelper.getInstance().getProcessDate().getMonthValue() < 10) {

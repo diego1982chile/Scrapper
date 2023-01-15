@@ -1,9 +1,6 @@
 package cl.ctl.scrapper.scrappers;
 
-import cl.ctl.scrapper.helpers.AccountHelper;
-import cl.ctl.scrapper.helpers.ConfigHelper;
 import cl.ctl.scrapper.helpers.ProcessHelper;
-import cl.ctl.scrapper.model.Account;
 import cl.ctl.scrapper.model.exceptions.MultipleSubmitsSameRequestException;
 import cl.ctl.scrapper.model.exceptions.NoReportsException;
 import cl.ctl.scrapper.model.exceptions.TimeOutException;
@@ -24,7 +21,7 @@ import java.util.logging.Level;
 /**
  * Created by des01c7 on 16-12-20.
  */
-public class WalMartScrapper extends AbstractScrapper {
+public class WalmartScrapper extends AbstractScrapper {
 
     Robot robot;
 
@@ -36,7 +33,7 @@ public class WalMartScrapper extends AbstractScrapper {
 
     Map<String, String> jobIds = new HashMap<>();
 
-    public WalMartScrapper() throws IOException {
+    public WalmartScrapper() throws IOException {
         super();
         retailer = "WalMart";
         client = "Nutrisa";
@@ -54,7 +51,7 @@ public class WalMartScrapper extends AbstractScrapper {
         locales.put("querySubmitted","Query Submitted");
     }
 
-    public WalMartScrapper(String client) throws IOException {
+    public WalmartScrapper(String client) throws IOException {
         this();
         this.client = client;
     }

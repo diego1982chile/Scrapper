@@ -33,14 +33,10 @@ public class ParamsHelper {
 
     private static final ParamsHelper instance = new ParamsHelper();
 
-    private static Timer timer;
-
     /** Logger para la clase */
     private static Logger logger;
 
     static LogHelper fh;
-
-    private static final String BASE_URL = "http://localhost:8080/ScrapperService/api/";
 
     private static String PARAMETERS_ENDPOINT;
 
@@ -55,10 +51,9 @@ public class ParamsHelper {
      */
     private ParamsHelper() {
 
-        PARAMETERS_ENDPOINT = BASE_URL + "parameters";
-        SCHEDULES_ENDPOINT = BASE_URL + "schedules/" + ConfigHelper.getInstance().getParameter(RETAILER.getParameter());
+        PARAMETERS_ENDPOINT = ConfigHelper.getInstance().getParameter(BASE_URL_CONFIG.getParameter()) + "parameters";
+        SCHEDULES_ENDPOINT = ConfigHelper.getInstance().getParameter(BASE_URL_CONFIG.getParameter()) + "schedules/" + ConfigHelper.getInstance().getParameter(RETAILER.getParameter());
 
-        timer  = new Timer();
         fh = LogHelper.getInstance();
         logger = Logger.getLogger(ParamsHelper.class.getName());
         logger.addHandler(fh);
@@ -67,7 +62,7 @@ public class ParamsHelper {
 
     public void loadParameters() throws Exception {
 
-        Thread.sleep(5000);
+        Thread.sleep(2000);
 
         populateSchedules();
         populateParameters();
@@ -110,7 +105,7 @@ public class ParamsHelper {
                 .findFirst()
                 .orElseThrow(() -> new MissingParameterException("No parameter " + MAIL_FROM_USER.getParameter() + " found"));
 
-        ConfigHelper.getInstance().setParameter(MAIL_FROM_USER.name(), mailFromUser);
+        ConfigHelper.getInstance().setParameter(MAIL_FROM_USER.getParameter(), mailFromUser);
 
         String mailTo = parameters.stream()
                 .filter(e -> e.getName().equals(MAIL_TO.getParameter()))
@@ -159,6 +154,14 @@ public class ParamsHelper {
                 .orElseThrow(() -> new MissingParameterException("No parameter " + UPLOAD_TARGET.getParameter() + " found"));
 
         ConfigHelper.getInstance().setParameter(UPLOAD_TARGET.getParameter(), uploadTarget);
+
+        String uploadUser = parameters.stream()
+                .filter(e -> e.getName().equals(UPLOAD_USER.getParameter()))
+                .map(Parameter::getValue)
+                .findFirst()
+                .orElseThrow(() -> new MissingParameterException("No parameter " + UPLOAD_USER.getParameter() + " found"));
+
+        ConfigHelper.getInstance().setParameter(UPLOAD_USER.getParameter(), uploadUser);
 
         // Leyendo schedules
         SchedulerHelper.getInstance().schedule(schedules);

@@ -14,6 +14,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import static cl.ctl.scrapper.model.ParameterEnum.CAPTCHA_API_KEY;
+
 /**
  * Created by des01c7 on 17-12-20.
  */
@@ -28,7 +30,7 @@ public class CaptchaHelper {
 
     final String API_BASE_URL = "http://2captcha.com/" ;
     //public static final String API_KEY = "78dba8221a8530a80ab8ac1b676389ad";
-    public static final String API_KEY = ConfigHelper.getInstance().CONFIG.get("captcha.api_key");
+    public static final String API_KEY = ConfigHelper.getInstance().getParameter(CAPTCHA_API_KEY.getParameter());
 
     String BASE_URL;
 

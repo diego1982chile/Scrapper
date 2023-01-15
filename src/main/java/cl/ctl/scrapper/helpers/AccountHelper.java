@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static cl.ctl.scrapper.model.ParameterEnum.BASE_URL_CONFIG;
 import static cl.ctl.scrapper.model.ParameterEnum.TOKEN;
 
 /**
@@ -26,7 +27,7 @@ public class AccountHelper {
 
     public Map<String, String> CONFIG = new HashMap<>();
 
-    private static final String ENDPOINT = "http://localhost:8181/AccountService/api/accounts/";
+    private static String ACCOUNTS_ENDPOINT;
 
     private static final Logger logger = Logger.getLogger(ConfigHelper.class.getName());
 
@@ -34,7 +35,7 @@ public class AccountHelper {
      * Constructor privado para el Singleton del Factory.
      */
     public AccountHelper() {
-
+        ACCOUNTS_ENDPOINT = ConfigHelper.getInstance().getParameter(BASE_URL_CONFIG.getParameter()) + "accounts/";
     }
 
     public Account getAccountByClientAndRetailer(String client, String retailer) {
@@ -46,7 +47,7 @@ public class AccountHelper {
 
         try {
 
-            URL url = new URL(ENDPOINT + client.toLowerCase() + "/" + retailer.toLowerCase());
+            URL url = new URL(ACCOUNTS_ENDPOINT + client.toLowerCase() + "/" + retailer.toLowerCase());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
@@ -60,7 +61,6 @@ public class AccountHelper {
             BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
 
             String output;
-            System.out.println("Output from Server .... \n");
 
             while ((output = br.readLine()) != null) {
                 ObjectMapper mapper = new ObjectMapper();

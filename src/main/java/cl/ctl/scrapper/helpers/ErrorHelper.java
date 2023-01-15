@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
+import static cl.ctl.scrapper.model.ParameterEnum.ERROR_TO;
+import static cl.ctl.scrapper.model.ParameterEnum.MAIL_FROM_PASSWORD;
+import static cl.ctl.scrapper.model.ParameterEnum.MAIL_FROM_USER;
+
 /**
  * @author Diego Soto
  */
@@ -37,17 +41,17 @@ public class ErrorHelper {
 
     //private static final String from = "sistemas@minsal.cl";//"semantikos.minsal@gmail.com";
 
-    private static final String from = ConfigHelper.getInstance().CONFIG.get("mail.from.user"); //"diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
+    private static final String from = ConfigHelper.getInstance().getParameter(MAIL_FROM_USER.getParameter());
 
     //private static final String to = "diego.abelardo.soto@gmail.com";
 
     //private static final String to = "cristian.fiedler@fiedler-bi.com";//"semantikos.minsal@gmail.com";
 
-    private static final String to = ConfigHelper.getInstance().CONFIG.get("error.to");//"diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
+    private static final String to = ConfigHelper.getInstance().getParameter(ERROR_TO.getParameter());
 
-    private static final String username = ConfigHelper.getInstance().CONFIG.get("mail.from.user"); //"diego.abelardo.soto@gmail.com";
+    private static final String username = ConfigHelper.getInstance().getParameter(MAIL_FROM_USER.getParameter()); //"diego.abelardo.soto@gmail.com";
 
-    private static final String password = ConfigHelper.getInstance().CONFIG.get("mail.from.password");
+    private static final String password = ConfigHelper.getInstance().getParameter(MAIL_FROM_PASSWORD.getParameter());
 
     private static final String subject = "CTL - Descarga Scraps";
 
@@ -83,9 +87,9 @@ public class ErrorHelper {
         return instance;
     }
 
-    public void sendMail() throws Exception {
+    void sendMail() throws Exception {
 
-        this.body = "";
+        body = "";
 
         if(flag) {
            return;
@@ -107,10 +111,10 @@ public class ErrorHelper {
         String executionMonth = WordUtils.capitalize(LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES")));
         String executionYear = String.valueOf(LocalDate.now().getYear());
 
-        this.body = this.body.replace("[Process]", FilesHelper.getInstance().PROCESS_NAME);
-        this.body = this.body.replace("[ProcessDay]", weekProcessDay + " " + processMonthDay + " de " + processMonth + " del " + processYear);
-        this.body = this.body.replace("[ExecutionDay]", weekExecutionDay + " " + executionMonthDay + " de " + executionMonth + " del " + executionYear);
-        this.body = this.body.replace("%email%", to);
+        body = body.replace("[Process]", FilesHelper.getInstance().PROCESS_NAME);
+        body = body.replace("[ProcessDay]", weekProcessDay + " " + processMonthDay + " de " + processMonth + " del " + processYear);
+        body = body.replace("[ExecutionDay]", weekExecutionDay + " " + executionMonthDay + " de " + executionMonth + " del " + executionYear);
+        body = body.replace("%email%", to);
 
 
         addRecords();
@@ -161,7 +165,7 @@ public class ErrorHelper {
             html = html + html2;
         }
 
-        this.body = this.body.replace("[rows]", html);
+        body = body.replace("[rows]", html);
     }
 
     private void send() throws MessagingException {

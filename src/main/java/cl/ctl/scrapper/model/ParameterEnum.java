@@ -21,7 +21,8 @@ public enum ParameterEnum {
     UPLOAD_PASSWORD("upload.password"),
     UPLOAD_PATH("upload.path"),
     UPLOAD_SERVER("upload.server"),
-    UPLOAD_TARGET("upload.target");
+    UPLOAD_TARGET("upload.target"),
+    UPLOAD_USER("upload.user");
 
     private String parameter;
 

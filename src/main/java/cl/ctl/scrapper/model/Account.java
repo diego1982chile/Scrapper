@@ -17,18 +17,18 @@ public class Account {
 
     private Client client;
 
-    private Holding holding;
+    private Retailer retailer;
 
     public Account() {
     }
 
-    public Account(long id, String company, String user, String password, Client client, Holding holding) {
+    public Account(long id, String company, String user, String password, Client client, Retailer retailer) {
         this.id = id;
         this.company = company;
         this.user = user;
         this.password = password;
         this.client = client;
-        this.holding = holding;
+        this.retailer = retailer;
     }
 
     public long getId() {
@@ -71,11 +71,11 @@ public class Account {
         this.client = client;
     }
 
-    public Holding getHolding() {
-        return holding;
+    public Retailer getRetailer() {
+        return retailer;
     }
 
-    public void setHolding(Holding holding) {
-        this.holding = holding;
+    public void setRetailer(Retailer retailer) {
+        this.retailer = retailer;
     }
 }

@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
+import static cl.ctl.scrapper.model.ParameterEnum.MAIL_FROM_PASSWORD;
+import static cl.ctl.scrapper.model.ParameterEnum.MAIL_FROM_USER;
+import static cl.ctl.scrapper.model.ParameterEnum.MAIL_TO;
+
 /**
  * @author Diego Soto
  */
@@ -37,17 +41,17 @@ public class MailHelper {
 
     //private static final String from = "sistemas@minsal.cl";//"semantikos.minsal@gmail.com";
 
-    private static final String from = ConfigHelper.getInstance().CONFIG.get("mail.from.user"); //"diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
+    private static final String from = ConfigHelper.getInstance().getParameter(MAIL_FROM_USER.getParameter());  //"diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
 
     //private static final String to = "diego.abelardo.soto@gmail.com";
 
     //private static final String to = "cristian.fiedler@fiedler-bi.com";//"semantikos.minsal@gmail.com";
 
-    private static final String to = ConfigHelper.getInstance().CONFIG.get("mail.to");//"diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
+    private static final String to = ConfigHelper.getInstance().getParameter(MAIL_TO.getParameter()); //"diego.abelardo.soto@gmail.com";//"semantikos.minsal@gmail.com";
 
-    private static final String username = ConfigHelper.getInstance().CONFIG.get("mail.from.user"); //"diego.abelardo.soto@gmail.com";
+    private static final String username = ConfigHelper.getInstance().getParameter(MAIL_FROM_USER.getParameter()); //"diego.abelardo.soto@gmail.com";
 
-    private static final String password = ConfigHelper.getInstance().CONFIG.get("mail.from.password");;
+    private static final String password = ConfigHelper.getInstance().getParameter(MAIL_FROM_PASSWORD.getParameter());
 
     private static String subject = "CTL - Descarga Scraps";
 
@@ -83,7 +87,7 @@ public class MailHelper {
 
     public void sendMail() throws IOException, MessagingException {
 
-        this.body = "";
+        body = "";
         loadMailBody();
 
         List<FileControl> fileControlList = LogHelper.getInstance().getFileControlList();
@@ -106,12 +110,12 @@ public class MailHelper {
 
         subject = "Scraps CTL: Proceso " + FilesHelper.getInstance().PROCESS_NAME + " - " + server;
 
-        this.body = this.body.replace("[Server]", server);
-        this.body = this.body.replace("[Process]", FilesHelper.getInstance().PROCESS_NAME);
-        this.body = this.body.replace("[Retailer]", ProcessHelper.getInstance().getRetailer());
-        this.body = this.body.replace("[ProcessDay]", weekProcessDay + " " + processMonthDay + " de " + processMonth + " del " + processYear);
-        this.body = this.body.replace("[ExecutionDay]", weekExecutionDay + " " + executionMonthDay + " de " + executionMonth + " del " + executionYear);
-        this.body = this.body.replace("%email%", to);
+        body = body.replace("[Server]", server);
+        body = body.replace("[Process]", FilesHelper.getInstance().PROCESS_NAME);
+        body = body.replace("[Retailer]", ProcessHelper.getInstance().getRetailer());
+        body = body.replace("[ProcessDay]", weekProcessDay + " " + processMonthDay + " de " + processMonth + " del " + processYear);
+        body = body.replace("[ExecutionDay]", weekExecutionDay + " " + executionMonthDay + " de " + executionMonth + " del " + executionYear);
+        body = body.replace("%email%", to);
 
         addRecords();
 
@@ -184,7 +188,7 @@ public class MailHelper {
             }
         }
 
-        this.body = this.body.replace("[rows]", html);
+        body = body.replace("[rows]", html);
     }
 
     private void send() throws MessagingException {
