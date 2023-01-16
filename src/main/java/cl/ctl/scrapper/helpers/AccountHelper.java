@@ -1,6 +1,7 @@
 package cl.ctl.scrapper.helpers;
 
 import cl.ctl.scrapper.model.Account;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -64,6 +65,7 @@ public class AccountHelper {
 
             while ((output = br.readLine()) != null) {
                 ObjectMapper mapper = new ObjectMapper();
+                mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 JsonNode tree = mapper.readTree(output);
 
                 account = mapper.treeToValue(tree, Account.class);

@@ -42,6 +42,9 @@ public class Main {
 
             for(int i = 0; i < args.length; ++i) {
                 switch (args[i].toUpperCase()) {
+                    case "-CLIENT":
+                        ConfigHelper.getInstance().setParameter(CLIENT.getParameter(), args[i+1]);
+                        break;
                     case "-RETAILER":
                         ConfigHelper.getInstance().setParameter(RETAILER.getParameter(), args[i+1]);
                         break;
@@ -64,6 +67,16 @@ public class Main {
 
             logger.log(Level.INFO, "Loading parameters from ScrapperConfig...");
             ParamsHelper.getInstance().loadParameters();
+
+            if(ConfigHelper.getInstance().getParameter(CLIENT.getParameter()) == null) {
+                 SchedulerHelper.getInstance().loadSchedules();
+            }
+            else {
+                // We set client for development/testing purposes, in this case we don't want scheduling, but rather
+                // a direct immediate execution of the scrapper for that specific client/retailer pair
+                ProcessHelper.getInstance().process(ConfigHelper.getInstance().getParameter(RETAILER.getParameter()));
+            }
+
 
         } catch (SecurityException e) {
             logger.log(Level.SEVERE, e.getMessage());

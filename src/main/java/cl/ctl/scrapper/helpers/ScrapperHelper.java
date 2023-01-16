@@ -1,18 +1,18 @@
 package cl.ctl.scrapper.helpers;
 
-import cl.ctl.scrapper.model.*;
+import cl.ctl.scrapper.model.Account;
+import cl.ctl.scrapper.model.Client;
+import cl.ctl.scrapper.model.Retailer;
 import cl.ctl.scrapper.model.exceptions.MissingParameterException;
-import cl.ctl.scrapper.scrappers.*;
+import cl.ctl.scrapper.scrappers.AbstractScrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.internal.StringUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
@@ -21,9 +21,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static cl.ctl.scrapper.model.ParameterEnum.BASE_URL_CONFIG;
-import static cl.ctl.scrapper.model.ParameterEnum.RETAILER;
-import static cl.ctl.scrapper.model.ParameterEnum.TOKEN;
+import static cl.ctl.scrapper.model.ParameterEnum.*;
 
 /**
  * Created by des01c7 on 18-12-20.
@@ -44,11 +42,11 @@ public class ScrapperHelper {
 
     private static String RETAILERS_ENDPOINT;
 
-    private List<Account> accounts;
+    private List<Account> accounts = new ArrayList<>();
 
-    private List<Client> clients;
+    private List<Client> clients = new ArrayList<>();
 
-    private List<Retailer> retailers;
+    private List<Retailer> retailers = new ArrayList<>();
 
     /**
      * Constructor privado para el Singleton del Factory.
@@ -174,6 +172,12 @@ public class ScrapperHelper {
     }
 
     private void populateClients() throws IOException, MissingParameterException {
+
+        if(ConfigHelper.getInstance().getParameter(CLIENT.getParameter()) != null) {
+            Client client = new Client(-1, ConfigHelper.getInstance().getParameter(CLIENT.getParameter()));
+            clients.add(client);
+            return;
+        }
 
         URL url = new URL(CLIENTS_ENDPOINT);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();

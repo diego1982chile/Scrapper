@@ -9,6 +9,7 @@ public enum ParameterEnum {
     PASSWORD("password"),
     BASE_URL_TOKEN("base_url_token"),
     BASE_URL_CONFIG("base_url_config"),
+    CLIENT("client"),
     RETAILER("retailer"),
     TOKEN("token"),
     CAPTCHA_API_KEY("captcha.api_key"),

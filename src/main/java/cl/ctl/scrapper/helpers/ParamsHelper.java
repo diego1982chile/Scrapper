@@ -40,11 +40,8 @@ public class ParamsHelper {
 
     private static String PARAMETERS_ENDPOINT;
 
-    private static String SCHEDULES_ENDPOINT;
-
     private List<Parameter> parameters;
 
-    private List<Schedule> schedules;
 
     /**
      * Constructor privado para el Singleton del Factory.
@@ -52,7 +49,6 @@ public class ParamsHelper {
     private ParamsHelper() {
 
         PARAMETERS_ENDPOINT = ConfigHelper.getInstance().getParameter(BASE_URL_CONFIG.getParameter()) + "parameters";
-        SCHEDULES_ENDPOINT = ConfigHelper.getInstance().getParameter(BASE_URL_CONFIG.getParameter()) + "schedules/" + ConfigHelper.getInstance().getParameter(RETAILER.getParameter());
 
         fh = LogHelper.getInstance();
         logger = Logger.getLogger(ParamsHelper.class.getName());
@@ -64,7 +60,6 @@ public class ParamsHelper {
 
         Thread.sleep(2000);
 
-        populateSchedules();
         populateParameters();
 
         String captchaApiKey = parameters.stream()
@@ -163,9 +158,6 @@ public class ParamsHelper {
 
         ConfigHelper.getInstance().setParameter(UPLOAD_USER.getParameter(), uploadUser);
 
-        // Leyendo schedules
-        SchedulerHelper.getInstance().schedule(schedules);
-
     }
 
     public static ParamsHelper getInstance() {
@@ -200,41 +192,6 @@ public class ParamsHelper {
             if(parameters.isEmpty()) {
                 throw new MissingParameterException("Empty parameter list retrieved from ScrapperConfig!!");
             }
-        }
-
-        conn.disconnect();
-
-    }
-
-    private void populateSchedules() throws IOException, MissingParameterException {
-
-        URL url = new URL(SCHEDULES_ENDPOINT);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("Accept", "application/json");
-        conn.setRequestProperty("Authorization", "Bearer " + ConfigHelper.getInstance().getParameter(TOKEN.getParameter()));
-
-        if (conn.getResponseCode() != 200) {
-            throw new RuntimeException("Failed : HTTP error code : "
-                    + conn.getResponseCode());
-        }
-
-        BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-
-        String output;
-
-        while ((output = br.readLine()) != null) {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            ObjectReader objectReader = mapper.reader().forType(new TypeReference<List<Schedule>>() {
-            });
-
-            schedules = objectReader.readValue(output);
-
-            if(schedules.isEmpty()) {
-                throw new MissingParameterException("Empty schedule list retrieved from ScrapperConfig!!");
-            }
-
         }
 
         conn.disconnect();
